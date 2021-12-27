@@ -1,0 +1,16 @@
+http:= import("http")
+fmt := import("fmt")
+
+host:= "www.baidu.com"
+port:= 80
+isSSL:=false
+timeOut:=10000
+
+client := http.newHttpClient(host,port,isSSL,10000)
+request := http.newHttpRequest("get","/").addHeader("User-Agent","GOClient")
+
+res := client.send(request)
+
+fmt.println(res.getStatusCode())
+//fmt.println(res.getBodyAsString())
+fmt.println(res.getHeader("Content-Type"))
