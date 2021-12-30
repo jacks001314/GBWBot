@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"github.com/cbot/proto/http"
+	"github.com/cbot/proto/transport"
 	"github.com/d5/tengo/compiler/token"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
 	"github.com/d5/tengo/stdlib"
 	"io/ioutil"
+	"time"
 )
 
 func testHttp(){
@@ -221,9 +224,65 @@ func testScript(){
 
 }
 
+func testTcpScript(){
+
+	path:="D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\tcp.tengo"
+	data,_:=ioutil.ReadFile(path)
+	script := script.New(data)
+
+	mm := objects.NewModuleMap()
+	mm.Add("transport", transport.TransportTengo{})
+	mm.AddMap(stdlib.GetModuleMap("fmt"))
+	script.SetImports(mm)
+
+	// run the script
+	_, err := script.RunContext(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	//objects.Map{}
+
+}
+
+func testConnection(){
+
+	addr := "www.sohu.com:443"
+	timout := 30*time.Second
+
+	req := "GET / HTTP/1.1\r\nHost: www.sohu.com\r\nUser-Agent: go-client\r\n\r\n"
+
+	conn,err := transport.Dial("tcp",addr,transport.DialConnectTimeout(timout),
+		transport.DialReadTimeout(timout),
+		transport.DialWriteTimeout(timout),
+		transport.DialTLSHandshakeTimeout(timout),
+		transport.DialTLSSkipVerify(true),
+		transport.DialUseTLS(true))
+
+	if err!=nil {
+		fmt.Println(err)
+		return
+	}
+
+
+	//conn.WriteString(req)
+	conn.WriteHex(hex.EncodeToString([]byte(req)))
+	conn.Flush()
+
+	data,err:= conn.ReadBytes(1024)
+
+	defer conn.Close()
+
+	fmt.Println(string(data))
+
+}
+
 func main() {
 
-	testScript()
+	//testConnection()
+	//testScript()
 	//testHttp()
+
+	testTcpScript()
 }
 

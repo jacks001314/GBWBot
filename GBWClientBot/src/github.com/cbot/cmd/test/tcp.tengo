@@ -1,0 +1,20 @@
+transport := import("transport")
+fmt := import("fmt")
+
+network := "tcp"
+host := "www.sohu.com"
+port := 443
+isSSL := true
+timeOut := 10000
+conn := transport.newConnection(network,host,port,isSSL,timeOut,timeOut,timeOut)
+
+conn.writeString("GET / HTTP/1.1\r\n")
+conn.writeString("Host: www.sohu.com\r\n")
+conn.writeString("User-Agent: go-client\r\n\r\n")
+conn.flush()
+
+fmt.println(conn.readLineAsString())
+fmt.println(conn.readLineAsString())
+fmt.println(conn.readBytesAsString(1024))
+conn.close()
+

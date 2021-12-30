@@ -621,7 +621,6 @@ var moduleMap objects.Object = &objects.ImmutableMap{
 
 func (HttpTengo) Import(moduleName string) (interface{}, error) {
 
-	fmt.Println(moduleName)
 	switch moduleName {
 	case "http":
 		return moduleMap, nil

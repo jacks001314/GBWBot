@@ -7,7 +7,7 @@ isSSL:=false
 timeOut:=10000
 
 client := http.newHttpClient(host,port,isSSL,10000)
-request := http.newHttpRequest("get","/").addHeader("User-Agent","GOClient")
+request := http.newHttpRequest("get","/").addHeader("User-Agent","GOClient").addHeader("Fuck","you!!!")
 
 res := client.send(request)
 
