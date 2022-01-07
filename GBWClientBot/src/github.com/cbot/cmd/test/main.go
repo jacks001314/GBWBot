@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/cbot/ip"
 	"github.com/cbot/proto/http"
 	"github.com/cbot/proto/transport"
+	"github.com/cbot/utils/netutils"
 	"github.com/d5/tengo/compiler/token"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
@@ -277,12 +279,47 @@ func testConnection(){
 
 }
 
+
+func testIPConstraint(){
+
+	con := ip.NewConstraint(0)
+
+	con.Set(netutils.IPStrToInt("128.128.0.0"), 1, 22)
+	con.Set(netutils.IPStrToInt("128.128.0.0"), 1, 1)
+	con.Set(netutils.IPStrToInt("128.0.0.0"), 1, 1)
+	con.Set(netutils.IPStrToInt("10.0.0.0"), 24, 1)
+	con.Set(netutils.IPStrToInt("10.0.0.0"), 24, 0)
+	con.Set(netutils.IPStrToInt("10.11.12.0"), 24, 1)
+	con.Set(netutils.IPStrToInt("141.212.0.0"), 16, 0)
+
+
+
+	fmt.Printf("count(0)=%d\n", con.CountIPS( 0))
+	fmt.Printf("count(1)=%d\n", con.CountIPS( 1))
+	fmt.Printf("%d\n",con.LookupIP(netutils.IPStrToInt("10.11.12.0")))
+
+	fmt.Println(con.CountIPS( 0) + con.CountIPS(1) == 1 << 32)
+
+}
+
+/*
+int main(void)
+{
+
+
+
+	constraint_free(con);
+}
+*/
+
 func main() {
 
 	//testConnection()
 	//testScript()
 	//testHttp()
 
-	testTcpScript()
+	//testTcpScript()
+
+	testIPConstraint()
 }
 
