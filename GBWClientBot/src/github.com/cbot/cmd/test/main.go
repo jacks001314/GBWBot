@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cbot/ip"
+	"github.com/cbot/genip"
 	"github.com/cbot/proto/http"
 	"github.com/cbot/proto/transport"
 	"github.com/cbot/utils/netutils"
@@ -282,7 +282,7 @@ func testConnection(){
 
 func testIPConstraint(){
 
-	con := ip.NewConstraint(0)
+	con := genip.NewConstraint(0)
 
 	con.Set(netutils.IPStrToInt("128.128.0.0"), 1, 22)
 	con.Set(netutils.IPStrToInt("128.128.0.0"), 1, 1)
@@ -302,15 +302,22 @@ func testIPConstraint(){
 
 }
 
-/*
-int main(void)
-{
+func testIPGen(){
 
+	//wlist := []string {"192.168.1.0/24","10.0.1.0/24"}
+	//blist := []string {"192.168.1.1","10.0.1.1","10.0.1.0"}
 
+	ipg ,_:= genip.NewIPGen("","",[]string{},[]string{},true)
 
-	constraint_free(con);
+	var c uint32 = 0
+	for ip := ipg.GetCurIP();ip!=0;ip=ipg.GetNextIP() {
+
+		fmt.Println(netutils.IPv4StrBig(ip))
+		c++
+	}
+
+	fmt.Println(c)
 }
-*/
 
 func main() {
 
@@ -320,6 +327,9 @@ func main() {
 
 	//testTcpScript()
 
-	testIPConstraint()
+	//testIPConstraint()
+	//testAES()
+
+	testIPGen()
 }
 
