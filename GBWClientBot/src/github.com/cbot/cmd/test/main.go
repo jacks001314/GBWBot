@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"github.com/cbot/genip"
 	"github.com/cbot/proto/http"
+	"github.com/cbot/proto/redis"
+	"github.com/cbot/proto/ssh"
 	"github.com/cbot/proto/transport"
+	"github.com/cbot/targets/genip"
+	"github.com/cbot/targets/local"
 	"github.com/cbot/utils/netutils"
 	"github.com/d5/tengo/compiler/token"
 	"github.com/d5/tengo/objects"
@@ -15,6 +18,49 @@ import (
 	"io/ioutil"
 	"time"
 )
+
+func testSSH(){
+
+	host := ""
+	port := 22
+	user := "root"
+	pass := ""
+	fpath := ""
+	remoteDir := "/tmp/"
+	downloadDir := "D:\\"
+
+	sshclient,err:= ssh.LoginWithPasswd(host,port,user,pass,1000)
+	//sshclient,err := ssh.LoginNoPassword(host,port,user,1000)
+
+	if err!=nil {
+
+		fmt.Println(err)
+		return
+	}
+
+	defer sshclient.Close()
+
+
+	//res,_:=sshclient.RunCmd("cat sum.c;cat /etc/passwd")
+
+	ftp,err:= ssh.NewSftpClient(sshclient)
+	if err!=nil {
+
+		fmt.Println(err)
+		return
+	}
+	defer ftp.Close()
+
+	ftp.UPloadFile(fpath,remoteDir)
+
+
+	ftp.DownloadFile("/tmp/main.go",downloadDir)
+
+	//res,_:=sshclient.RunCmd("cat /tmp/main.go")
+
+	//fmt.Println(string(res))
+
+}
 
 func testHttp(){
 
@@ -207,7 +253,7 @@ func (Test) Import(moduleName string) (interface{}, error) {
 
 func testScript(){
 
-	path:="D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\t.tengo"
+	path:=""
 	data,_:=ioutil.ReadFile(path)
 	script := script.New(data)
 
@@ -228,7 +274,7 @@ func testScript(){
 
 func testTcpScript(){
 
-	path:="D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\tcp.tengo"
+	path:=""
 	data,_:=ioutil.ReadFile(path)
 	script := script.New(data)
 
@@ -319,7 +365,36 @@ func testIPGen(){
 	fmt.Println(c)
 }
 
+func testRedis(){
+
+	host := "192.168.198.128"
+	port := 6379
+
+	cli := redis.NewRedisClient(host,port,"",10000,2)
+
+	//fmt.Println(cli.Info())
+
+	fmt.Println(cli.Do("set","bb","fuck"))
+	fmt.Println(cli.Do("get","bb"))
+	fmt.Println(cli.Info())
+}
+
+func testAddr(){
+
+	addrs := local.Addrs(true)
+
+	for _,addr:= range addrs {
+
+		fmt.Println(addr.NetWorkRange())
+	}
+
+
+	fmt.Println(local.GetOutIP())
+	fmt.Println(local.GetWorkingIPRange(true))
+}
+
 func main() {
+
 
 	//testConnection()
 	//testScript()
@@ -330,6 +405,10 @@ func main() {
 	//testIPConstraint()
 	//testAES()
 
-	testIPGen()
+	//testIPGen()
+
+	//testSSH()
+	//testRedis()
+	testAddr()
 }
 
