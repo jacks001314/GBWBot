@@ -191,3 +191,19 @@ func GetOutIP() string {
 	return strings.TrimSpace(ip)
 }
 
+/*is local ip*/
+func ISLocalIP(ip string) bool {
+
+	addrs := Addrs(true)
+
+	for _,addr := range addrs {
+
+		if strings.EqualFold(ip,addr.ip.String()){
+
+			return true
+		}
+	}
+
+	return false
+}
+

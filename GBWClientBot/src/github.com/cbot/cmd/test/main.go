@@ -16,6 +16,7 @@ import (
 	"github.com/d5/tengo/script"
 	"github.com/d5/tengo/stdlib"
 	"io/ioutil"
+	"os"
 	"time"
 )
 
@@ -391,6 +392,26 @@ func testAddr(){
 
 	fmt.Println(local.GetOutIP())
 	fmt.Println(local.GetWorkingIPRange(true))
+	fmt.Println(os.UserHomeDir())
+
+	fmt.Println(local.ISLocalIP("192.168.2.109"))
+
+
+}
+
+func testSSHHost(){
+
+
+	sshLoginInfo := local.CollectSSHLoginInfo()
+
+	fmt.Println(sshLoginInfo.User())
+	fmt.Println(sshLoginInfo.PrivateKey())
+
+	for _,sshHost:= range sshLoginInfo.Hosts() {
+
+		fmt.Printf("{ip:%s,host:%s,port:%d,user:%s,userName:%s}\n",sshHost.IP(),sshHost.Host(),sshHost.Port(),sshHost.UserName(),sshHost.UserName())
+	}
+
 }
 
 func main() {
@@ -409,6 +430,8 @@ func main() {
 
 	//testSSH()
 	//testRedis()
-	testAddr()
+	//testAddr()
+	testSSHHost()
+
 }
 
