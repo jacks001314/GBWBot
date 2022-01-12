@@ -3,6 +3,7 @@ package source
 import (
 
 	"fmt"
+	"github.com/cbot/proto/http"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
 	"github.com/d5/tengo/stdlib"
@@ -69,6 +70,7 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 
 	mm.AddMap(builtinMaps)
 	mm.Add("source", ScriptSource{})
+	mm.Add("http", http.HttpTengo{})
 	script.SetImports(mm)
 
 

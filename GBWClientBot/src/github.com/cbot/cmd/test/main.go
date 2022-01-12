@@ -419,7 +419,7 @@ func testSSHHost(){
 
 func testScriptSource(){
 
-	fpath := "D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\scriptSource.tengo"
+	fpath := "D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\script\\source\\fofaAPI.tengo"
 
 	rtypes := []string {"sshBruteForce"}
 
@@ -438,13 +438,13 @@ func testScriptSource(){
 		return
 	}
 
-
+	/*
 	reader2,err:= ss.OpenReader("ssh2",rtypes,10)
 
 	if err!= nil {
 		fmt.Println(err)
 		return
-	}
+	}*/
 
 	ss.Start()
 
@@ -455,7 +455,7 @@ func testScriptSource(){
 		if err!=nil {
 
 			fmt.Println(err)
-			break																																																																																																																																																									
+			break
 		}
 
 		if entry == nil {
@@ -463,11 +463,11 @@ func testScriptSource(){
 			continue
 		}
 
-		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}************\n",
+		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}\n",
 			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
 	}}()
 
-
+/*
 	go func (){for {
 
 		entry,err:= reader2.Read()
@@ -485,7 +485,7 @@ func testScriptSource(){
 
 		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}----------\n",
 			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
-	}}()
+	}}()*/
 
 	for {time.Sleep(10*time.Second)}
 
