@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package sbot.proto;
+
+option csharp_namespace = "SBot.Proto";
+option go_package = "github.com/sbot/proto";
+option java_multiple_files = true;
+option java_outer_classname = "NodeService";
+option java_package = "com.gbw3bao.sbot.proto";
+option php_namespace = "SBot\\Proto";
+
+service Node {
+
+  rpc Ping(Status) returns (PingReply);
+
+}
+
+message Status {
+
+  string localIP = 1;
+  string outIP = 2;
+  string mac = 3;
+  string os = 4;
+  string cbotVersion = 5;
+
+}
+
+message PingReply {
+
+  uint32 status = 1;
+  string message = 2;
+}
+
