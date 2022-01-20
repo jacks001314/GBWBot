@@ -2,17 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/sbot/proto"
+	"fmt"
+	"github.com/sbot/proto/model"
+	"github.com/sbot/proto/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"os"
-	"time"
 )
 
 func testRPCClient(addr string,ip string){
-
-
 
 	conn, err := grpc.Dial(addr,grpc.WithTransportCredentials(insecure.NewCredentials()))
 
@@ -21,38 +20,93 @@ func testRPCClient(addr string,ip string){
 	}
 
 	defer conn.Close()
-	c := proto.NewNodeClient(conn)
+	c := service.NewCmdServiceClient(conn)
 
-	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
 
-	os,_:= os.Hostname()
-
-	r, err := c.Ping(ctx, &proto.Status{
-		LocalIP:     ip,
-		OutIP:       ip,
-		Mac:         "fff",
-		Os:          os,
-		CbotVersion: "1.1.0",
-	})
+	r, err := c.FetchCmd(context.Background())
 
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
 
-	log.Printf("Greeting: %s", r.GetMessage())
-}
+	err = r.Send(&model.CmdReply{
+		NodeId:   ip,
+		Status:   0,
+		Time:     0,
+		Contents: []byte{},
+	})
 
-func main(){
+	if err!= nil {
+
+		fmt.Printf("%v",err)
+		return
+	}
 
 	for {
 
-		time.Sleep(10*time.Second)
-		testRPCClient(os.Args[1],os.Args[2])
+		// receive a cmd
+		cmd,err:= r.Recv()
+
+		if err!=nil {
+			fmt.Printf("%v",err)
+			return
+		}
+
+		fmt.Printf("receive a cmd:%v",cmd)
+
+		err = r.Send(&model.CmdReply{
+			NodeId:   ip,
+			Status:   0,
+			Time:     0,
+			Contents: []byte(cmd.Name),
+		})
+
+		if err != nil {
+
+			fmt.Printf("%v",err)
+			return
+		}
 
 	}
+}
 
+func testChan(ich chan int,id string ){
+
+	go func (){
+
+		for {
+			select {
+			case i := <-ich:
+
+				fmt.Printf("accept:%d,node:%s\n",i,id)
+			}
+		}
+	}()
+
+}
+
+
+func main(){
+
+	testRPCClient(os.Args[1],os.Args[2])
+
+	/*
+	ich := make(chan int )
+
+	testChan(ich,"node1")
+	testChan(ich,"node2")
+
+	i := 0
+	for {
+
+		ich <- i
+
+		time.Sleep(10*time.Second)
+		i++
+	}*/
+	//wg := sync.WaitGroup{}
+	//wg.Add(2)
+	//wg.Wait()
 }
 
 

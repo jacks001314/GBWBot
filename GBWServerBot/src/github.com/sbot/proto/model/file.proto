@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+import "proto/model/node.proto";
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "Download";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+
+message DownloadRequest {
+
+  // the node information that sends download request
+  Node node = 1;
+
+  //the file name that wants to dowload
+  string fname = 2;
+
+}
+
+message FilePart {
+
+  string fpath = 1;
+
+  //the total size of file that been downloaded/uploaded
+  int64 tbytes = 2;
+
+  //the content size of this chunk
+  int64 bytes = 3;
+
+  //is last parts of file
+  bool isLastParts = 4;
+
+  // the md5 that been downloaded/uploaded
+  string md5 = 5;
+
+  // the buffer used to store file contents
+  bytes contents = 6;
+
+}
+
+message UPloadStatus {
+
+  //0 ---ok,-1 failed
+  int64 status = 1;
+
+  string  fpath = 2;
+
+}

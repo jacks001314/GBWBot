@@ -23,7 +23,6 @@ func testRPC(host string,port string)  {
 
 		time.Sleep(10*time.Second)
 
-
 	}
 
 }
@@ -33,8 +32,6 @@ func testRPC(host string,port string)  {
 func main(){
 
 	testRPC(os.Args[1],os.Args[2])
-
-
 
 }
 

@@ -2,8 +2,8 @@ package rpc
 
 import (
 	"fmt"
-	"github.com/sbot/node"
-	"github.com/sbot/proto"
+	"github.com/sbot/proto/service"
+	"github.com/sbot/rpc/rservice"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
@@ -63,7 +63,9 @@ func (s *GRPCService) Start(){
 
 	s.grpcServer = grpc.NewServer(opts...)
 
-	proto.RegisterNodeServer(s.grpcServer,&node.Server{})
+	service.RegisterFileSerivceServer(s.grpcServer,rservice.NewFileService("/var/tmp"))
+	service.RegisterNodeServiceServer(s.grpcServer,&rservice.NodeService{})
+	service.RegisterCmdServiceServer(s.grpcServer,rservice.NewCmdService())
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)

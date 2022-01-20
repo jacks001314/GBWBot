@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/file.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "FileService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+service FileSerivce {
+
+  // download a file from server bot
+  rpc Download(model.DownloadRequest) returns (stream model.FilePart){};
+
+  //upload a file from cbot/other clients
+  rpc UPload(stream model.FilePart) returns (model.UPloadStatus){};
+
+}
+

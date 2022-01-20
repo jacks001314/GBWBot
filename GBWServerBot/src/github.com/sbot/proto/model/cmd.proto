@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "Cmd";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+enum CmdCode {
+
+  RunOSCmd = 0;
+
+}
+
+message CmdRequest {
+
+  //the node ids that run this cmd,if nodes is empty then broadcast cmd to all nodes
+
+  repeated string nodeIdS = 1;
+
+  // the cmd that needs running
+  Cmd cmd = 2;
+
+  //this os that can run this cmd
+  string os = 3;
+
+}
+
+message CmdReply {
+
+  // the node that run this cmd
+  string  nodeId = 1;
+
+  //the run cmd status,0----ok,-1----failed
+  int32 status = 2;
+
+  //the time that runned cmd
+  uint64 time = 3;
+
+  // run cmd results
+  bytes contents = 4;
+
+}
+
+message Cmd {
+
+  
+  //cmd code
+  CmdCode code = 1;
+
+  //cmd name
+  string name = 2;
+
+  // cmd args
+  repeated string args = 3;
+
+}
+
+

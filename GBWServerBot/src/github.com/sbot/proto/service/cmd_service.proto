@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/cmd.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "CmdService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+service CmdService {
+
+  //Run a cmd
+  rpc RunCmd(model.CmdRequest) returns (stream model.CmdReply) {}
+
+  /* fetch a cmd from server bot
+   */
+  rpc FetchCmd(stream model.CmdReply) returns (stream model.Cmd) {};
+
+
+}
+
