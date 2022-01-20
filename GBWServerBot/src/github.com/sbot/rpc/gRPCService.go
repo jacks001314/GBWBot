@@ -66,6 +66,7 @@ func (s *GRPCService) Start(){
 	service.RegisterFileSerivceServer(s.grpcServer,rservice.NewFileService("/var/tmp"))
 	service.RegisterNodeServiceServer(s.grpcServer,&rservice.NodeService{})
 	service.RegisterCmdServiceServer(s.grpcServer,rservice.NewCmdService())
+	service.RegisterLogStreamServiceServer(s.grpcServer,rservice.NewLogStreamService())
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)

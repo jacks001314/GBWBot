@@ -111,7 +111,7 @@ func (s *CmdService) sendCmds(req *model.CmdRequest) *cmdContext{
 
 func (s *CmdService) RunCmd(req *model.CmdRequest, reply service.CmdService_RunCmdServer) error {
 
-	//write to cmd channel to wait cmd reply
+	//write to cmd logstream.proto to wait cmd reply
 
 	cmdCtx := s.sendCmds(req)
 

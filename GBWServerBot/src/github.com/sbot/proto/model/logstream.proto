@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "LogStream";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+enum CmdOP {
+
+  OPEN = 0;
+  CLOSE = 1;
+  READ = 2;
+}
+
+message TargetNode {
+
+  string nodeId = 1;
+
+}
+
+message LogCmd {
+
+  // the cmdOP
+
+  CmdOP op = 1;
+
+  // the nodeId of cbot
+  string nodeId = 2;
+
+}
+
+message OPStatus {
+
+  //0---ok,-1 failed
+  int32 status = 1;
+
+  // the status description
+  string message = 2;
+
+  //nodeId
+  string nodeId = 3;
+
+}
+
+message LogStream {
+
+  //nodeId
+  string nodeId =1;
+  
+  uint64 dsize = 2;
+
+  bytes data = 3;
+
+}

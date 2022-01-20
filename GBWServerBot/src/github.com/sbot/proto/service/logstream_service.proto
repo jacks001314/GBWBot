@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/logstream.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "LogStreamService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+service LogStreamService {
+
+  rpc Open(model.TargetNode) returns (stream model.LogStream) {};
+
+  rpc Close(model.TargetNode) returns (model.OPStatus) {};
+
+  rpc CmdChannel(model.TargetNode) returns (stream model.LogCmd) {};
+
+  rpc Channel(stream model.LogStream) returns (model.OPStatus) {}
+
+}
