@@ -24,6 +24,7 @@ type nodeContext struct {
 	cmdCh chan *model.LogCmd
 	logCh chan *model.LogStream
 	notifyCh chan int
+	closeCh  chan int
 	isOpen bool
 }
 
@@ -47,6 +48,7 @@ func (s *LogStreamService) addNode(target *model.TargetNode) *nodeContext {
 		cmdCh:    make(chan *model.LogCmd),
 		logCh:    make(chan *model.LogStream),
 		notifyCh: make(chan int),
+		closeCh:  make(chan int),
 		isOpen:false,
 	}
 
@@ -119,17 +121,47 @@ func (s *LogStreamService) Open(target *model.TargetNode, stream service.LogStre
 
 			if err := stream.Send(logStream);err!=nil {
 
-				//s.removeNode(target)
+				doClose(nodeCtx, target)
 
-				s.Close(context.Background(),target)
+				log.WithField("NodeId", target.NodeId).Info("Cannot Send log to client,Remove it")
 
-				log.WithField("NodeId",target.NodeId).Info("Cannot Send log to client,Remove it")
-
-				return status.Errorf(codes.Unavailable,"Cannot Send log data to client")
+				return status.Errorf(codes.Unavailable, "Cannot Send log data to client")
 
 			}
+
+		case <-nodeCtx.closeCh:
+			log.WithField("NodeId",target.NodeId).Info("Node has been Closed,will exit stream,stop receive log")
+			return status.Errorf(codes.Aborted,"Node has been Closed,will exit stream,stop receive log")
 		}
+
 	}
+}
+
+func doClose(nodeCtx *nodeContext,target *model.TargetNode) (*model.OPStatus,error){
+
+	//send a open cmd to channel
+	logCmd := &model.LogCmd{
+		Op:     model.CmdOP_CLOSE,
+		NodeId: target.NodeId,
+	}
+
+	nodeCtx.cmdCh<- logCmd
+
+	//wait cbot call Channel Method to close stream
+	<-nodeCtx.notifyCh
+
+	log.WithField("NodeId",target.NodeId).Info("Node log stream has been closed")
+
+	//s.removeNode(target)
+
+	nodeCtx.isOpen = false
+
+	return &model.OPStatus{
+		Status:  0,
+		Message: "Ok",
+		NodeId:  target.NodeId,
+	},nil
+
 }
 
 func (s *LogStreamService) Close(ctx context.Context, target *model.TargetNode) (*model.OPStatus, error) {
@@ -156,29 +188,12 @@ func (s *LogStreamService) Close(ctx context.Context, target *model.TargetNode) 
 
 	}
 
-	//send a open cmd to channel
-	logCmd := &model.LogCmd{
-		Op:     model.CmdOP_CLOSE,
-		NodeId: target.NodeId,
-	}
+	st,err := doClose(nodeCtx,target)
 
-	nodeCtx.cmdCh<- logCmd
+	//notify open stream to close
+	nodeCtx.closeCh<-1
 
-	//wait cbot call Channel Method to close stream
-	<-nodeCtx.notifyCh
-
-	log.WithField("NodeId",target.NodeId).Info("Node log stream has been closed")
-
-	//s.removeNode(target)
-
-	nodeCtx.isOpen = false
-
-	return &model.OPStatus{
-		Status:  0,
-		Message: "Ok",
-		NodeId:  target.NodeId,
-	},nil
-
+	return st,err
 }
 
 
