@@ -1,5 +1,7 @@
 package store
 
+import "fmt"
+
 type Store interface {
 
 	//open a database to store
@@ -17,6 +19,10 @@ type Store interface {
 	Query(queryString string,timeRange [2]uint64,pageable *Pageable) (*QueryResult,error)
 
 	FlushDB() error
+
+	Count() uint64
+
+	Facet(query string ,term string,num uint64,isDec bool) ([]*TermFacet,error)
 }
 
 type Pageable struct {
@@ -40,4 +46,15 @@ type QueryResult struct {
 	TNum  uint64
 	Results []*ResultEntry
 
+}
+
+type TermFacet struct {
+
+	Key string  `json:"key"`
+	Count uint64 `json:"count"`
+}
+
+func (t *TermFacet) String()string {
+
+	return fmt.Sprintf(`{"key":%s,"count":%d}`,t.Key,t.Count)
 }

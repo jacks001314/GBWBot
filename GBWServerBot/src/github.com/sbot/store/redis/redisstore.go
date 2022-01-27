@@ -172,8 +172,8 @@ func (s *RedisStore)Open(cfg *store.Config) (store.Store,error) {
 		redisClient: client,
 		ctx:         ctx,
 		db:          db,
-		storeTimeKey: fmt.Sprintf("redis.%s.%s.times",s.cfg.DB,s.cfg.Table),
-		storeValueKey: fmt.Sprintf("redis.%s.%s.values",s.cfg.DB,s.cfg.Table),
+		storeTimeKey: fmt.Sprintf("redis.%s.%s.times",cfg.DB,cfg.Table),
+		storeValueKey: fmt.Sprintf("redis.%s.%s.values",cfg.DB,cfg.Table),
 		putScript: redis.NewScript(putSCRIPT),
 		delScript: redis.NewScript(delScript),
 	},nil
@@ -353,4 +353,119 @@ func (s *RedisStore) FlushDB() error {
 
 	return s.redisClient.FlushDB(s.ctx).Err()
 
+}
+
+func (s *RedisStore) Count() uint64 {
+
+	v,err:= s.redisClient.ZCard(s.ctx,s.storeTimeKey).Result()
+
+	if err!=nil {
+		return 0
+	}
+
+	return uint64(v)
+}
+
+func getFacetScript( query string,term string) string  {
+
+	fscritp := `
+
+local valueKey = KEYS[1]
+
+local num = tonumber(ARGV[1])
+local isDec = tonumber(ARGV[2])
+
+local buckets = {}
+
+local cur = 0
+local values = {}
+local sortValues = {}
+local results = {}
+
+repeat
+
+    values = redis.call("hscan",valueKey,cur)
+    cur = tonumber(values[1])
+    local kvals = values[2]
+
+    for i=1,#kvals,2 do
+
+        local JsonValue = cjson.decode(kvals[i+1])
+        if %s then
+            local vv = %s
+
+            if buckets[vv] then
+                buckets[vv] = buckets[vv]+1
+            else
+                buckets[vv] = 1
+            end
+        end
+    end
+
+until cur == 0
+
+
+for k,v in pairs(buckets) do
+
+    table.insert(sortValues,{key=k,count=v})
+end
+
+local cmp = function(a,b)
+    if a and b then
+        if isDec == 1 then
+            return a.count>b.count
+        else
+            return a.count<b.count
+        end
+    end
+    return false
+end
+
+table.sort(sortValues,cmp)
+
+if num >= #sortValues then
+    return cjson.encode(sortValues)
+end
+
+for i=1,#sortValues,1 do
+
+    table.insert(results,sortValues[i])
+    if i>= num then
+        break
+    end
+end
+
+return cjson.encode(results)
+
+`
+	return fmt.Sprintf(fscritp,query,term)
+
+}
+
+func (s *RedisStore) Facet(query string ,term string,num uint64,isDec bool) ([]*store.TermFacet,error) {
+
+	results := make([]*store.TermFacet,0)
+
+	src := getFacetScript(query,term)
+	script := redis.NewScript(src)
+
+	keys := []string{s.storeValueKey}
+
+	dec := 0
+	if isDec {
+		dec = 1
+	}
+
+	r,err := script.Run(s.ctx,s.redisClient,keys,num,dec).Result()
+
+	if err!=nil {
+
+		return nil,err
+	}
+
+	data := []byte(r.(string))
+
+	err =json.Unmarshal(data,&results)
+
+	return results,err
 }
