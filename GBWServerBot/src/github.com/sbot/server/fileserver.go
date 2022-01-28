@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/sbot/utils/fileutils"
@@ -20,7 +19,7 @@ type FileServer struct {
 
 	lock sync.Mutex
 
-	cfg *Config
+	cfg *FileServerConfig
 
 
 	fhandler http.Handler
@@ -45,7 +44,7 @@ type FileDownloadRequest struct {
 
 }
 
-type Config struct {
+type FileServerConfig struct {
 
 	//the root dir that file stores
 	RootDir string `json:"rootDir"`
@@ -123,26 +122,7 @@ func (f *FileServer) makeHttpRequest(fname string,r *http.Request) *http.Request
 	return r2
 }
 
-func getArgsMap(content string) map[string]string {
 
-	results := make(map[string]string)
-
-	args := strings.Split(content,"&")
-
-	for _,arg := range args {
-
-		kv := strings.Split(arg,"=")
-
-		if len(kv) <=1 {
-			results[arg] = ""
-		}else {
-
-			results[kv[0]] = kv[1]
-		}
-	}
-
-	return results
-}
 
 func (f *FileServer) makeFileDownloadRequst(r *http.Request) (*FileDownloadRequest,error) {
 
@@ -153,16 +133,7 @@ func (f *FileServer) makeFileDownloadRequst(r *http.Request) (*FileDownloadReque
 		return nil,errURLFormat
 	}
 
-	base64Content := path[1:]
-
-	content,err:= base64.StdEncoding.DecodeString(base64Content)
-
-	if err!=nil {
-
-		return nil,err
-	}
-
-	argsMap := getArgsMap(string(content))
+	argsMap := DecodeCryptArgs(path[1:])
 
 	port,err:= strconv.ParseInt(argsMap["tPort"],10,32)
 
@@ -224,7 +195,7 @@ func (f *FileServer) Start() {
 }
 
 
-func NewFileServer(cfg *Config) *FileServer {
+func NewFileServer(cfg *FileServerConfig) *FileServer {
 
 	return &FileServer{
 		lock:     sync.Mutex{},
