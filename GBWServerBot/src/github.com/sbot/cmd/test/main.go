@@ -1,29 +1,27 @@
 package main
 
 import (
-	"github.com/sbot/rpc"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/sbot/server"
 	"os"
-	"time"
 )
 
-func testRPC(host string,port string)  {
 
-	cfg := rpc.Config{
-		Host:     host,
-		Port:     port,
-		CertFlag: "",
-		KeyFlag:  "",
-	}
+func getReq(fname string) string {
 
-	service := rpc.NewGRPCService(&cfg)
+	/*
+	Fname:        argsMap["fname"],
+		AttackType:   argsMap["atype"],
+			AttackIP:     argsMap["pip"],
+			TargetIP:     argsMap["tip"],
+			TargetPort:   int(port),
+			TargetOutIP:  r.RemoteAddr,
+			DownloadTool: argsMap["dt"],
+	*/
 
-	service.Start()
-
-	for {
-
-		time.Sleep(10*time.Second)
-
-	}
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("fname=%s&atype=hadoop&pip=192.168.1.151&tip=192.168.1.152&tPort=8081&dt=wget",fname)))
 
 }
 
@@ -31,7 +29,32 @@ func testRPC(host string,port string)  {
 
 func main(){
 
-	testRPC(os.Args[1],os.Args[2])
 
+	cfg := &server.Config{
+		RootDir: os.Args[1],
+		Host:    "0.0.0.0",
+		Port:    8080,
+	}
+
+	f := server.NewFileServer(cfg)
+
+	go f.Start()
+
+	sub := f.NewFileDownloadRequestSub()
+
+	for {
+
+		select {
+
+		case fr := <- sub.Sub():
+
+			data,_:= json.Marshal(fr)
+
+			fmt.Println(string(data))
+
+		}
+	}
+
+	fmt.Println(getReq("init.sh"))
 }
 
