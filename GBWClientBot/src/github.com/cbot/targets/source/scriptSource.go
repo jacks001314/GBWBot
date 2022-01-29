@@ -136,7 +136,7 @@ func (s *ScriptSource) canRead(rtypes []string) bool {
 
 /*create a source reader
 *@rtypes  ----that the types wanted to been read by reader
- @capacity ----channel capacity
+ @capacity ----logstream.proto capacity
  */
 func (s *ScriptSource) OpenReader(name string,rtypes []string, capacity int) (*SourceReader,error)  {
 

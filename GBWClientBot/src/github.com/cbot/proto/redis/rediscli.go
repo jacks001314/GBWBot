@@ -25,10 +25,12 @@ func NewRedisClient(host string,port int,pass string,timeout uint64,db int) *Red
 		DB: db,
 	})
 
+
 	return &RedisClient{client:rdb}
 }
 
 func (c *RedisClient) Info() (string,error) {
+
 
 	return c.client.Info(context.Background()).Result()
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/sbot/utils/netutils"
 	"golang.org/x/net/dns/dnsmessage"
 	"net"
 	"strconv"
@@ -75,21 +76,16 @@ func (s *DNSRequestSub) Sub() chan *DNSRequest {
 	return s.requests
 }
 
-func (d *DNSServer) makeDnsRequest(rip string,domain string ,argsMap map[string]string) *DNSRequest {
+func (d *DNSServer) makeDnsRequest(rip string,domain string ,dcr *netutils.DNSDomainCrypt) *DNSRequest {
 
-	port,err:= strconv.ParseInt(argsMap["tPort"],10,32)
 
-	if err!=nil {
-
-		return nil
-	}
 
 	return &DNSRequest{
 		Domain:      domain,
-		AttackType:  argsMap["atype"],
-		AttackIP:    argsMap["pip"],
-		TargetIP:    argsMap["tip"],
-		TargetPort:  int(port),
+		AttackType:  dcr.AttackType,
+		AttackIP:    dcr.AttackIP,
+		TargetIP:    dcr.TargetIP,
+		TargetPort:  dcr.TargetPort,
 		TargetOutIP: rip,
 	}
 
@@ -137,15 +133,15 @@ func (d *DNSServer) serverDNS(addr *net.UDPAddr,conn *net.UDPConn,msg *dnsmessag
 		return
 	}
 
-	argsMap := DecodeCryptArgs(domain[:indx])
+	dcr,err:= netutils.DeCryptToDNSDomain(domain[:indx])
 
-	if len(argsMap) == 0 {
-		log.Errorf("Receive a Dns Request from:%v,but this domain:%s format is error ",
-			addr,domain)
+	if err!=nil  {
+		log.Errorf("Receive a Dns Request from:%v,but this domain:%s format is error:%v ",
+			addr,domain,err)
 		return
 	}
 
-	dnsReq := d.makeDnsRequest(addr.IP.String(),domain,argsMap)
+	dnsReq := d.makeDnsRequest(addr.IP.String(),domain,dcr)
 
 	if dnsReq == nil {
 		log.Errorf("Receive a Dns Request from:%v,but this domain:%s format is error ",
