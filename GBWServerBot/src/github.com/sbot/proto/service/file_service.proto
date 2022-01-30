@@ -19,5 +19,8 @@ service FileSerivce {
   //upload a file from cbot/other clients
   rpc UPload(stream model.FilePart) returns (model.UPloadStatus){};
 
+  //exe some file command ,del mkdir rename ....
+  rpc FileCmd(model.FileCmdRequest) returns (model.FileCmdResponse) {};
+
 }
 

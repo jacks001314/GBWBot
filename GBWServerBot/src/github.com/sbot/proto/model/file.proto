@@ -7,7 +7,7 @@ import "proto/model/node.proto";
 option csharp_namespace = "SBot.Proto.Model";
 option go_package = "github.com/sbot/proto/model";
 option java_multiple_files = true;
-option java_outer_classname = "Download";
+option java_outer_classname = "FileRequest";
 option java_package = "com.gbw3bao.sbot.proto.model";
 option php_namespace = "SBot\\Proto\\Model";
 
@@ -51,3 +51,32 @@ message UPloadStatus {
   string  fpath = 2;
 
 }
+
+enum FileCmd {
+
+  MKDIR = 0;
+
+  DEL = 1;
+
+  LIST = 2;
+
+  RENAME = 3;
+
+}
+
+message FileCmdRequest {
+
+  FileCmd cmd =1;
+
+  repeated string args =2;
+
+}
+
+message FileCmdResponse {
+
+  //0 ---ok,-1 failed
+  int32 status = 1;
+
+  bytes response = 2;
+}
+

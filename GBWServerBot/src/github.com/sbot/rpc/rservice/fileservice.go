@@ -1,12 +1,16 @@
 package rservice
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/sbot/proto/model"
 	"github.com/sbot/proto/service"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FileService struct {
@@ -18,6 +22,16 @@ type FileService struct {
 
 }
 
+type DirEntry struct {
+
+	Name string `json:name`
+	IsFile bool `json:"isFile"`
+	Size  int64 `json:size`
+
+}
+
+
+
 func NewFileService(fdir string) *FileService {
 
 	return &FileService{
@@ -27,16 +41,28 @@ func NewFileService(fdir string) *FileService {
 
 }
 
+func (s *FileService) getPath(fpath string) string {
+
+
+	if strings.Contains(fpath,"/") && (string(os.PathSeparator)!="/") {
+
+		fpath = strings.ReplaceAll(fpath,"/",string(os.PathSeparator))
+
+	}
+
+	return filepath.Join(s.fdir,fpath)
+}
+
+
 func (s *FileService) Download(req *model.DownloadRequest, part service.FileSerivce_DownloadServer) error {
 
 	var (
-		writing = true
 		buf     []byte
 		n       int
 		file    *os.File
 	)
 
-	fpath := filepath.Join(s.fdir,req.Fname)
+	fpath := s.getPath(req.Fname)
 
 	file, err := os.Open(fpath)
 	if err != nil {
@@ -64,13 +90,22 @@ func (s *FileService) Download(req *model.DownloadRequest, part service.FileSeri
 	size := stat.Size()
 	buf = make([]byte, 1<<12)
 
-	for writing {
+	for  {
+
 		n, err = file.Read(buf)
 		if err != nil {
 			if err == io.EOF {
-				writing = false
+
+				err = part.Send(&model.FilePart{
+					Fpath:       fpath,
+					Tbytes:      size,
+					Bytes:       0,
+					IsLastParts: true,
+					Md5:         "",
+					Contents:   []byte{},
+				})
+
 				err = nil
-				continue
 			}
 
 			return err
@@ -80,7 +115,7 @@ func (s *FileService) Download(req *model.DownloadRequest, part service.FileSeri
 			Fpath:       fpath,
 			Tbytes:      size,
 			Bytes:       int64(n),
-			IsLastParts: writing == false,
+			IsLastParts: false,
 			Md5:         "",
 			Contents:   buf[:n],
 		})
@@ -90,9 +125,6 @@ func (s *FileService) Download(req *model.DownloadRequest, part service.FileSeri
 		}
 
 	}
-
-
-	return nil
 }
 
 
@@ -115,7 +147,7 @@ func (s *FileService) UPload(stream service.FileSerivce_UPloadServer) error {
 			return err
 		}
 
-		fpath =  filepath.Join(s.fdir,fpart.Fpath)
+		fpath =  s.getPath(fpart.Fpath)
 
 		if fpart.Bytes != int64(len(fpart.Contents)) {
 			return fmt.Errorf("%v == nk.SizeInBytes != int64(len(nk.Data)) == %v",fpart.Bytes,len(fpart.Contents))
@@ -134,13 +166,15 @@ func (s *FileService) UPload(stream service.FileSerivce_UPloadServer) error {
 			firstPart = false
 		}
 
+		if fpart.IsLastParts {
+			goto END
+		}
+
 		err = writeToFd(fd, fpart.Contents)
 		if err != nil {
 			return err
 		}
-		if fpart.IsLastParts {
-			goto END
-		}
+
 	}
 
 	END:
@@ -148,6 +182,7 @@ func (s *FileService) UPload(stream service.FileSerivce_UPloadServer) error {
 		Status: 0,
 		Fpath:  fpath,
 	})
+
 	return err
 }
 
@@ -166,3 +201,123 @@ func writeToFd(fd *os.File, data []byte) error {
 	}
 }
 
+
+func (s *FileService) listDir(args []string) (string,int) {
+
+	if len(args)!= 1{
+
+		return fmt.Sprintf(`{"message":"Invalid args number:%d"}`,len(args)),-1
+
+	}
+
+	entries := make([]*DirEntry,0)
+
+	dir := s.getPath(args[0])
+
+	files,err := ioutil.ReadDir(dir)
+
+	if err!=nil {
+
+		return fmt.Sprintf(`{"message":%v}`,err),-1
+	}
+
+	for _,f := range files {
+
+		entries = append(entries,&DirEntry{
+			Name:   f.Name(),
+			IsFile: !f.IsDir(),
+			Size:   f.Size(),
+		})
+	}
+
+
+	data,_:= json.Marshal(entries)
+
+	return fmt.Sprintf(`{"message:%s"}`,string(data)),0
+}
+
+func (s *FileService)mkdir(args []string) (string,int) {
+
+	if len(args)!= 1{
+
+		return fmt.Sprintf(`{"message":"Invalid args number:%d"}`,len(args)),-1
+	}
+
+	dir := s.getPath(args[0])
+
+	if err := os.MkdirAll(dir,0755);err!=nil {
+
+		return fmt.Sprintf(`{"message":%v}`,err),-1
+	}
+
+	return fmt.Sprintf(`{"message":"ok"}`),0
+}
+
+func (s *FileService)del(args []string) (string,int) {
+
+	if len(args)!= 1{
+
+		return fmt.Sprintf(`{"message":"Invalid args number:%d"}`,len(args)),-1
+	}
+
+	dir := s.getPath(args[0])
+
+	if err := os.RemoveAll(dir);err!=nil {
+
+		return fmt.Sprintf(`{"message":%v}`,err),-1
+	}
+
+	return fmt.Sprintf(`{"message":"ok"}`),0
+}
+
+func (s *FileService)rename(args []string) (string,int) {
+
+	if len(args)!= 2 {
+
+		return fmt.Sprintf(`{"message":"Invalid args number:%d"}`,len(args)),-1
+	}
+
+	oname := s.getPath(args[0])
+	nname := s.getPath(args[1])
+
+	if err := os.Rename(oname,nname);err!=nil {
+
+		return fmt.Sprintf(`{"message":%v}`,err),-1
+	}
+
+	return fmt.Sprintf(`{"message":"ok"}`),0
+}
+
+
+func (s *FileService) FileCmd(ctx context.Context, req *model.FileCmdRequest) (*model.FileCmdResponse, error) {
+
+	var message string
+	var status int
+
+	switch req.Cmd {
+
+	case model.FileCmd_MKDIR:
+		message,status = s.mkdir(req.Args)
+
+	case model.FileCmd_LIST:
+		message,status = s.listDir(req.Args)
+
+	case model.FileCmd_DEL:
+		message,status = s.del(req.Args)
+
+	case model.FileCmd_RENAME:
+
+		message,status = s.rename(req.Args)
+
+	default:
+		message = fmt.Sprintf(`{"message":"UnImplement File Cmd:%d"}`,req.Cmd)
+		status = -1
+
+	}
+
+	return &model.FileCmdResponse{
+		Status:   int32(status),
+		Response: []byte(message),
+	},nil
+
+}

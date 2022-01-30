@@ -23,6 +23,8 @@ type FileSerivceClient interface {
 	Download(ctx context.Context, in *model.DownloadRequest, opts ...grpc.CallOption) (FileSerivce_DownloadClient, error)
 	//upload a file from cbot/other clients
 	UPload(ctx context.Context, opts ...grpc.CallOption) (FileSerivce_UPloadClient, error)
+	//exe some file command ,del mkdir rename ....
+	FileCmd(ctx context.Context, in *model.FileCmdRequest, opts ...grpc.CallOption) (*model.FileCmdResponse, error)
 }
 
 type fileSerivceClient struct {
@@ -34,7 +36,7 @@ func NewFileSerivceClient(cc grpc.ClientConnInterface) FileSerivceClient {
 }
 
 func (c *fileSerivceClient) Download(ctx context.Context, in *model.DownloadRequest, opts ...grpc.CallOption) (FileSerivce_DownloadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FileSerivce_ServiceDesc.Streams[0], "/sbot.proto.FileSerivce/Download", opts...)
+	stream, err := c.cc.NewStream(ctx, &FileSerivce_ServiceDesc.Streams[0], "/sbot.proto.service.FileSerivce/Download", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +68,7 @@ func (x *fileSerivceDownloadClient) Recv() (*model.FilePart, error) {
 }
 
 func (c *fileSerivceClient) UPload(ctx context.Context, opts ...grpc.CallOption) (FileSerivce_UPloadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &FileSerivce_ServiceDesc.Streams[1], "/sbot.proto.FileSerivce/UPload", opts...)
+	stream, err := c.cc.NewStream(ctx, &FileSerivce_ServiceDesc.Streams[1], "/sbot.proto.service.FileSerivce/UPload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +101,15 @@ func (x *fileSerivceUPloadClient) CloseAndRecv() (*model.UPloadStatus, error) {
 	return m, nil
 }
 
+func (c *fileSerivceClient) FileCmd(ctx context.Context, in *model.FileCmdRequest, opts ...grpc.CallOption) (*model.FileCmdResponse, error) {
+	out := new(model.FileCmdResponse)
+	err := c.cc.Invoke(ctx, "/sbot.proto.service.FileSerivce/FileCmd", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FileSerivceServer is the server API for FileSerivce service.
 // All implementations must embed UnimplementedFileSerivceServer
 // for forward compatibility
@@ -107,6 +118,8 @@ type FileSerivceServer interface {
 	Download(*model.DownloadRequest, FileSerivce_DownloadServer) error
 	//upload a file from cbot/other clients
 	UPload(FileSerivce_UPloadServer) error
+	//exe some file command ,del mkdir rename ....
+	FileCmd(context.Context, *model.FileCmdRequest) (*model.FileCmdResponse, error)
 	mustEmbedUnimplementedFileSerivceServer()
 }
 
@@ -119,6 +132,9 @@ func (UnimplementedFileSerivceServer) Download(*model.DownloadRequest, FileSeriv
 }
 func (UnimplementedFileSerivceServer) UPload(FileSerivce_UPloadServer) error {
 	return status.Errorf(codes.Unimplemented, "method UPload not implemented")
+}
+func (UnimplementedFileSerivceServer) FileCmd(context.Context, *model.FileCmdRequest) (*model.FileCmdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FileCmd not implemented")
 }
 func (UnimplementedFileSerivceServer) mustEmbedUnimplementedFileSerivceServer() {}
 
@@ -180,13 +196,36 @@ func (x *fileSerivceUPloadServer) Recv() (*model.FilePart, error) {
 	return m, nil
 }
 
+func _FileSerivce_FileCmd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(model.FileCmdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileSerivceServer).FileCmd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sbot.proto.service.FileSerivce/FileCmd",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileSerivceServer).FileCmd(ctx, req.(*model.FileCmdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FileSerivce_ServiceDesc is the grpc.ServiceDesc for FileSerivce service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var FileSerivce_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "sbot.proto.FileSerivce",
+	ServiceName: "sbot.proto.service.FileSerivce",
 	HandlerType: (*FileSerivceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "FileCmd",
+			Handler:    _FileSerivce_FileCmd_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Download",
