@@ -349,9 +349,6 @@ func findSSHLoginStr(line string) (string,int) {
 	return host,int(port)
 }
 
-
-
-
 func (s *SSHLoginInfo) collectSSHHostFromHistoryFile(curUser string){
 
 

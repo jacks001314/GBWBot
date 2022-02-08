@@ -419,7 +419,7 @@ func testSSHHost(){
 
 func testScriptSource(){
 
-	fpath := "D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\script\\source\\fofaAPI.tengo"
+	fpath := `D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\script\source\ipgenSource.tengo`
 
 	rtypes := []string {"sshBruteForce"}
 

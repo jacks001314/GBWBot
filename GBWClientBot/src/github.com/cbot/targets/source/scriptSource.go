@@ -4,6 +4,8 @@ import (
 
 	"fmt"
 	"github.com/cbot/proto/http"
+	"github.com/cbot/targets"
+	"github.com/cbot/targets/genip"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
 	"github.com/d5/tengo/stdlib"
@@ -71,6 +73,8 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 	mm.AddMap(builtinMaps)
 	mm.Add("source", ScriptSource{})
 	mm.Add("http", http.HttpTengo{})
+	mm.Add("ipgen",genip.IPGen{})
+
 	script.SetImports(mm)
 
 
@@ -170,7 +174,7 @@ func (s *ScriptSource) CloseReader(r *SourceReader) {
 }
 
 
-func (s*ScriptSource) Put(entry SourceEntry) error{
+func (s*ScriptSource) Put(entry targets.Target) error{
 
 	s.locker.Lock()
 	defer s.locker.Unlock()
@@ -190,7 +194,7 @@ func (s *ScriptSource) Start() error {
 	go func () error {
 
 		s.scomp.Set("scriptSource", s)
-		s.scomp.Set("shajf","fuck")
+
 		if err := s.scomp.Run(); err != nil {
 
 			return err
@@ -263,7 +267,7 @@ func (sp *SourcePut) Call(args ... objects.Object) (objects.Object,error) {
 		return nil, tengo.ErrWrongNumArguments
 	}
 
-	entry := args[0].(SourceEntry)
+	entry := args[0].(targets.Target)
 
 	sp.source.Put(entry)
 

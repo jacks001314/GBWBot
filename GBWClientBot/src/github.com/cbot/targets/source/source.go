@@ -1,21 +1,15 @@
 package source
 
-import "errors"
+import (
+	"errors"
+	"github.com/cbot/targets"
+)
 
 var endError error = errors.New("Source Read Over!")
 
-type SourceEntry interface {
-
-	IP() 		string
-	Host() 		string
-	Port() 		int
-	Proto() 	string
-	App()		string
-}
-
 type Source interface {
 
-	Put(entry *SourceEntry) error
+	Put(target targets.Target) error
 
 	OpenReader(name string,rtypes []string, capacity int) (*SourceReader,error)
 
@@ -32,7 +26,7 @@ type SourceReader struct {
 
 	name 		string
 	isEnd 		bool
-	rch 		chan SourceEntry
+	rch 		chan targets.Target
 	capacity 	int
 	rtypes      []string
 }
@@ -42,13 +36,13 @@ func NewSourceReader(name string,rtypes []string, capacity int) *SourceReader {
 	return &SourceReader{
 		name: name,
 		isEnd:    false,
-		rch:      make(chan SourceEntry),
+		rch:      make(chan targets.Target),
 		capacity: capacity,
 		rtypes:   rtypes,
 	}
 }
 
-func (r *SourceReader) Read() (SourceEntry,error) {
+func (r *SourceReader) Read() (targets.Target,error) {
 
 	if r.isEnd {
 		return nil,endError
@@ -65,7 +59,7 @@ func (r *SourceReader) Read() (SourceEntry,error) {
 
 }
 
-func (r *SourceReader) Push( entry SourceEntry) {
+func (r *SourceReader) Push( entry targets.Target) {
 
 	r.rch<- entry
 }

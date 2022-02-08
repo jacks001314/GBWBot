@@ -2,10 +2,15 @@ package genip
 
 import (
 	"fmt"
+	"github.com/cbot/utils/netutils"
+	"github.com/d5/tengo/objects"
+	"github.com/d5/tengo/v2"
 	"math/big"
 )
 
 type IPGen struct {
+
+	TengoObj
 
 	wb *WBList
 	cycle *Cycle
@@ -137,6 +142,186 @@ func (ipg *IPGen) roll2Valid() uint32 {
 	}
 
 	return ipg.GetNextIP()
+}
+
+
+func (p *IPGen) IndexGet(index objects.Object)(value objects.Object,err error){
+
+	key,ok := objects.ToString(index)
+
+	if !ok {
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "index",
+			Expected: "string(compatible)",
+			Found:    index.TypeName(),
+		}
+	}
+
+	switch key {
+
+	case "curIP":
+
+		return &TengoCurIP{
+			TengoObj: TengoObj{name: "curIP"},
+			ipgen:  p,
+		}, nil
+
+	case "nextIP":
+
+		return &TengoNextIP{
+			TengoObj: TengoObj{name: "nextIP"},
+			ipgen:   p,
+		}, nil
+
+	}
+
+	return nil,fmt.Errorf("Unknown ipgen method:%s",key)
+}
+
+type TengoCurIP struct {
+
+	TengoObj
+
+	ipgen *IPGen
+}
+
+func (t *TengoCurIP) Call(args ... objects.Object) (objects.Object,error) {
+
+	ip := t.ipgen.GetCurIP()
+
+	if ip ==0 {
+
+		return objects.FromInterface("")
+	}
+
+
+	return objects.FromInterface(netutils.IPv4StrBig(ip))
+
+}
+
+type TengoNextIP struct {
+
+	TengoObj
+
+	ipgen *IPGen
+}
+
+func (t *TengoNextIP) Call(args ... objects.Object) (objects.Object,error) {
+
+	ip := t.ipgen.GetNextIP()
+
+	if ip ==0 {
+
+		return objects.FromInterface("")
+	}
+
+	return objects.FromInterface(netutils.IPv4StrBig(ip))
+}
+
+
+func newTengoIPGenFromFile(args ... objects.Object) (objects.Object,error) {
+
+	if len(args) != 2 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	wlistFname, ok := objects.ToString(args[0])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "wlistFname",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	blistFname,ok := objects.ToString(args[1])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "blistFname",
+			Expected: "string(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+	return NewIPGen(wlistFname,blistFname,[]string{},[]string{},true)
+}
+
+
+func newTengoIPGenFromArray(args ... objects.Object) (objects.Object,error) {
+
+	if len(args) != 2 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+
+	wlistArr,ok:= objects.ToInterface(args[0]).([]interface{})
+
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:    "wlistArray",
+			Expected: "[]string(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+	blistArr,ok:= objects.ToInterface(args[1]).([]interface{})
+
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "blistArray",
+			Expected: "[]string(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+	wlists := make([]string,0)
+	blists := make([]string,0)
+
+	for _,w := range wlistArr {
+
+		wlists = append(wlists,w.(string))
+	}
+
+	for _,b := range blistArr {
+
+		blists = append(blists,b.(string))
+	}
+
+	return NewIPGen("","",wlists,blists,true)
+}
+
+
+var moduleMap objects.Object = &objects.ImmutableMap{
+
+	Value: map[string]objects.Object{
+
+		"newIPGenFromFile": &objects.UserFunction{
+			Name:  "new_ipgen_fromfile",
+			Value: newTengoIPGenFromFile,
+		},
+
+		"newIPGenFromArray": &objects.UserFunction{
+			Name:  "new_ipgen_from_array",
+			Value: newTengoIPGenFromArray,
+		},
+
+	},
+}
+
+func (IPGen) Import(moduleName string) (interface{}, error) {
+
+	switch moduleName {
+	case "ipgen":
+		return moduleMap, nil
+	default:
+		return nil, fmt.Errorf("undefined module %q", moduleName)
+	}
 }
 
 

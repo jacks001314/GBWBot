@@ -1,14 +1,16 @@
 package targets
 
-type Target struct {
+type Target interface {
 
-	Host string `json:"host"`
+	IP() 		string
 
-	Port int	`json:"port"`
+	Host() 		string
 
-	Proto string	`json:"proto"`
+	Port() 		int
 
-	App string		`json:"app"`
+	Proto() 	string
+
+	App()		string
 
 }
 
