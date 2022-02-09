@@ -1,7 +1,6 @@
 package source
 
 import (
-
 	"fmt"
 	"github.com/cbot/proto/http"
 	"github.com/cbot/targets"
@@ -11,25 +10,19 @@ import (
 	"github.com/d5/tengo/stdlib"
 	"github.com/d5/tengo/v2"
 	"io/ioutil"
-	"sync"
 )
 
 type ScriptSource struct {
 
 	TengoObj
 
-	locker sync.Mutex
-
-
+	name  string
 	/*tengo script instanse Compiled*/
 	scomp  *script.Compiled
 
-	/*readers for this source to read*/
-	readers map[string]*SourceReader
+	spool *SourcePool
 
-	/*the reader types that this source can provided*/
-	rtypesMap map[string]bool
-
+	types []string
 }
 
 
@@ -84,7 +77,7 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 
 /*Create a script source by script content*/
 
-func NewScriptSourceFromContent(rtypes []string,sdata []byte) (*ScriptSource,error) {
+func NewScriptSourceFromContent(spool *SourcePool,name string,rtypes []string,sdata []byte) (*ScriptSource,error) {
 
 	com,err := scriptCompile(sdata)
 
@@ -93,25 +86,18 @@ func NewScriptSourceFromContent(rtypes []string,sdata []byte) (*ScriptSource,err
 		return nil,err
 	}
 
-	rtypesMap := make(map[string]bool,0)
-
-	for _,rtype:= range rtypes {
-
-		rtypesMap[rtype] = true
-	}
-
 	return &ScriptSource{
-		TengoObj: TengoObj{name: "scriptSource"},
-		locker:   sync.Mutex{},
+		TengoObj: TengoObj{name:name},
+		name: name,
 		scomp:    com,
-		readers:  make(map[string]*SourceReader,0),
-		rtypesMap: rtypesMap,
+		spool: spool,
+		types: rtypes,
 	},nil
 
 }
 
 /*create a script source by file*/
-func NewScriptSourceFromFile(rtypes []string,fname string) (*ScriptSource,error){
+func NewScriptSourceFromFile(spool *SourcePool,name string,rtypes []string,fname string) (*ScriptSource,error){
 
 	sdata,err:= ioutil.ReadFile(fname)
 
@@ -120,88 +106,27 @@ func NewScriptSourceFromFile(rtypes []string,fname string) (*ScriptSource,error)
 	}
 
 
-	return NewScriptSourceFromContent(rtypes,sdata)
+	return NewScriptSourceFromContent(spool,name,rtypes,sdata)
 
 }
 
+func (s *ScriptSource) Put(entry targets.Target) error{
 
-func (s *ScriptSource) canRead(rtypes []string) bool {
-
-	for _,rtype := range rtypes {
-
-		if _,ok := s.rtypesMap[rtype]; ok {
-
-			return true
-		}
-	}
-
-	return false
-}
-
-/*create a source reader
-*@rtypes  ----that the types wanted to been read by reader
- @capacity ----logstream.proto capacity
- */
-func (s *ScriptSource) OpenReader(name string,rtypes []string, capacity int) (*SourceReader,error)  {
-
-	s.locker.Lock()
-	defer s.locker.Unlock()
-
-	if v,ok := s.readers[name]; ok {
-
-		//existed
-		return v,nil
-	}
-
-	if !s.canRead(rtypes) {
-
-		return nil,fmt.Errorf("This Script source cannot provide rtyps:%v to been read,only provide rtypes:%v",
-			rtypes,s.rtypesMap)
-	}
-
-	reader := NewSourceReader(name,rtypes,capacity)
-
-	s.readers[name] = reader
-
-	return reader,nil
-}
-
-func (s *ScriptSource) CloseReader(r *SourceReader) {
-
-	s.locker.Lock()
-	defer s.locker.Unlock()
-	delete(s.readers,r.name)
-}
-
-
-func (s*ScriptSource) Put(entry targets.Target) error{
-
-	s.locker.Lock()
-	defer s.locker.Unlock()
-
-	for _,reader := range s.readers {
-
-		reader.Push(entry)
-
-	}
-
+	s.spool.put(s,entry)
 
 	return nil
 }
 
 func (s *ScriptSource) Start() error {
 
-	go func () error {
 
-		s.scomp.Set("scriptSource", s)
+	s.scomp.Set("scriptSource", s)
 
-		if err := s.scomp.Run(); err != nil {
+	if err := s.scomp.Run(); err != nil {
 
-			return err
-		}
+		return err
 
-		return nil
-	}()
+	}
 
 	return nil
 }
@@ -211,13 +136,21 @@ func (s* ScriptSource) Stop() {
 
 }
 
+func (s* ScriptSource)GetTypes() []string {
+
+
+	return s.types
+}
+
+
 func (s* ScriptSource) AtEnd() {
 
-	for _,reader := range s.readers {
+	s.spool.StopSource(s)
+}
 
-		reader.isEnd = true
-	}
+func (s *ScriptSource) Name() string {
 
+	return s.name
 }
 
 func (s *ScriptSource) IndexGet(index objects.Object)(value objects.Object,err error){

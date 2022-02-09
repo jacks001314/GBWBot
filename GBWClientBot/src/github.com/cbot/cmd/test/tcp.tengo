@@ -2,10 +2,10 @@ transport := import("transport")
 fmt := import("fmt")
 
 network := "tcp"
-host := "www.sohu.com"
+host := "www.sohu1.com"
 port := 443
 isSSL := true
-timeOut := 10000
+timeOut := 1000
 conn := transport.newConnection(network,host,port,isSSL,timeOut,timeOut,timeOut)
 
 conn.writeString("GET / HTTP/1.1\r\n")

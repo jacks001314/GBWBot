@@ -1,0 +1,34 @@
+fmt := import("fmt")
+ssh := import("ssh")
+
+host := "192.168.2.121"
+port := 22
+user := "pi"
+passwd := "Shage070338"
+key := ""
+timeout := 10000
+
+
+sshClient:= ssh.newSSHClientWithPass(host,port,user,passwd,timeout)
+
+if sshClient == undefined {
+    fmt.println("err...............")
+}
+
+fmt.println(sshClient)
+//sshClient := ssh.newSSHClientWithKey(host,port,user,key,timeout)
+
+fmt.println(sshClient.runCmd("cat /etc/passwd;ls -alh /var/tmp"))
+
+sshClient.download("/var/tmp/blink.c","D:\\")
+
+fmt.println("download ok")
+
+sshClient.upload("D:\\shajf_dev\\self\\GBWBot\\GBWClientBot\\src\\github.com\\cbot\\cmd\\test\\scriptSource.tengo","/var/tmp/")
+
+fmt.println("upload ok")
+sshClient.close()
+
+
+
+

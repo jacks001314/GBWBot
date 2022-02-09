@@ -36,7 +36,7 @@ func LoginWithPasswd(host string,port int,user string,passwd string,timeout int6
 	return &SSHClient{con:con},nil
 }
 
-func LoginWithPrivKey(host string,port int,user string,privkey string,timeout uint64) (*SSHClient,error) {
+func LoginWithPrivKey(host string,port int,user string,privkey string,timeout int64) (*SSHClient,error) {
 
 	signer, err := ssh.ParsePrivateKey([]byte(privkey))
 	if err != nil {
@@ -66,7 +66,7 @@ func LoginWithPrivKey(host string,port int,user string,privkey string,timeout ui
 	return &SSHClient{con:con},nil
 }
 
-func LoginNoPassword(host string,port int,user string,timeout uint64) (*SSHClient,error) {
+func LoginNoPassword(host string,port int,user string,timeout int64) (*SSHClient,error) {
 
 	sock, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
 	if err != nil {

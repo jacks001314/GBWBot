@@ -4,9 +4,9 @@ fmt := import("fmt")
 host:= "www.baidu.com"
 port:= 80
 isSSL:=false
-timeOut:=10000
+timeOut:=1000
 
-client := http.newHttpClient(host,port,isSSL,10000)
+client := http.newHttpClient(host,port,isSSL,1000)
 request := http.newHttpRequest("get","/").addHeader("User-Agent","GOClient").addHeader("Fuck","you!!!")
 
 res := client.send(request)

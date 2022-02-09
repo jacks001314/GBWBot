@@ -8,6 +8,7 @@ import (
 	"github.com/cbot/proto/redis"
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/proto/transport"
+	"github.com/cbot/targets"
 	"github.com/cbot/targets/genip"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
@@ -23,15 +24,15 @@ import (
 
 func testSSH(){
 
-	host := ""
+	host := "www.gbw3bao.com"
 	port := 22
 	user := "root"
-	pass := ""
+	pass := "ffff"
 	fpath := ""
 	remoteDir := "/tmp/"
 	downloadDir := "D:\\"
 
-	sshclient,err:= ssh.LoginWithPasswd(host,port,user,pass,1000)
+	sshclient,err:= ssh.LoginWithPasswd(host,port,user,pass,10000)
 	//sshclient,err := ssh.LoginNoPassword(host,port,user,1000)
 
 	if err!=nil {
@@ -267,7 +268,7 @@ func testScript(){
 	// run the script
 	_, err := script.RunContext(context.Background())
 	if err != nil {
-		panic(err)
+		//panic(err)
 	}
 
 	//objects.Map{}
@@ -276,12 +277,13 @@ func testScript(){
 
 func testTcpScript(){
 
-	path:=""
+	path:=`D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\cmd\test\tcp.tengo`
 	data,_:=ioutil.ReadFile(path)
 	script := script.New(data)
 
 	mm := objects.NewModuleMap()
-	mm.Add("transport", transport.TransportTengo{})
+	mm.Add("transport",transport.TransportTengo{})
+
 	mm.AddMap(stdlib.GetModuleMap("fmt"))
 	script.SetImports(mm)
 
@@ -289,7 +291,7 @@ func testTcpScript(){
 	// run the script
 	_, err := script.RunContext(context.Background())
 	if err != nil {
-		panic(err)
+		//panic(err)
 	}
 
 
@@ -417,55 +419,53 @@ func testSSHHost(){
 
 }
 
-func testScriptSource(){
+func testScriptSource() {
 
-	fpath := `D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\script\source\ipgenSource.tengo`
+	fpath1 := `D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\cmd\test\scriptSource.tengo`
+	fpath2 := `D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\script\source\ipgenSource.tengo`
 
-	rtypes := []string {"sshBruteForce"}
+	rtypes := []string{"sshBruteForce"}
 
-	ss,err := source.NewScriptSourceFromFile(rtypes,fpath)
+	spool := source.NewSourcePool()
 
-	if err!= nil {
+	ss1, err := source.NewScriptSourceFromFile(spool, "test1", rtypes, fpath1)
+
+	if err != nil {
 
 		fmt.Println(err)
 		return
 	}
 
-	reader1,err:= ss.OpenReader("ssh",rtypes,10)
+	ss2, err := source.NewScriptSourceFromFile(spool, "test2", rtypes, fpath2)
 
-	if err!= nil {
+	if err != nil {
+
 		fmt.Println(err)
 		return
 	}
 
-	/*
-	reader2,err:= ss.OpenReader("ssh2",rtypes,10)
+	rch := spool.SubTarget("treader", 10, func(s source.Source, target targets.Target) bool {
 
-	if err!= nil {
-		fmt.Println(err)
-		return
-	}*/
+		return true
+	})
 
-	ss.Start()
+	spool.StartSource(ss1)
+	spool.StartSource(ss2)
 
-	go func (){for {
+	go func() {
+		for {
 
-		entry,err:= reader1.Read()
+			select {
 
-		if err!=nil {
+			case entry := <-rch:
 
-			fmt.Println(err)
-			break
+				fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}\n",
+					entry.IP(), entry.Host(), entry.Port(), entry.Proto(), entry.App())
+			}
+
 		}
+	}()
 
-		if entry == nil {
-
-			continue
-		}
-
-		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}\n",
-			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
-	}}()
 
 /*
 	go func (){for {
@@ -487,7 +487,13 @@ func testScriptSource(){
 			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
 	}}()*/
 
-	for {time.Sleep(10*time.Second)}
+	for {
+
+		spool.StartSource(ss2)
+
+		time.Sleep(10*time.Second)
+
+	}
 
 }
 
@@ -499,7 +505,7 @@ func main() {
 	//testScript()
 	//testHttp()
 
-	//testTcpScript()
+	testTcpScript()
 
 	//testIPConstraint()
 	//testAES()
@@ -511,6 +517,6 @@ func main() {
 	//testAddr()
 	//testSSHHost()
 
-	testScriptSource()
+	//testScriptSource()
 }
 
