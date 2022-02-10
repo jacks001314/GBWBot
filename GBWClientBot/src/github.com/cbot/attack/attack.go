@@ -1,11 +1,12 @@
 package attack
 
+import "github.com/cbot/targets"
+
 type Attack interface {
 
 
-	Start()
+	Run(target targets.Target)
 
-	Stop()
-
+	PubProcess(process *AttackProcess)
 
 }
