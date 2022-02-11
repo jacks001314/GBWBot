@@ -200,7 +200,9 @@ func (sp *SourcePut) Call(args ... objects.Object) (objects.Object,error) {
 		return nil, tengo.ErrWrongNumArguments
 	}
 
-	entry := args[0].(targets.Target)
+	entry := args[0].(*ScriptSourceEntry)
+
+	entry.source = sp.source
 
 	sp.source.Put(entry)
 

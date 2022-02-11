@@ -8,19 +8,30 @@ import (
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
 	"github.com/d5/tengo/stdlib"
+	"github.com/d5/tengo/v2"
 	"io/ioutil"
+	"strings"
 )
 
 type AttackScript struct {
 
 	attack.TengoObj
 
+	attackTasks *attack.AttackTasks
+
 	name string
+
+	attackType string
+
+	defaultPort int
+
+	defaultProto string
 
 	/*tengo script instanse Compiled*/
 	attackTengo  *script.Compiled
 
 }
+
 
 /*compile tengo script*/
 func scriptCompile(sdata []byte) (*script.Compiled, error) {
@@ -49,7 +60,12 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 }
 
 /*Create an attack script  by script content*/
-func NewAttackScriptFromContent(name string,data []byte) (*AttackScript,error) {
+func NewAttackScriptFromContent(attackTasks *attack.AttackTasks,
+	name string,
+	attackType string,
+	defaultPort int,
+	defaultProto string,
+	data []byte) (*AttackScript,error) {
 
 	com,err := scriptCompile(data)
 
@@ -58,16 +74,25 @@ func NewAttackScriptFromContent(name string,data []byte) (*AttackScript,error) {
 		return nil,err
 	}
 
-	return &AttackScript {
-		TengoObj: attack.TengoObj{Name: name},
-		name: name,
-		attackTengo:    com,
+	return &AttackScript{
+		TengoObj:     attack.TengoObj{Name:name},
+		attackTasks:  attackTasks,
+		name:         name,
+		attackType:   attackType,
+		defaultPort:  defaultPort,
+		defaultProto: defaultProto,
+		attackTengo:  com,
 	},nil
+
 
 }
 
 /*create an attack script  by file*/
-func NewAttackScriptFromFile(name string,fname string) (*AttackScript,error){
+func NewAttackScriptFromFile(attackTasks *attack.AttackTasks,
+	name string,
+	attackType string,
+	defaultPort int,
+	defaultProto string,fname string) (*AttackScript,error){
 
 	data,err:= ioutil.ReadFile(fname)
 
@@ -76,18 +101,65 @@ func NewAttackScriptFromFile(name string,fname string) (*AttackScript,error){
 	}
 
 
-	return NewAttackScriptFromContent(name,data)
+	return NewAttackScriptFromContent(attackTasks,name,attackType,defaultPort,defaultProto,data)
 
 }
 
-func (a *AttackScript) Run( target targets.Target) {
+func (as *AttackScript) Name() string {
 
+	return as.name
+}
 
+func (as *AttackScript) DefaultPort() int {
+
+	return as.defaultPort
 }
 
 
-func (a *AttackScript) PubProcess(process *attack.AttackProcess) {
+func (as *AttackScript) DefaultProto() string {
 
+	return as.defaultProto
+}
+
+func (as *AttackScript)Accept(target targets.Target) bool {
+
+	types := target.Source().GetTypes()
+
+	for _,t:= range types {
+
+		if strings.EqualFold(t,as.attackType){
+
+			return true
+		}
+	}
+
+	return false
+}
+
+
+func (as *AttackScript) Run(target targets.Target) error {
+
+	defer as.attackTasks.PubSyn()
+
+	attackTarget := newAttackTarget(as,target)
+
+	ts := as.attackTengo.Clone()
+
+	ts.Set("attackTarget", attackTarget)
+	ts.Set("attackScript", as)
+
+	if err := ts.Run(); err != nil {
+
+		return err
+
+	}
+
+	return nil
+}
+
+func (as *AttackScript) PubProcess(process *attack.AttackProcess) {
+
+	as.attackTasks.PubAttackProcess(process)
 
 }
 
@@ -110,6 +182,54 @@ func newAttackProcess(args ...objects.Object) (ret objects.Object, err error) {
 
 }
 
+
+func (as *AttackScript) IndexGet(index objects.Object)(value objects.Object,err error){
+
+	key,ok := objects.ToString(index)
+
+	if !ok {
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "index",
+			Expected: "string(compatible)",
+			Found:    index.TypeName(),
+		}
+	}
+
+	switch key {
+
+	case "pubProcess":
+
+		return &PubProcessMethod{
+			TengoObj: attack.TengoObj{Name: "pubProcess"},
+			as:   as,
+		}, nil
+
+	}
+
+	return nil,fmt.Errorf("Unknown Attack script method:%s",key)
+}
+
+
+type PubProcessMethod struct {
+
+	attack.TengoObj
+
+	as *AttackScript
+}
+
+func (pp *PubProcessMethod) Call(args ... objects.Object) (objects.Object,error) {
+
+	if len(args) != 1 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	ap := args[0].(*attack.AttackProcess)
+
+	pp.as.attackTasks.PubAttackProcess(ap)
+
+	return pp.as,nil
+}
 
 var moduleMap objects.Object = &objects.ImmutableMap{
 

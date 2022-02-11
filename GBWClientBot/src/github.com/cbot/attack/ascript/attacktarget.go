@@ -11,9 +11,22 @@ type AttackTarget struct {
 
 	attack.TengoObj
 
+	attack attack.Attack
+
 	target targets.Target
 
 }
+
+func newAttackTarget(at attack.Attack,target targets.Target)*AttackTarget {
+
+	return &AttackTarget{
+
+		TengoObj: attack.TengoObj{Name: "AttackTarget"},
+		attack:   at,
+		target:   target,
+	}
+}
+
 
 func (at *AttackTarget) IndexGet(index objects.Object)(value objects.Object,err error) {
 
@@ -36,13 +49,29 @@ func (at *AttackTarget) IndexGet(index objects.Object)(value objects.Object,err 
 		return objects.FromInterface(at.target.Host())
 
 	case "port":
-		return objects.FromInterface(at.target.Port())
+
+		port := at.target.Port()
+
+		if port <=0 {
+
+			port = at.attack.DefaultPort()
+		}
+
+		return objects.FromInterface(port)
 
 	case "app":
 		return objects.FromInterface(at.target.App())
 
 	case "proto":
-		return objects.FromInterface(at.target.Proto())
+
+		proto := at.target.Proto()
+
+		if proto == ""{
+
+			proto = at.attack.DefaultProto()
+		}
+
+		return objects.FromInterface(proto)
 
 
 	}

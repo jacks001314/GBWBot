@@ -23,7 +23,7 @@ type sourceReader struct {
 
 	capacity 	int
 
-	accept  func (Source,targets.Target) bool
+	accept  func (targets.Target) bool
 }
 
 func NewSourcePool() *SourcePool {
@@ -71,7 +71,7 @@ func (p *SourcePool) StopSource(s Source) {
 }
 
 
-func (p *SourcePool) SubTarget(name string,capacity int,accept func (Source,targets.Target) bool) chan targets.Target {
+func (p *SourcePool) SubTarget(name string,capacity int,accept func (targets.Target) bool) chan targets.Target {
 
 	p.lock.Lock()
 	defer p.lock.Unlock()
@@ -101,7 +101,7 @@ func (p *SourcePool) put(s Source,target targets.Target) {
 
 	for _,r:= range p.readers {
 
-		if r.accept(s,target) {
+		if r.accept(target) {
 
 			r.rch<-target
 		}

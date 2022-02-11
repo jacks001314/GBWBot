@@ -1,5 +1,7 @@
 package targets
 
+import "github.com/cbot/targets/source"
+
 type Target interface {
 
 	IP() 		string
@@ -12,5 +14,6 @@ type Target interface {
 
 	App()		string
 
+	Source() source.Source
 }
 

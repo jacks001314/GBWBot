@@ -15,6 +15,8 @@ type ScriptSourceEntry struct {
 	port 	int
 	proto 	string
 	app		string
+
+	source Source
 }
 
 func newEntry(args ... objects.Object) (objects.Object,error) {
@@ -172,4 +174,9 @@ func (e *ScriptSourceEntry) Proto() string {
 func (e *ScriptSourceEntry) App() string {
 
 	return e.app
+}
+
+func (e *ScriptSourceEntry) Source() Source {
+
+	return e.source
 }
