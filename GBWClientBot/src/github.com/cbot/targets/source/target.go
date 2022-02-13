@@ -1,6 +1,4 @@
-package targets
-
-import "github.com/cbot/targets/source"
+package source
 
 type Target interface {
 
@@ -14,6 +12,6 @@ type Target interface {
 
 	App()		string
 
-	Source() source.Source
+	Source() Source
 }
 

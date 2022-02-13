@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "AttackTask";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+
+enum OsType {
+
+  Linux = 0;
+  Windows = 1;
+  Macos = 2;
+}
+
+enum AttackTaskCmd {
+
+  GetStatus = 0;
+
+}
+
+message CreateAttackTaskRequest {
+
+  string userId = 1;
+
+  string host = 2;
+
+  int32  port = 3;
+
+  string user = 4;
+
+  string passwd = 5;
+
+  string privateKey = 6;
+
+  OsType osType = 7;
+
+  string cbot = 8;
+
+}
+
+message CreateAttackTaskReply {
+
+  //0 ---ok,-1 failied
+
+  int32 status =1;
+
+  string taskId =2 ;
+
+}
+
+
+message AttackTaskCmdRequest {
+
+
+}
+
+
+message AttackTaskCmdReply {
+
+
+}

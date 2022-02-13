@@ -178,7 +178,6 @@ func testLogStream(addr string,ip string)  {
 			continue
 		}
 
-
 		if cmd.Op == model.CmdOP_OPEN {
 
 			go openLogStream(logClient, ip, ch)

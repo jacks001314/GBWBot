@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/attacktask.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "AttackTaskService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+
+service AttackTaskService {
+
+  rpc CreateAttackTask(model.AttackTask) returns (model.AttackTaskReply){};
+
+
+}

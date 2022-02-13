@@ -8,7 +8,7 @@ import (
 	"github.com/cbot/proto/redis"
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/proto/transport"
-	"github.com/cbot/targets"
+
 	"github.com/cbot/targets/genip"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
@@ -19,6 +19,7 @@ import (
 	"github.com/d5/tengo/stdlib"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -444,7 +445,7 @@ func testScriptSource() {
 		return
 	}
 
-	rch := spool.SubTarget("treader", 10, func(s source.Source, target targets.Target) bool {
+	rch := spool.SubTarget("treader", 10, func(target source.Target) bool {
 
 		return true
 	})
@@ -498,6 +499,20 @@ func testScriptSource() {
 }
 
 
+func testOSCmd(){
+
+	args := []string{"-all"}
+
+	cmd := exec.Command("ipconfig",args...)
+
+	data,err:=cmd.CombinedOutput()
+
+	fmt.Println(string(data),err)
+
+
+}
+
+
 func main() {
 
 
@@ -505,7 +520,7 @@ func main() {
 	//testScript()
 	//testHttp()
 
-	testTcpScript()
+	//testTcpScript()
 
 	//testIPConstraint()
 	//testAES()
@@ -518,5 +533,7 @@ func main() {
 	//testSSHHost()
 
 	//testScriptSource()
+
+	testOSCmd()
 }
 

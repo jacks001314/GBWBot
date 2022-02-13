@@ -3,7 +3,6 @@ package source
 import (
 	"fmt"
 	"github.com/cbot/proto/http"
-	"github.com/cbot/targets"
 	"github.com/cbot/targets/genip"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
@@ -110,7 +109,7 @@ func NewScriptSourceFromFile(spool *SourcePool,name string,rtypes []string,fname
 
 }
 
-func (s *ScriptSource) Put(entry targets.Target) error{
+func (s *ScriptSource) Put(entry Target) error{
 
 	s.spool.put(s,entry)
 

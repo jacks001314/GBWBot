@@ -31,7 +31,7 @@ func NewAttackTasks(cfg *Config,spool *source.SourcePool) *AttackTasks {
 		spool:   spool,
 		attacks: make(map[string]Attack),
 		syncChan: make(chan int,cfg.MaxThreads),
-		attackProcessChan: make(chan *AttackProcess,cfg.AttackProcessCapacity),
+		attackProcessChan:  make(chan *AttackProcess,cfg.AttackProcessCapacity),
 	}
 
 }

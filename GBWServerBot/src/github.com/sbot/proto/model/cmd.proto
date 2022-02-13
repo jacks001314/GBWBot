@@ -12,7 +12,9 @@ option php_namespace = "SBot\\Proto\\Model";
 enum CmdCode {
 
   RunOSCmd = 0;
-
+  RunAddAttackSource = 1;
+  RunAddAttack = 2;
+  
 }
 
 message CmdRequest {

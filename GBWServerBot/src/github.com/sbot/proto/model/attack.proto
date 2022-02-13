@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "Attack";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+message AddAttackRequest {
+
+  string name = 1;
+
+  string attackType = 2;
+
+  int32 defaultPort = 3;
+
+  string defaultProto = 4;
+
+  uint64 contentLen = 5;
+
+  bytes content = 6;
+
+  
+}

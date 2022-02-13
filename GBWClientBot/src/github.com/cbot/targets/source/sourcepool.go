@@ -1,7 +1,6 @@
 package source
 
 import (
-	"github.com/cbot/targets"
 	"sync"
 )
 
@@ -19,11 +18,11 @@ type sourceReader struct {
 
 	name 		string
 
-	rch 		chan targets.Target
+	rch 		chan Target
 
 	capacity 	int
 
-	accept  func (targets.Target) bool
+	accept  func (Target) bool
 }
 
 func NewSourcePool() *SourcePool {
@@ -71,7 +70,7 @@ func (p *SourcePool) StopSource(s Source) {
 }
 
 
-func (p *SourcePool) SubTarget(name string,capacity int,accept func (targets.Target) bool) chan targets.Target {
+func (p *SourcePool) SubTarget(name string,capacity int,accept func (Target) bool) chan Target {
 
 	p.lock.Lock()
 	defer p.lock.Unlock()
@@ -84,7 +83,7 @@ func (p *SourcePool) SubTarget(name string,capacity int,accept func (targets.Tar
 
 	nr := &sourceReader{
 		name:    name,
-		rch:     make(chan targets.Target,capacity),
+		rch:     make(chan Target,capacity),
 		capacity: capacity,
 		accept:   accept,
 	}
@@ -94,7 +93,7 @@ func (p *SourcePool) SubTarget(name string,capacity int,accept func (targets.Tar
 	return nr.rch
 }
 
-func (p *SourcePool) put(s Source,target targets.Target) {
+func (p *SourcePool) put(s Source,target Target) {
 
 	p.lock.Lock()
 	defer p.lock.Unlock()
