@@ -27,6 +27,7 @@ type AttackProcess struct {
 
 	Result  string `json:"result"`
 
+	Details string `json:"details"`
 }
 
 
@@ -107,6 +108,12 @@ func (ap *AttackProcess) IndexGet(index objects.Object)(value objects.Object,err
 	case "setResult":
 		return &FieldSet{
 			TengoObj: TengoObj{Name:"result"},
+			ap:    ap,
+		},nil
+
+	case "setDetails":
+		return &FieldSet{
+			TengoObj: TengoObj{Name:"details"},
 			ap:    ap,
 		},nil
 
@@ -191,6 +198,9 @@ func (f *FieldSet) Call(args ... objects.Object) (objects.Object,error) {
 
 	case "result":
 		f.ap.Result = sdata
+
+	case "details":
+		f.ap.Details = sdata
 
 	}
 

