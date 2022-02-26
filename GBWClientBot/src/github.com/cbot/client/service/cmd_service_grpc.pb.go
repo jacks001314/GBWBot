@@ -4,7 +4,7 @@ package service
 
 import (
 	context "context"
-	model "github.com/sbot/proto/model"
+	model "github.com/cbot/client/model"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"

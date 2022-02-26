@@ -7,14 +7,12 @@ import (
 	"strings"
 )
 
-
 type NetInterface struct {
-
 	name string
-	ip net.IP
+	ip   net.IP
 	mask net.IPMask
-	mac string
-	gw string
+	mac  string
+	gw   string
 }
 
 func (n *NetInterface) Name() string {
@@ -32,7 +30,6 @@ func (n *NetInterface) IP6() string {
 	return n.ip.To16().String()
 }
 
-
 func (n *NetInterface) Mask() string {
 
 	return n.mask.String()
@@ -40,9 +37,9 @@ func (n *NetInterface) Mask() string {
 
 func (n *NetInterface) NetWorkRange() string {
 
-	prefixLen,_ := n.mask.Size()
+	prefixLen, _ := n.mask.Size()
 
-	return fmt.Sprintf("%s/%d",n.ip.Mask(n.mask).String(),prefixLen)
+	return fmt.Sprintf("%s/%d", n.ip.Mask(n.mask).String(), prefixLen)
 }
 
 func (n *NetInterface) Mac() string {
@@ -58,52 +55,51 @@ func (n *NetInterface) GW() string {
 func (n *NetInterface) String() string {
 
 	return fmt.Sprintf("{name:%s,ip:%s,mask:%s,mac:%s,gw:%s}",
-		n.name,n.ip,n.mask,n.mac,n.gw)
+		n.name, n.ip, n.mask, n.mac, n.gw)
 }
 
 func Addrs(isv4 bool) []*NetInterface {
 
+	interfaces := make([]*NetInterface, 0)
 
-	interfaces := make([]*NetInterface,0)
+	ifaces, err := net.Interfaces()
 
-	ifaces,err := net.Interfaces()
-
-	if err!=nil {
+	if err != nil {
 		return interfaces
 	}
 
-	for _,iface := range ifaces {
+	for _, iface := range ifaces {
 
-		if iface.Flags&net.FlagUp == 0 ||iface.Flags&net.FlagLoopback!=0 {
+		if iface.Flags&net.FlagUp == 0 || iface.Flags&net.FlagLoopback != 0 {
 
 			continue
 		}
 
-		addrs,err := iface.Addrs()
-		if err!=nil {
+		addrs, err := iface.Addrs()
+		if err != nil {
 			return interfaces
 		}
 
-		for _,addr := range addrs {
+		for _, addr := range addrs {
 
-			ip,mask := getIpFromAddr(addr)
+			ip, mask := getIpFromAddr(addr)
 
 			if ip == nil {
 				continue
 			}
-			prefixlen,_:=mask.Size()
+			prefixlen, _ := mask.Size()
 
-			if isv4 && prefixlen>32 {
+			if isv4 && prefixlen > 32 {
 				continue
 			}
-			interfaces = append(interfaces,makeInterface(iface,ip,mask))
+			interfaces = append(interfaces, makeInterface(iface, ip, mask))
 		}
 	}
 
 	return interfaces
 }
 
-func makeInterface(p net.Interface,ip net.IP,mask net.IPMask) (*NetInterface){
+func makeInterface(p net.Interface, ip net.IP, mask net.IPMask) *NetInterface {
 
 	return &NetInterface{
 		name: p.Name,
@@ -114,7 +110,7 @@ func makeInterface(p net.Interface,ip net.IP,mask net.IPMask) (*NetInterface){
 	}
 }
 
-func getIpFromAddr(addr net.Addr) (net.IP,net.IPMask) {
+func getIpFromAddr(addr net.Addr) (net.IP, net.IPMask) {
 
 	var ip net.IP
 	var mask net.IPMask
@@ -131,12 +127,11 @@ func getIpFromAddr(addr net.Addr) (net.IP,net.IPMask) {
 	}
 
 	if ip == nil || ip.IsLoopback() {
-		return nil,nil
+		return nil, nil
 	}
 
-	return ip,mask
+	return ip, mask
 }
-
 
 // Get preferred outbound ip of this machine
 func GetWorkingIP() net.IP {
@@ -162,9 +157,9 @@ func GetWorkingIPRange(isv4 bool) string {
 
 	addrs := Addrs(isv4)
 
-	for _,addr := range addrs {
+	for _, addr := range addrs {
 
-		if strings.EqualFold(addr.ip.String(),ip.String()){
+		if strings.EqualFold(addr.ip.String(), ip.String()) {
 
 			return addr.NetWorkRange()
 		}
@@ -176,18 +171,18 @@ func GetWorkingIPRange(isv4 bool) string {
 /*get out ip*/
 func GetOutIP() string {
 
-	client := http.NewHttpClient("ip.sb",80,false,10000)
+	client := http.NewHttpClient("ip.sb", 80, false, 10000)
 
-	req := http.NewHttpRequest("GET","/").AddHeader("User-Agent"," curl/7.61.1")
+	req := http.NewHttpRequest("GET", "/").AddHeader("User-Agent", " curl/7.61.1")
 
-	res,err:= client.Send(req)
+	res, err := client.Send(req)
 
-	if err!=nil {
+	if err != nil {
 		fmt.Println(err)
 		return ""
 	}
 
-	ip,_:= res.GetBodyAsString()
+	ip, _ := res.GetBodyAsString()
 	return strings.TrimSpace(ip)
 }
 
@@ -196,9 +191,9 @@ func ISLocalIP(ip string) bool {
 
 	addrs := Addrs(true)
 
-	for _,addr := range addrs {
+	for _, addr := range addrs {
 
-		if strings.EqualFold(ip,addr.ip.String()){
+		if strings.EqualFold(ip, addr.ip.String()) {
 
 			return true
 		}
@@ -207,3 +202,17 @@ func ISLocalIP(ip string) bool {
 	return false
 }
 
+func GetMacByIP(ip string) string {
+
+	addrs := Addrs(true)
+
+	for _, addr := range addrs {
+
+		if strings.EqualFold(ip, addr.ip.String()) {
+
+			return addr.mac
+		}
+	}
+
+	return ""
+}

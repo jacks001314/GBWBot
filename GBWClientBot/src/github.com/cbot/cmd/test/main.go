@@ -8,7 +8,6 @@ import (
 	"github.com/cbot/proto/redis"
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/proto/transport"
-
 	"github.com/cbot/targets/genip"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
@@ -20,10 +19,11 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 	"time"
 )
 
-func testSSH(){
+func testSSH() {
 
 	host := "www.gbw3bao.com"
 	port := 22
@@ -33,10 +33,10 @@ func testSSH(){
 	remoteDir := "/tmp/"
 	downloadDir := "D:\\"
 
-	sshclient,err:= ssh.LoginWithPasswd(host,port,user,pass,10000)
+	sshclient, err := ssh.LoginWithPasswd(host, port, user, pass, 10000)
 	//sshclient,err := ssh.LoginNoPassword(host,port,user,1000)
 
-	if err!=nil {
+	if err != nil {
 
 		fmt.Println(err)
 		return
@@ -44,21 +44,19 @@ func testSSH(){
 
 	defer sshclient.Close()
 
-
 	//res,_:=sshclient.RunCmd("cat sum.c;cat /etc/passwd")
 
-	ftp,err:= ssh.NewSftpClient(sshclient)
-	if err!=nil {
+	ftp, err := ssh.NewSftpClient(sshclient)
+	if err != nil {
 
 		fmt.Println(err)
 		return
 	}
 	defer ftp.Close()
 
-	ftp.UPloadFile(fpath,remoteDir)
+	ftp.UPloadFile(fpath, remoteDir)
 
-
-	ftp.DownloadFile("/tmp/main.go",downloadDir)
+	ftp.DownloadFile("/tmp/main.go", downloadDir)
 
 	//res,_:=sshclient.RunCmd("cat /tmp/main.go")
 
@@ -66,18 +64,18 @@ func testSSH(){
 
 }
 
-func testHttp(){
+func testHttp() {
 
-	host  := "www.163.com"
-	port  := 443
+	host := "www.163.com"
+	port := 443
 
-	client := http.NewHttpClient(host,port,true,10000)
-	request := http.NewHttpRequest("get","/").AddHeader("User-Agent","GOClient")
+	client := http.NewHttpClient(host, port, true, 10000)
+	request := http.NewHttpRequest("get", "/").AddHeader("User-Agent", "GOClient")
 
-	if resp,err:= client.Send(request);err!=nil {
+	if resp, err := client.Send(request); err != nil {
 
 		fmt.Println(err)
-	}else {
+	} else {
 
 		fmt.Println(resp.GetHeaderValue("Content-Type"))
 		fmt.Println(resp.GetStatusCode())
@@ -89,7 +87,6 @@ type Test struct {
 
 	//tengo.ObjectImpl
 	c int
-
 }
 
 func (t *Test) BinaryOp(op token.Token, rhs objects.Object) (objects.Object, error) {
@@ -118,7 +115,7 @@ func (t *Test) String() string {
 	return "test"
 }
 
-func (t *Test) Call(args ... objects.Object) (objects.Object,error){
+func (t *Test) Call(args ...objects.Object) (objects.Object, error) {
 
 	fmt.Println(args[1])
 	fmt.Println(t.c)
@@ -126,8 +123,8 @@ func (t *Test) Call(args ... objects.Object) (objects.Object,error){
 	fmt.Println(tt.c)
 
 	return &objects.Int{
-		Value:      12,
-	},nil
+		Value: 12,
+	}, nil
 
 }
 
@@ -141,57 +138,56 @@ func newTest(args ...objects.Object) (objects.Object, error) {
 	var t Test
 	t.c = 1234
 	fmt.Println(",,,,,,,,,,,,,,,,,,,,,,,,,,,")
-	return &t,nil
+	return &t, nil
 }
 
 type TestGetCall struct {
 	Test
-	fmap map[string]interface{}
+	fmap  map[string]interface{}
 	value string
 }
 
 func newGetCall(args ...objects.Object) (objects.Object, error) {
 
 	return &TestGetCall{
-		Test:  Test{},
-		fmap:map[string]interface{}{
-		"get":newGetFunc,
-		"set":newSetFunc,
-	},
-	value: "",
-	},nil
+		Test: Test{},
+		fmap: map[string]interface{}{
+			"get": newGetFunc,
+			"set": newSetFunc,
+		},
+		value: "",
+	}, nil
 }
 
-func (tc *TestGetCall)IndexGet(index objects.Object) (value objects.Object, err error){
+func (tc *TestGetCall) IndexGet(index objects.Object) (value objects.Object, err error) {
 
-	k,_:= objects.ToString(index)
+	k, _ := objects.ToString(index)
 
 	if k == "get" {
 
 		return &GetFunc{
 			Test: Test{},
 			name: "get",
-			tgc: tc,
-		},nil
+			tgc:  tc,
+		}, nil
 	}
 
-	if k== "set" {
+	if k == "set" {
 
 		return &SetFunc{
 			Test: Test{},
 			name: "set",
 			tgc:  tc,
-		},nil
+		}, nil
 	}
 
-	return nil,nil
+	return nil, nil
 }
 
 type GetFunc struct {
-
 	Test
 	name string
-	tgc *TestGetCall
+	tgc  *TestGetCall
 }
 
 func newGetFunc() *GetFunc {
@@ -202,16 +198,15 @@ func newGetFunc() *GetFunc {
 	}
 }
 
-func (tc *GetFunc) Call(args ... objects.Object) (objects.Object,error){
+func (tc *GetFunc) Call(args ...objects.Object) (objects.Object, error) {
 
 	return objects.FromInterface(tc.tgc.value)
 }
 
 type SetFunc struct {
-
 	Test
 	name string
-	tgc *TestGetCall
+	tgc  *TestGetCall
 }
 
 func newSetFunc() *SetFunc {
@@ -222,13 +217,12 @@ func newSetFunc() *SetFunc {
 	}
 }
 
-func (tc *SetFunc) Call(args ... objects.Object) (objects.Object,error){
+func (tc *SetFunc) Call(args ...objects.Object) (objects.Object, error) {
 
-	tc.tgc.value ,_= objects.ToString(args[0])
+	tc.tgc.value, _ = objects.ToString(args[0])
 
-	return nil,nil
+	return nil, nil
 }
-
 
 var moduleMap objects.Object = &objects.ImmutableMap{
 	Value: map[string]objects.Object{
@@ -254,11 +248,10 @@ func (Test) Import(moduleName string) (interface{}, error) {
 	}
 }
 
+func testScript() {
 
-func testScript(){
-
-	path:=""
-	data,_:=ioutil.ReadFile(path)
+	path := ""
+	data, _ := ioutil.ReadFile(path)
 	script := script.New(data)
 
 	mm := objects.NewModuleMap()
@@ -276,14 +269,14 @@ func testScript(){
 
 }
 
-func testTcpScript(){
+func testTcpScript() {
 
-	path:=`D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\cmd\test\tcp.tengo`
-	data,_:=ioutil.ReadFile(path)
+	path := `D:\shajf_dev\self\GBWBot\GBWClientBot\src\github.com\cbot\cmd\test\tcp.tengo`
+	data, _ := ioutil.ReadFile(path)
 	script := script.New(data)
 
 	mm := objects.NewModuleMap()
-	mm.Add("transport",transport.TransportTengo{})
+	mm.Add("transport", transport.TransportTengo{})
 
 	mm.AddMap(stdlib.GetModuleMap("fmt"))
 	script.SetImports(mm)
@@ -295,36 +288,34 @@ func testTcpScript(){
 		//panic(err)
 	}
 
-
 	//objects.Map{}
 
 }
 
-func testConnection(){
+func testConnection() {
 
 	addr := "www.sohu.com:443"
-	timout := 30*time.Second
+	timout := 30 * time.Second
 
 	req := "GET / HTTP/1.1\r\nHost: www.sohu.com\r\nUser-Agent: go-client\r\n\r\n"
 
-	conn,err := transport.Dial("tcp",addr,transport.DialConnectTimeout(timout),
+	conn, err := transport.Dial("tcp", addr, transport.DialConnectTimeout(timout),
 		transport.DialReadTimeout(timout),
 		transport.DialWriteTimeout(timout),
 		transport.DialTLSHandshakeTimeout(timout),
 		transport.DialTLSSkipVerify(true),
 		transport.DialUseTLS(true))
 
-	if err!=nil {
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
 
 	//conn.WriteString(req)
 	conn.WriteHex(hex.EncodeToString([]byte(req)))
 	conn.Flush()
 
-	data,err:= conn.ReadBytes(1024)
+	data, err := conn.ReadBytes(1024)
 
 	defer conn.Close()
 
@@ -332,8 +323,7 @@ func testConnection(){
 
 }
 
-
-func testIPConstraint(){
+func testIPConstraint() {
 
 	con := genip.NewConstraint(0)
 
@@ -345,25 +335,23 @@ func testIPConstraint(){
 	con.Set(netutils.IPStrToInt("10.11.12.0"), 24, 1)
 	con.Set(netutils.IPStrToInt("141.212.0.0"), 16, 0)
 
+	fmt.Printf("count(0)=%d\n", con.CountIPS(0))
+	fmt.Printf("count(1)=%d\n", con.CountIPS(1))
+	fmt.Printf("%d\n", con.LookupIP(netutils.IPStrToInt("10.11.12.0")))
 
-
-	fmt.Printf("count(0)=%d\n", con.CountIPS( 0))
-	fmt.Printf("count(1)=%d\n", con.CountIPS( 1))
-	fmt.Printf("%d\n",con.LookupIP(netutils.IPStrToInt("10.11.12.0")))
-
-	fmt.Println(con.CountIPS( 0) + con.CountIPS(1) == 1 << 32)
+	fmt.Println(con.CountIPS(0)+con.CountIPS(1) == 1<<32)
 
 }
 
-func testIPGen(){
+func testIPGen() {
 
 	//wlist := []string {"192.168.1.0/24","10.0.1.0/24"}
 	//blist := []string {"192.168.1.1","10.0.1.1","10.0.1.0"}
 
-	ipg ,_:= genip.NewIPGen("","",[]string{},[]string{},true)
+	ipg, _ := genip.NewIPGen("", "", []string{}, []string{}, true)
 
 	var c uint32 = 0
-	for ip := ipg.GetCurIP();ip!=0;ip=ipg.GetNextIP() {
+	for ip := ipg.GetCurIP(); ip != 0; ip = ipg.GetNextIP() {
 
 		fmt.Println(netutils.IPv4StrBig(ip))
 		c++
@@ -372,29 +360,29 @@ func testIPGen(){
 	fmt.Println(c)
 }
 
-func testRedis(){
+func testRedis() {
 
 	host := "192.168.198.128"
 	port := 6379
 
-	cli := redis.NewRedisClient(host,port,"",10000,2)
+	cli := redis.NewRedisClient(host, port, "", 10000, 2)
 
 	//fmt.Println(cli.Info())
 
-	fmt.Println(cli.Do("set","bb","fuck"))
-	fmt.Println(cli.Do("get","bb"))
+	fmt.Println(cli.Do("set", "bb", "fuck"))
+	fmt.Println(cli.Do("get", "bb"))
 	fmt.Println(cli.Info())
 }
 
-func testAddr(){
+func testAddr() {
 
 	addrs := local.Addrs(true)
 
-	for _,addr:= range addrs {
+	for _, addr := range addrs {
 
 		fmt.Println(addr.NetWorkRange())
+		fmt.Println(addr.Mac())
 	}
-
 
 	fmt.Println(local.GetOutIP())
 	fmt.Println(local.GetWorkingIPRange(true))
@@ -402,20 +390,21 @@ func testAddr(){
 
 	fmt.Println(local.ISLocalIP("192.168.2.109"))
 
+	fmt.Println(local.GetWorkingIP())
 
+	fmt.Println(local.GetMacByIP(local.GetWorkingIP().String()))
 }
 
-func testSSHHost(){
-
+func testSSHHost() {
 
 	sshLoginInfo := local.CollectSSHLoginInfo()
 
 	fmt.Println(sshLoginInfo.User())
 	fmt.Println(sshLoginInfo.PrivateKey())
 
-	for _,sshHost:= range sshLoginInfo.Hosts() {
+	for _, sshHost := range sshLoginInfo.Hosts() {
 
-		fmt.Printf("{ip:%s,host:%s,port:%d,user:%s,userName:%s}\n",sshHost.IP(),sshHost.Host(),sshHost.Port(),sshHost.UserName(),sshHost.UserName())
+		fmt.Printf("{ip:%s,host:%s,port:%d,user:%s,userName:%s}\n", sshHost.IP(), sshHost.Host(), sshHost.Port(), sshHost.UserName(), sshHost.UserName())
 	}
 
 }
@@ -467,54 +456,49 @@ func testScriptSource() {
 		}
 	}()
 
+	/*
+		go func (){for {
 
-/*
-	go func (){for {
+			entry,err:= reader2.Read()
 
-		entry,err:= reader2.Read()
+			if err!=nil {
 
-		if err!=nil {
+				fmt.Println(err)
+				break
+			}
 
-			fmt.Println(err)
-			break
-		}
+			if entry == nil {
 
-		if entry == nil {
+				continue
+			}
 
-			continue
-		}
-
-		fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}----------\n",
-			entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
-	}}()*/
+			fmt.Printf("{ip:%s,host:%s,port:%d,proto:%s,app:%s}----------\n",
+				entry.IP(),entry.Host(),entry.Port(),entry.Proto(),entry.App())
+		}}()*/
 
 	for {
 
 		spool.StartSource(ss2)
 
-		time.Sleep(10*time.Second)
+		time.Sleep(10 * time.Second)
 
 	}
 
 }
 
-
-func testOSCmd(){
+func testOSCmd() {
 
 	args := []string{"-all"}
 
-	cmd := exec.Command("ipconfig",args...)
+	cmd := exec.Command("ipconfig", args...)
 
-	data,err:=cmd.CombinedOutput()
+	data, err := cmd.CombinedOutput()
 
-	fmt.Println(string(data),err)
-
+	fmt.Println(string(data), err)
 
 }
 
-
 func main() {
-
 
 	//testConnection()
 	//testScript()
@@ -534,6 +518,16 @@ func main() {
 
 	//testScriptSource()
 
-	testOSCmd()
-}
+	//testOSCmd()
 
+	fmt.Println(runtime.GOARCH)
+	fmt.Println(runtime.GOOS)
+
+	m := make(map[string]bool)
+
+	m["root"] = true
+	m["root"] = false
+
+	fmt.Println(m["root"])
+	fmt.Println(len(m))
+}

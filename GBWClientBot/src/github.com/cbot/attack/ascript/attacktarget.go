@@ -2,22 +2,21 @@ package ascript
 
 import (
 	"github.com/cbot/attack"
-	"github.com/cbot/targets"
+	"github.com/cbot/targets/source"
+
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/v2"
 )
 
 type AttackTarget struct {
-
 	attack.TengoObj
 
 	attack attack.Attack
 
-	target targets.Target
-
+	target source.Target
 }
 
-func newAttackTarget(at attack.Attack,target targets.Target)*AttackTarget {
+func newAttackTarget(at attack.Attack, target source.Target) *AttackTarget {
 
 	return &AttackTarget{
 
@@ -27,8 +26,7 @@ func newAttackTarget(at attack.Attack,target targets.Target)*AttackTarget {
 	}
 }
 
-
-func (at *AttackTarget) IndexGet(index objects.Object)(value objects.Object,err error) {
+func (at *AttackTarget) IndexGet(index objects.Object) (value objects.Object, err error) {
 
 	key, ok := objects.ToString(index)
 
@@ -52,7 +50,7 @@ func (at *AttackTarget) IndexGet(index objects.Object)(value objects.Object,err 
 
 		port := at.target.Port()
 
-		if port <=0 {
+		if port <= 0 {
 
 			port = at.attack.DefaultPort()
 		}
@@ -66,15 +64,14 @@ func (at *AttackTarget) IndexGet(index objects.Object)(value objects.Object,err 
 
 		proto := at.target.Proto()
 
-		if proto == ""{
+		if proto == "" {
 
 			proto = at.attack.DefaultProto()
 		}
 
 		return objects.FromInterface(proto)
 
-
 	}
 
-	return nil,nil
+	return nil, nil
 }
