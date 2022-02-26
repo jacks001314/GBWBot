@@ -26,11 +26,14 @@ message CreateNodeRequest {
   //the os that been attacked node
   string os = 5;
 
+  //the system arch
+  string arch = 6;
+
   //the current user
-  string user = 6;
+  string user = 7;
 
   //the host name that been attacked node
-  string hostName = 7;
+  string hostName = 8;
 
 }
 
@@ -46,8 +49,7 @@ message Node {
 
 message PingRequest {
 
-  //the node information that send ping request
-  Node node = 1;
+  string nodeId = 1;
 
   //the time that cbot sends ,time unit is ms
   uint64 time = 2;

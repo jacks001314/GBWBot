@@ -102,6 +102,7 @@ func openLogStream( logClient service.LogStreamServiceClient,ip string,closeCh c
 		Data:   []byte{},
 	})
 
+
 	if err !=nil {
 		return err
 	}
@@ -158,7 +159,6 @@ func testLogStream(addr string,ip string)  {
 		fmt.Printf("%v",err)
 		return
 	}
-
 
 	for {
 
