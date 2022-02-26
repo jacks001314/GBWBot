@@ -22,6 +22,13 @@ type SSHBruteforceAttack struct {
 	attackTasks *attack.AttackTasks
 }
 
+func NewSSHBruteforceAttack(dictPool *DictPool,attackTasks *attack.AttackTasks) *SSHBruteforceAttack{
+
+	return &SSHBruteforceAttack{
+		dictPool: dictPool,
+		attackTasks: attackTasks,
+	}
+}
 
 func (sba *SSHBruteforceAttack) Name() string {
 
