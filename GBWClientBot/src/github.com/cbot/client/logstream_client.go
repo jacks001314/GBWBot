@@ -96,27 +96,31 @@ func (ls *LogStreamClient) Start() error {
 		return err
 	}
 
-	for {
+	go func() {
+		for {
 
-		cmd, err := cmdMethod.Recv()
+			cmd, err := cmdMethod.Recv()
 
-		if err != nil || cmd.NodeId != ls.nd.NodeId() {
+			if err != nil || cmd.NodeId != ls.nd.NodeId() {
 
-			continue
+				continue
+			}
+
+			switch cmd.Op {
+
+			case model.CmdOP_OPEN:
+
+				go ls.sendLog()
+
+			case model.CmdOP_CLOSE:
+
+				ls.closeCh <- 1
+			}
+
 		}
+	}()
 
-		switch cmd.Op {
-
-		case model.CmdOP_OPEN:
-
-			go ls.sendLog()
-
-		case model.CmdOP_CLOSE:
-
-			ls.closeCh <- 1
-		}
-
-	}
+	return nil
 }
 
 func (ls *LogStreamClient) Stop() {

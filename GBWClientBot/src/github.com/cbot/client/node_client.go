@@ -80,7 +80,7 @@ func (n *NodeClient) Ping() error {
 	return err
 }
 
-func (n *NodeClient) SendAttackProcess(process attack.AttackProcess) error {
+func (n *NodeClient) SendAttackProcess(process *attack.AttackProcess) error {
 
 	_, err := n.nodeClient.SendAttackProcessRequest(context.Background(), &model.AttackProcessRequest{
 		NodeId:     n.nodeId,

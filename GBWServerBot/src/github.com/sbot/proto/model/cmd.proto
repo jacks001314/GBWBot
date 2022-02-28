@@ -14,7 +14,7 @@ enum CmdCode {
   RunOSCmd = 0;
   RunAddAttackSource = 1;
   RunAddAttack = 2;
-  
+  RunAddDict = 3;
 }
 
 message CmdRequest {

