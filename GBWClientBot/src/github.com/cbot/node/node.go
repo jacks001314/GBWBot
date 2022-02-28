@@ -5,6 +5,7 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/attack/ascript"
 	"github.com/cbot/client"
+	"github.com/cbot/logstream"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
 	"google.golang.org/grpc"
@@ -29,6 +30,8 @@ type Node struct {
 	attackTasks *attack.AttackTasks
 
 	nodeInfo *local.NodeInfo
+
+	logStream *logstream.LogStream
 }
 
 func NewNode(cfg *Config) *Node {
@@ -52,12 +55,12 @@ func (n *Node) Start() error {
 	var err error
 
 	//connect to sbot
-	n.grpcClient, err = grpc.Dial(fmt.Sprintf("%s:%d", n.cfg.sbotHost, n.cfg.sbotRPCPort),
+	n.grpcClient, err = grpc.Dial(fmt.Sprintf("%s:%d", n.cfg.SbotHost, n.cfg.SbotRPCPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
 
-		return err
+		return fmt.Errorf("Cannot connect to sbot:%v", err)
 	}
 
 	//connect to sbot,and create node
@@ -66,8 +69,27 @@ func (n *Node) Start() error {
 
 	if err != nil {
 
-		return err
+		return fmt.Errorf("Create node failed:%v", err)
 	}
+
+	n.cmdClient, err = client.NewCmdClient(n, n.grpcClient)
+	if err != nil {
+		return fmt.Errorf("Create command node client failed:%v", err)
+	}
+
+	n.logStream = logstream.NewLogStream()
+	n.logStreamClient = client.NewLogStreamClient(n, n.grpcClient, n.logStream)
+
+	//create attack sources
+	n.spool = source.NewSourcePool()
+
+	n.attackTasks = attack.NewAttackTasks(&attack.Config{
+		MaxThreads:            n.cfg.MaxThreads,
+		SourceCapacity:        n.cfg.SourceCapacity,
+		AttackProcessCapacity: n.cfg.AttackProcessCapacity,
+		SBotHost:              n.cfg.SbotHost,
+		SBotPort:              n.cfg.SbotFileServerPort,
+	}, n.nodeInfo, n.spool)
 
 	return nil
 }

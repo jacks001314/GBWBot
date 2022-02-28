@@ -69,4 +69,43 @@ message PingReply {
 
 }
 
+message AttackProcessRequest {
+
+  string nodeId = 1;
+
+  uint64 time = 2;
+
+  string targetIP = 3;
+
+  string targetHost = 4;
+
+  int32  targetPort = 5;
+
+  string proto = 6;
+
+  string app = 7;
+
+  string os = 8;
+
+  string attackName = 9;
+
+  string attackType = 10;
+
+  int32 status = 11;
+
+  string payload = 12;
+
+  string result = 13;
+
+  string details = 14;
+
+}
+
+message AttackProcessReply {
+
+  int32 status = 1;
+
+
+  string message =2 ;
+}
 

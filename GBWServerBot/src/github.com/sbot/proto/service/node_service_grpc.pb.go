@@ -23,6 +23,8 @@ type NodeServiceClient interface {
 	CreateNode(ctx context.Context, in *model.CreateNodeRequest, opts ...grpc.CallOption) (*model.Node, error)
 	//the ping request of node that been attacked
 	Ping(ctx context.Context, in *model.PingRequest, opts ...grpc.CallOption) (*model.PingReply, error)
+	//send attack process of node to sbot
+	SendAttackProcessRequest(ctx context.Context, in *model.AttackProcessRequest, opts ...grpc.CallOption) (*model.AttackProcessReply, error)
 }
 
 type nodeServiceClient struct {
@@ -51,6 +53,15 @@ func (c *nodeServiceClient) Ping(ctx context.Context, in *model.PingRequest, opt
 	return out, nil
 }
 
+func (c *nodeServiceClient) SendAttackProcessRequest(ctx context.Context, in *model.AttackProcessRequest, opts ...grpc.CallOption) (*model.AttackProcessReply, error) {
+	out := new(model.AttackProcessReply)
+	err := c.cc.Invoke(ctx, "/sbot.proto.service.NodeService/SendAttackProcessRequest", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServiceServer is the server API for NodeService service.
 // All implementations must embed UnimplementedNodeServiceServer
 // for forward compatibility
@@ -59,6 +70,8 @@ type NodeServiceServer interface {
 	CreateNode(context.Context, *model.CreateNodeRequest) (*model.Node, error)
 	//the ping request of node that been attacked
 	Ping(context.Context, *model.PingRequest) (*model.PingReply, error)
+	//send attack process of node to sbot
+	SendAttackProcessRequest(context.Context, *model.AttackProcessRequest) (*model.AttackProcessReply, error)
 	mustEmbedUnimplementedNodeServiceServer()
 }
 
@@ -71,6 +84,9 @@ func (UnimplementedNodeServiceServer) CreateNode(context.Context, *model.CreateN
 }
 func (UnimplementedNodeServiceServer) Ping(context.Context, *model.PingRequest) (*model.PingReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedNodeServiceServer) SendAttackProcessRequest(context.Context, *model.AttackProcessRequest) (*model.AttackProcessReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendAttackProcessRequest not implemented")
 }
 func (UnimplementedNodeServiceServer) mustEmbedUnimplementedNodeServiceServer() {}
 
@@ -121,6 +137,24 @@ func _NodeService_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_SendAttackProcessRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(model.AttackProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).SendAttackProcessRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sbot.proto.service.NodeService/SendAttackProcessRequest",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).SendAttackProcessRequest(ctx, req.(*model.AttackProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NodeService_ServiceDesc is the grpc.ServiceDesc for NodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +169,10 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _NodeService_Ping_Handler,
+		},
+		{
+			MethodName: "SendAttackProcessRequest",
+			Handler:    _NodeService_SendAttackProcessRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

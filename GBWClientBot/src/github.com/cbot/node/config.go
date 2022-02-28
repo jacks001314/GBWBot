@@ -1,9 +1,15 @@
 package node
 
 type Config struct {
-	sbotHost string `json:"sbotHost"`
+	SbotHost string `json:"sbotHost"`
 
-	sbotRPCPort int `json:"sbotRPCPort"`
+	SbotRPCPort int `json:"sbotRPCPort"`
 
-	sbotFileServerPort int `json:"sbotFileServerPort"`
+	SbotFileServerPort int `json:"sbotFileServerPort"`
+
+	MaxThreads int `json:"maxThreads"`
+
+	SourceCapacity int `json:"sourceCapacity"`
+
+	AttackProcessCapacity int `json:"attackProcessCapacity"`
 }

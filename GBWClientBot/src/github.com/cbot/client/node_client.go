@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/cbot/attack"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
 	"github.com/cbot/node"
@@ -76,10 +77,27 @@ func (n *NodeClient) Ping() error {
 		Time:   uint64(time.Now().UnixNano() / (1000 * 1000)),
 	})
 
-	if err != nil {
+	return err
+}
 
-		return err
-	}
+func (n *NodeClient) SendAttackProcess(process attack.AttackProcess) error {
 
-	return nil
+	_, err := n.nodeClient.SendAttackProcessRequest(context.Background(), &model.AttackProcessRequest{
+		NodeId:     n.nodeId,
+		Time:       uint64(time.Now().UnixNano() / (1000 * 1000)),
+		TargetIP:   process.IP,
+		TargetHost: process.Host,
+		TargetPort: int32(process.Port),
+		Proto:      process.Proto,
+		App:        process.App,
+		Os:         process.OS,
+		AttackName: process.Name,
+		AttackType: process.Type,
+		Status:     int32(process.Status),
+		Payload:    process.Payload,
+		Result:     process.Result,
+		Details:    process.Details,
+	})
+
+	return err
 }
