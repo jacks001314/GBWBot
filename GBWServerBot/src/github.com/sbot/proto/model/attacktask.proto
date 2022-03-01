@@ -17,29 +17,25 @@ enum OsType {
   Macos = 2;
 }
 
-enum AttackTaskCmd {
-
-  GetStatus = 0;
-
-}
-
 message CreateAttackTaskRequest {
 
-  string userId = 1;
+  string name = 1;
 
-  string host = 2;
+  string userId = 2;
 
-  int32  port = 3;
+  string host = 3;
 
-  string user = 4;
+  int32  port = 4;
 
-  string passwd = 5;
+  string user = 5;
 
-  string privateKey = 6;
+  string passwd = 6;
 
-  OsType osType = 7;
+  string privateKey = 7;
 
-  string cbot = 8;
+  OsType osType = 8;
+
+  string cbot = 9;
 
 }
 
@@ -50,17 +46,5 @@ message CreateAttackTaskReply {
   int32 status =1;
 
   string taskId =2 ;
-
-}
-
-
-message AttackTaskCmdRequest {
-
-
-}
-
-
-message AttackTaskCmdReply {
-
 
 }

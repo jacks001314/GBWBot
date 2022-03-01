@@ -9,8 +9,12 @@ import (
 )
 
 type NodeService struct {
-
 	service.UnimplementedNodeServiceServer
+}
+
+func NewNodeService() *NodeService {
+
+	return &NodeService{}
 }
 
 func (s *NodeService) CreateNode(context.Context, *model.CreateNodeRequest) (*model.Node, error) {
@@ -20,5 +24,3 @@ func (s *NodeService) CreateNode(context.Context, *model.CreateNodeRequest) (*mo
 func (s *NodeService) Ping(context.Context, *model.PingRequest) (*model.PingReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
-
-

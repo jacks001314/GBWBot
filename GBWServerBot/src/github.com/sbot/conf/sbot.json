@@ -1,0 +1,29 @@
+{
+  "rhost": "",
+
+  "rport": 3333,
+
+  "rDownloadDir": "/opt/data/store/files",
+
+  "certFlag": "",
+
+  "keyFlag": "",
+
+  "dbHost": "0.0.0.0",
+
+  "dbPort": 6379,
+
+  "dbUser": "redis",
+
+  "dbPass": "",
+
+  "subDomain": "",
+
+  "dnslogReplyIP": "",
+
+  "fserverDir": "/opt/data/store/files",
+
+  "fserverHost": "0.0.0.0",
+
+  "fserverPort": 6666
+}

@@ -11,31 +11,28 @@ import (
 )
 
 type GRPCService struct {
-
-	cfg 		*Config
-	listener 	net.Listener
-	grpcServer 	*grpc.Server
-
+	cfg        *Config
+	listener   net.Listener
+	grpcServer *grpc.Server
 }
 
 type Config struct {
+	Host     string
+	Port     string
+	CertFlag string
+	KeyFlag  string
 
-	Host                    string
-	Port                    string
-	CertFlag                string
-	KeyFlag                 string
-
+	FDir string
 }
 
 func NewGRPCService(cfg *Config) *GRPCService {
 
 	return &GRPCService{
-		cfg:        cfg,
+		cfg: cfg,
 	}
 }
 
-
-func (s *GRPCService) Start(){
+func (s *GRPCService) Start() {
 
 	address := fmt.Sprintf("%s:%s", s.cfg.Host, s.cfg.Port)
 	lis, err := net.Listen("tcp", address)
@@ -63,10 +60,10 @@ func (s *GRPCService) Start(){
 
 	s.grpcServer = grpc.NewServer(opts...)
 
-	service.RegisterFileSerivceServer(s.grpcServer,rservice.NewFileService("/var/tmp"))
-	service.RegisterNodeServiceServer(s.grpcServer,&rservice.NodeService{})
-	service.RegisterCmdServiceServer(s.grpcServer,rservice.NewCmdService())
-	service.RegisterLogStreamServiceServer(s.grpcServer,rservice.NewLogStreamService())
+	service.RegisterFileSerivceServer(s.grpcServer, rservice.NewFileService(s.cfg.FDir))
+	service.RegisterNodeServiceServer(s.grpcServer, rservice.NewNodeService())
+	service.RegisterCmdServiceServer(s.grpcServer, rservice.NewCmdService())
+	service.RegisterLogStreamServiceServer(s.grpcServer, rservice.NewLogStreamService())
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)
@@ -81,7 +78,7 @@ func (s *GRPCService) Start(){
 
 }
 
-func (s *GRPCService) Stop()  {
+func (s *GRPCService) Stop() {
 
 }
 
@@ -89,4 +86,3 @@ func (s *GRPCService) Name() string {
 
 	return "GRPCService"
 }
-

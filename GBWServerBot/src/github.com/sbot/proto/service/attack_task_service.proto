@@ -14,7 +14,6 @@ option php_namespace = "SBot\\Proto\\Service";
 
 service AttackTaskService {
 
-  rpc CreateAttackTask(model.AttackTask) returns (model.AttackTaskReply){};
-
+  rpc CreateAttackTask(model.CreateAttackTaskRequest) returns (model.CreateAttackTaskReply){};
 
 }
