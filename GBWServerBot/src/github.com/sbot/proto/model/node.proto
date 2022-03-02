@@ -11,29 +11,32 @@ option php_namespace = "SBot\\Proto\\Model";
 
 message CreateNodeRequest {
 
+  //the attack task id
+  string taskId = 1;
+
   //the cbot version
-  string version = 1;
+  string version = 2;
 
   //the local ip address that been attacked node
-  string localIP = 2;
+  string localIP = 3;
 
   // the out ip address that been attacked node
-  string outIP = 3;
+  string outIP = 4;
 
   // the mac address that been attacked node
-  string mac = 4;
+  string mac = 5;
 
   //the os that been attacked node
-  string os = 5;
+  string os = 6;
 
   //the system arch
-  string arch = 6;
+  string arch = 7;
 
   //the current user
-  string user = 7;
+  string user = 8;
 
   //the host name that been attacked node
-  string hostName = 8;
+  string hostName = 9;
 
 }
 
@@ -49,10 +52,12 @@ message Node {
 
 message PingRequest {
 
-  string nodeId = 1;
+  string taskId = 1;
+
+  string nodeId = 2;
 
   //the time that cbot sends ,time unit is ms
-  uint64 time = 2;
+  uint64 time = 3;
 
 }
 
@@ -71,33 +76,35 @@ message PingReply {
 
 message AttackProcessRequest {
 
-  string nodeId = 1;
+  string taskId = 1;
 
-  uint64 time = 2;
+  string nodeId = 2;
 
-  string targetIP = 3;
+  uint64 time = 3;
 
-  string targetHost = 4;
+  string targetIP = 4;
 
-  int32  targetPort = 5;
+  string targetHost = 5;
 
-  string proto = 6;
+  int32  targetPort = 6;
 
-  string app = 7;
+  string proto = 7;
 
-  string os = 8;
+  string app = 8;
 
-  string attackName = 9;
+  string os = 9;
 
-  string attackType = 10;
+  string attackName = 10;
 
-  int32 status = 11;
+  string attackType = 11;
 
-  string payload = 12;
+  int32 status = 12;
 
-  string result = 13;
+  string payload = 13;
 
-  string details = 14;
+  string result = 14;
+
+  string details = 15;
 
 }
 

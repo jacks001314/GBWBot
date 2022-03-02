@@ -1,6 +1,8 @@
 package attack
 
 type Config struct {
+	TaskId string `json:"taskId"`
+
 	MaxThreads int `json:"maxThreads"`
 
 	SourceCapacity int `json:"sourceCapacity"`

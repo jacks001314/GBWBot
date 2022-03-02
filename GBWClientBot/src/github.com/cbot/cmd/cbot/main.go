@@ -13,16 +13,18 @@ import (
 
 func main() {
 
-	sbotHost := flag.String("host", "127.0.0.1", "set sbot host")
+	sbotHost := flag.String("rhost", "127.0.0.1", "set sbot host")
 	sbotRpcPort := flag.Int("rport", 3333, "set sbot rpc port")
 	sbotFileServerPort := flag.Int("fport", 6666, "set sbot file server port")
 	maxThreads := flag.Int("threads", 100, "set max threads that attack")
 	scapacity := flag.Int("scap", 100, "set source queue capacity")
 	acapacity := flag.Int("acap", 10, "set attack queue capacity")
+	taskId := flag.String("taskId", "", "set the task id")
 
 	flag.Parse()
 
 	cfg := &node.Config{
+		TaskId:                *taskId,
 		SbotHost:              *sbotHost,
 		SbotRPCPort:           *sbotRpcPort,
 		SbotFileServerPort:    *sbotFileServerPort,

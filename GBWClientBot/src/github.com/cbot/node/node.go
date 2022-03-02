@@ -46,6 +46,7 @@ func NewNode(cfg *Config) *Node {
 	spool := source.NewSourcePool()
 
 	attackTasks := attack.NewAttackTasks(&attack.Config{
+		TaskId:                cfg.TaskId,
 		MaxThreads:            cfg.MaxThreads,
 		SourceCapacity:        cfg.SourceCapacity,
 		AttackProcessCapacity: cfg.AttackProcessCapacity,
@@ -127,6 +128,8 @@ func (n *Node) Start() error {
 
 	n.waitAttackProcess()
 
+	n.Ping()
+
 	return nil
 }
 
@@ -138,6 +141,11 @@ func (n *Node) Stop() {
 func (n *Node) NodeId() string {
 
 	return n.nodeId
+}
+
+func (n *Node) TaskId() string {
+
+	return n.cfg.TaskId
 }
 
 func (n *Node) AddAttackSource(name string, types []string, content []byte) error {

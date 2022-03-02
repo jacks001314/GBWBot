@@ -45,6 +45,7 @@ func (n *NodeClient) CreateNode() (string, error) {
 	nodeInfo := n.nd.GetNodeInfo()
 
 	ndreply, err := n.nodeClient.CreateNode(context.Background(), &model.CreateNodeRequest{
+		TaskId:   n.nd.TaskId(),
 		Version:  "cbot-1.0",
 		LocalIP:  nodeInfo.IP,
 		OutIP:    nodeInfo.OutIP,
@@ -73,6 +74,7 @@ func (n *NodeClient) CreateNode() (string, error) {
 func (n *NodeClient) Ping() error {
 
 	_, err := n.nodeClient.Ping(context.Background(), &model.PingRequest{
+		TaskId: n.nd.TaskId(),
 		NodeId: n.nodeId,
 		Time:   uint64(time.Now().UnixNano() / (1000 * 1000)),
 	})
@@ -83,6 +85,7 @@ func (n *NodeClient) Ping() error {
 func (n *NodeClient) SendAttackProcess(process *attack.AttackProcess) error {
 
 	_, err := n.nodeClient.SendAttackProcessRequest(context.Background(), &model.AttackProcessRequest{
+		TaskId:     n.nd.TaskId(),
 		NodeId:     n.nodeId,
 		Time:       uint64(time.Now().UnixNano() / (1000 * 1000)),
 		TargetIP:   process.IP,

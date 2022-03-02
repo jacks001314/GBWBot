@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"strings"
 )
+
 type URLPathCrypt struct {
+	TaskId string
 
 	Fname string
 
@@ -21,23 +23,21 @@ type URLPathCrypt struct {
 	TargetPort int
 
 	DownloadTool string
-
 }
 
 type DNSDomainCrypt struct {
-
 	AttackType string
-	AttackIP string
-	TargetIP string
+	AttackIP   string
+	TargetIP   string
 	TargetPort int
 }
 
 func IPv4StrLittle(ip uint32) string {
-	return fmt.Sprintf("%d.%d.%d.%d",byte(ip),byte(ip>>8),byte(ip>>16),byte(ip>>24))
+	return fmt.Sprintf("%d.%d.%d.%d", byte(ip), byte(ip>>8), byte(ip>>16), byte(ip>>24))
 }
 
 func IPv4StrBig(ip uint32) string {
-	return fmt.Sprintf("%d.%d.%d.%d",byte(ip>>24),byte(ip>>16),byte(ip>>8),byte(ip))
+	return fmt.Sprintf("%d.%d.%d.%d", byte(ip>>24), byte(ip>>16), byte(ip>>8), byte(ip))
 }
 
 func IPStrToInt(ip string) uint32 {
@@ -51,29 +51,28 @@ func IPStrToInt(ip string) uint32 {
 func DNSDomainCryptToString(d *DNSDomainCrypt) string {
 
 	s := fmt.Sprintf("%s_%d_%d_%d",
-		d.AttackType,IPStrToInt(d.AttackIP),IPStrToInt(d.TargetIP),d.TargetPort)
+		d.AttackType, IPStrToInt(d.AttackIP), IPStrToInt(d.TargetIP), d.TargetPort)
 
 	return s
 }
 
-func DeCryptToDNSDomain(content string ) (*DNSDomainCrypt,error) {
+func DeCryptToDNSDomain(content string) (*DNSDomainCrypt, error) {
 
+	args := strings.Split(content, "_")
 
-	args := strings.Split(content,"_")
+	if len(args) != 4 {
 
-	if len(args)!=4 {
-
-		return nil,fmt.Errorf("Invalid dns domain format:%s",content)
+		return nil, fmt.Errorf("Invalid dns domain format:%s", content)
 
 	}
 
-	attackIPI,err := strconv.ParseUint(args[1],10,32)
-	targetIPI,err := strconv.ParseUint(args[2],10,32)
-	targetPortI,err := strconv.ParseUint(args[3],10,32)
+	attackIPI, err := strconv.ParseUint(args[1], 10, 32)
+	targetIPI, err := strconv.ParseUint(args[2], 10, 32)
+	targetPortI, err := strconv.ParseUint(args[3], 10, 32)
 
-	if err!=nil {
+	if err != nil {
 
-		return nil,fmt.Errorf("Invalid dns domain format:%s",content)
+		return nil, fmt.Errorf("Invalid dns domain format:%s", content)
 	}
 
 	return &DNSDomainCrypt{
@@ -81,56 +80,55 @@ func DeCryptToDNSDomain(content string ) (*DNSDomainCrypt,error) {
 		AttackIP:   IPv4StrBig(uint32(attackIPI)),
 		TargetIP:   IPv4StrBig(uint32(targetIPI)),
 		TargetPort: int(targetPortI),
-	},nil
+	}, nil
 }
-
-
 
 func URLPathCryptToString(u *URLPathCrypt) string {
 
-	s := fmt.Sprintf("%s,%s,%d,%d,%d,%s",
-		u.Fname,u.AttackType,IPStrToInt(u.AttackIP),IPStrToInt(u.TargetIP),u.TargetPort,u.DownloadTool)
+	s := fmt.Sprintf("%s,%s,%s,%d,%d,%d,%s", u.TaskId,
+		u.Fname, u.AttackType, IPStrToInt(u.AttackIP), IPStrToInt(u.TargetIP), u.TargetPort, u.DownloadTool)
 
 	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
-func DeCryptToURLPath(content string) (*URLPathCrypt,error) {
+func DeCryptToURLPath(content string) (*URLPathCrypt, error) {
 
-	d,err := base64.StdEncoding.DecodeString(content)
+	d, err := base64.StdEncoding.DecodeString(content)
 
-	if err!=nil {
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 
 	s := string(d)
 
-	if s == "" || strings.Index(s,",")<=0 {
+	if s == "" || strings.Index(s, ",") <= 0 {
 
-		return nil,fmt.Errorf("Invalid url path format:%s",s)
+		return nil, fmt.Errorf("Invalid url path format:%s", s)
 
 	}
 
-	args := strings.Split(s,",")
+	args := strings.Split(s, ",")
 
-	if len(args)!=6 {
-		return nil,fmt.Errorf("Invalid url path format:%s",s)
+	if len(args) != 7 {
+		return nil, fmt.Errorf("Invalid url path format:%s", s)
 	}
 
-	attackIPI,err := strconv.ParseUint(args[2],10,32)
-	targetIPI,err := strconv.ParseUint(args[3],10,32)
-	targetPortI,err := strconv.ParseUint(args[4],10,32)
+	attackIPI, err := strconv.ParseUint(args[3], 10, 32)
+	targetIPI, err := strconv.ParseUint(args[4], 10, 32)
+	targetPortI, err := strconv.ParseUint(args[5], 10, 32)
 
-	if err!=nil {
+	if err != nil {
 
-		return nil,fmt.Errorf("Invalid url path format:%s",s)
+		return nil, fmt.Errorf("Invalid url path format:%s", s)
 	}
 
 	return &URLPathCrypt{
-		Fname:        args[0],
-		AttackType:   args[1],
+		TaskId:       args[0],
+		Fname:        args[1],
+		AttackType:   args[2],
 		AttackIP:     IPv4StrBig(uint32(attackIPI)),
 		TargetIP:     IPv4StrBig(uint32(targetIPI)),
 		TargetPort:   int(targetPortI),
-		DownloadTool: args[5],
-	},nil
+		DownloadTool: args[6],
+	}, nil
 }
