@@ -174,7 +174,25 @@ func newAttackProcess(args ...objects.Object) (ret objects.Object, err error) {
 
 }
 
-//func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackType string, fname string) string {
+func (as *AttackScript) InitCmdForLinux(args ...objects.Object) (ret objects.Object, err error) {
+
+	if len(args) != 1 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	initUrl, ok := objects.ToString(args[0])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "targetIP",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	return objects.FromInterface(as.attackTasks.InitCmdForLinux(initUrl))
+}
+
 func (as *AttackScript) DownloadInitURL(args ...objects.Object) (ret objects.Object, err error) {
 
 	if len(args) != 3 {
@@ -240,6 +258,13 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 			TengoObj: attack.TengoObj{Name: "downloadInitUrl"},
 			as:       as,
 		}, nil
+
+	case "initCmdForLinux":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "initCmdForLinux"},
+			as:       as,
+		}, nil
 	}
 
 	return nil, fmt.Errorf("Unknown Attack script method:%s", key)
@@ -264,6 +289,8 @@ func (m *AttackScriptMethod) Call(args ...objects.Object) (objects.Object, error
 	case "downloadInitUrl":
 		return m.as.DownloadInitURL(args...)
 
+	case "initCmdForLinux":
+		return m.as.InitCmdForLinux(args...)
 	}
 
 	return m.as, nil

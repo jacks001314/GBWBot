@@ -13,6 +13,7 @@ import (
 
 func main() {
 
+	pnodeId := flag.String("pnode", "", "set parent nodeId")
 	sbotHost := flag.String("rhost", "127.0.0.1", "set sbot host")
 	sbotRpcPort := flag.Int("rport", 3333, "set sbot rpc port")
 	sbotFileServerPort := flag.Int("fport", 6666, "set sbot file server port")
@@ -25,6 +26,7 @@ func main() {
 
 	cfg := &node.Config{
 		TaskId:                *taskId,
+		PNodeId:               *pnodeId,
 		SbotHost:              *sbotHost,
 		SbotRPCPort:           *sbotRpcPort,
 		SbotFileServerPort:    *sbotFileServerPort,

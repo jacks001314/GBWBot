@@ -43,9 +43,11 @@ func (n *NodeClient) Stop() {
 func (n *NodeClient) CreateNode() (string, error) {
 
 	nodeInfo := n.nd.GetNodeInfo()
+	now := time.Now().UnixNano() / (1000 * 1000)
 
 	ndreply, err := n.nodeClient.CreateNode(context.Background(), &model.CreateNodeRequest{
 		TaskId:   n.nd.TaskId(),
+		PnodeId:  n.nd.ParentNodeId(),
 		Version:  "cbot-1.0",
 		LocalIP:  nodeInfo.IP,
 		OutIP:    nodeInfo.OutIP,
@@ -54,6 +56,8 @@ func (n *NodeClient) CreateNode() (string, error) {
 		Arch:     nodeInfo.Arch,
 		User:     nodeInfo.User,
 		HostName: nodeInfo.Hostname,
+		Time:     uint64(now),
+		LastTime: uint64(now),
 	})
 
 	if err != nil {

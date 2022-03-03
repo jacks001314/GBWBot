@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"fmt"
+	"github.com/sbot/handler"
 	"github.com/sbot/proto/service"
 	"github.com/sbot/rpc/rservice"
 	"google.golang.org/grpc"
@@ -11,9 +12,15 @@ import (
 )
 
 type GRPCService struct {
-	cfg        *Config
-	listener   net.Listener
+	cfg *Config
+
+	listener net.Listener
+
 	grpcServer *grpc.Server
+
+	attackTaskHandle *handler.AttackTaskHandler
+
+	nodeHandle *handler.NodeHandler
 }
 
 type Config struct {
@@ -25,10 +32,12 @@ type Config struct {
 	FDir string
 }
 
-func NewGRPCService(cfg *Config) *GRPCService {
+func NewGRPCService(cfg *Config, attackTaskHandle *handler.AttackTaskHandler, nodeHandler *handler.NodeHandler) *GRPCService {
 
 	return &GRPCService{
-		cfg: cfg,
+		cfg:              cfg,
+		attackTaskHandle: attackTaskHandle,
+		nodeHandle:       nodeHandler,
 	}
 }
 
@@ -61,9 +70,10 @@ func (s *GRPCService) Start() {
 	s.grpcServer = grpc.NewServer(opts...)
 
 	service.RegisterFileSerivceServer(s.grpcServer, rservice.NewFileService(s.cfg.FDir))
-	service.RegisterNodeServiceServer(s.grpcServer, rservice.NewNodeService())
+	service.RegisterNodeServiceServer(s.grpcServer, rservice.NewNodeService(s.nodeHandle))
 	service.RegisterCmdServiceServer(s.grpcServer, rservice.NewCmdService())
 	service.RegisterLogStreamServiceServer(s.grpcServer, rservice.NewLogStreamService())
+	service.RegisterAttackTaskServiceServer(s.grpcServer, rservice.NewAttackTaskService(s.attackTaskHandle))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)

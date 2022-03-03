@@ -103,6 +103,8 @@ func (n *Node) Start() error {
 		return fmt.Errorf("Create node failed:%v", err)
 	}
 
+	n.attackTasks.Cfg.NodeId = n.nodeId
+
 	n.cmdClient, err = client.NewCmdClient(n, n.grpcClient)
 	if err != nil {
 		return fmt.Errorf("Create command node client failed:%v", err)
@@ -146,6 +148,11 @@ func (n *Node) NodeId() string {
 func (n *Node) TaskId() string {
 
 	return n.cfg.TaskId
+}
+
+func (n *Node) ParentNodeId() string {
+
+	return n.cfg.PNodeId
 }
 
 func (n *Node) AddAttackSource(name string, types []string, content []byte) error {

@@ -14,29 +14,38 @@ message CreateNodeRequest {
   //the attack task id
   string taskId = 1;
 
+  //the parent cbot nodeId
+  string pnodeId = 2;
+
   //the cbot version
-  string version = 2;
+  string version = 3;
 
   //the local ip address that been attacked node
-  string localIP = 3;
+  string localIP = 4;
 
   // the out ip address that been attacked node
-  string outIP = 4;
+  string outIP = 5;
 
   // the mac address that been attacked node
-  string mac = 5;
+  string mac = 6;
 
   //the os that been attacked node
-  string os = 6;
+  string os = 7;
 
   //the system arch
-  string arch = 7;
+  string arch = 8;
 
   //the current user
-  string user = 8;
+  string user = 9;
 
   //the host name that been attacked node
-  string hostName = 9;
+  string hostName = 10;
+
+  //the create node time
+  uint64 time = 11;
+
+  //the last ping node time
+  uint64 lastTime = 12;
 
 }
 

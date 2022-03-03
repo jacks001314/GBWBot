@@ -3,6 +3,8 @@ package node
 type Config struct {
 	TaskId string `json:"taskId"`
 
+	PNodeId string `json:"pnodeId"`
+
 	SbotHost string `json:"sbotHost"`
 
 	SbotRPCPort int `json:"sbotRPCPort"`

