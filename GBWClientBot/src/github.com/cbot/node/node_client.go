@@ -1,4 +1,4 @@
-package client
+package node
 
 import (
 	"context"
@@ -6,13 +6,12 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
-	"github.com/cbot/node"
 	"google.golang.org/grpc"
 	"time"
 )
 
 type NodeClient struct {
-	nd *node.Node
+	nd *Node
 
 	nodeId string
 
@@ -21,7 +20,7 @@ type NodeClient struct {
 	nodeClient service.NodeServiceClient
 }
 
-func NewNodeClient(nd *node.Node, grpcClient *grpc.ClientConn) *NodeClient {
+func NewNodeClient(nd *Node, grpcClient *grpc.ClientConn) *NodeClient {
 
 	return &NodeClient{
 		nd:         nd,

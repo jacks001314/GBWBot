@@ -1,4 +1,4 @@
-package client
+package node
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
-	"github.com/cbot/node"
 	"google.golang.org/grpc"
 	"os/exec"
 	"strings"
@@ -15,7 +14,7 @@ import (
 )
 
 type CmdClient struct {
-	nd *node.Node
+	nd *Node
 
 	grpcClient *grpc.ClientConn
 
@@ -24,7 +23,7 @@ type CmdClient struct {
 	stop bool
 }
 
-func NewCmdClient(nd *node.Node, grpcClient *grpc.ClientConn) (*CmdClient, error) {
+func NewCmdClient(nd *Node, grpcClient *grpc.ClientConn) (*CmdClient, error) {
 
 	cmdClient, err := service.NewCmdServiceClient(grpcClient).FetchCmd(context.Background())
 

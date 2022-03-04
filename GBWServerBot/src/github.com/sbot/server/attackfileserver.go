@@ -27,32 +27,14 @@ type AttackFileServer struct {
 	port int
 }
 
-type AttackFileDownloadRequest struct {
-	TaskId string `json:"taskId"`
-	NodeId string `json:"nodeId"`
-
-	Url   string `json:"url"`
-	Fname string `json:"fname"`
-
-	AttackType string `json:"attackType"`
-	AttackIP   string `json:"attackIP"`
-	TargetIP   string `json:"targetIP"`
-	TargetPort int    `json:"targetPort"`
-
-	TargetOutIP  string `json:"targetOutIP"`
-	DownloadTool string `json:"downloadTool"`
-
-	UserAgent string `json:"userAgent"`
-}
-
-func (afs *AttackFileServer) isFileExisted(req *AttackFileDownloadRequest) bool {
+func (afs *AttackFileServer) isFileExisted(req *handler.AttackFileDownloadRequest) bool {
 
 	fpath := filepath.Join(afs.attackFileDir, req.TaskId, req.Fname)
 
 	return fileutils.FileIsExisted(fpath)
 }
 
-func (afs *AttackFileServer) makeHttpRequest(req *AttackFileDownloadRequest, r *http.Request) *http.Request {
+func (afs *AttackFileServer) makeHttpRequest(req *handler.AttackFileDownloadRequest, r *http.Request) *http.Request {
 
 	path := fmt.Sprintf("/%s/%s", req.TaskId, req.Fname)
 
@@ -65,7 +47,7 @@ func (afs *AttackFileServer) makeHttpRequest(req *AttackFileDownloadRequest, r *
 	return r2
 }
 
-func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.Request) (*AttackFileDownloadRequest, error) {
+func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.Request) (*handler.AttackFileDownloadRequest, error) {
 
 	paths := strings.Split(path, "/")
 
@@ -82,7 +64,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.
 	nodeId := paths[4]
 	fname := paths[len(paths)-1]
 
-	return &AttackFileDownloadRequest{
+	return &handler.AttackFileDownloadRequest{
 		TaskId:       taskId,
 		NodeId:       nodeId,
 		Url:          path,
@@ -97,7 +79,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.
 	}, nil
 }
 
-func (afs *AttackFileServer) makeAttackFileDownloadRequstFromCryptPath(path string, r *http.Request) (*AttackFileDownloadRequest, error) {
+func (afs *AttackFileServer) makeAttackFileDownloadRequstFromCryptPath(path string, r *http.Request) (*handler.AttackFileDownloadRequest, error) {
 
 	if path == "" || path[0] != '/' || strings.LastIndex(path, "/") != 0 {
 
@@ -116,7 +98,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequstFromCryptPath(path stri
 		return nil, fmt.Errorf(errS)
 	}
 
-	return &AttackFileDownloadRequest{
+	return &handler.AttackFileDownloadRequest{
 		TaskId:       ucr.TaskId,
 		NodeId:       ucr.NodeId,
 		Url:          r.URL.Path,
@@ -133,7 +115,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequstFromCryptPath(path stri
 
 func (afs *AttackFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	var dreq *AttackFileDownloadRequest
+	var dreq *handler.AttackFileDownloadRequest
 	var err error
 
 	log.Infof("Receive a attack file download request,from:%s,url:%s", r.RemoteAddr, r.URL.Path)

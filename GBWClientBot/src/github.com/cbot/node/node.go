@@ -6,7 +6,6 @@ import (
 	"github.com/cbot/attack/ascript"
 	"github.com/cbot/attack/bruteforce"
 	"github.com/cbot/attack/unix"
-	"github.com/cbot/client"
 	"github.com/cbot/logstream"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
@@ -21,11 +20,11 @@ type Node struct {
 
 	grpcClient *grpc.ClientConn
 
-	nodeClient *client.NodeClient
+	nodeClient *NodeClient
 
-	cmdClient *client.CmdClient
+	cmdClient *CmdClient
 
-	logStreamClient *client.LogStreamClient
+	logStreamClient *LogStreamClient
 
 	spool *source.SourcePool
 
@@ -92,10 +91,10 @@ func (n *Node) Start() error {
 		return fmt.Errorf("Cannot connect to sbot:%v", err)
 	}
 
-	n.logStreamClient = client.NewLogStreamClient(n, n.grpcClient, n.logStream)
+	n.logStreamClient = NewLogStreamClient(n, n.grpcClient, n.logStream)
 
 	//connect to sbot,and create node
-	n.nodeClient = client.NewNodeClient(n, n.grpcClient)
+	n.nodeClient = NewNodeClient(n, n.grpcClient)
 	n.nodeId, err = n.nodeClient.CreateNode()
 
 	if err != nil {
@@ -105,7 +104,7 @@ func (n *Node) Start() error {
 
 	n.attackTasks.Cfg.NodeId = n.nodeId
 
-	n.cmdClient, err = client.NewCmdClient(n, n.grpcClient)
+	n.cmdClient, err = NewCmdClient(n, n.grpcClient)
 	if err != nil {
 		return fmt.Errorf("Create command node client failed:%v", err)
 	}

@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sbot/server"
 	"github.com/sbot/store"
 	"github.com/sbot/utils/uuid"
 	"time"
@@ -13,12 +12,30 @@ type AttackFileServerHandle struct {
 	db store.Store
 }
 
+type AttackFileDownloadRequest struct {
+	TaskId string `json:"taskId"`
+	NodeId string `json:"nodeId"`
+
+	Url   string `json:"url"`
+	Fname string `json:"fname"`
+
+	AttackType string `json:"attackType"`
+	AttackIP   string `json:"attackIP"`
+	TargetIP   string `json:"targetIP"`
+	TargetPort int    `json:"targetPort"`
+
+	TargetOutIP  string `json:"targetOutIP"`
+	DownloadTool string `json:"downloadTool"`
+
+	UserAgent string `json:"userAgent"`
+}
+
 func NewAttackFileServerHandle(db store.Store) *AttackFileServerHandle {
 
 	return &AttackFileServerHandle{db: db}
 }
 
-func (afsh *AttackFileServerHandle) Handle(request *server.AttackFileDownloadRequest) error {
+func (afsh *AttackFileServerHandle) Handle(request *AttackFileDownloadRequest) error {
 
 	key := fmt.Sprintf("AttackFile_%s", uuid.UUID())
 

@@ -1,16 +1,15 @@
-package client
+package node
 
 import (
 	"context"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
 	"github.com/cbot/logstream"
-	"github.com/cbot/node"
 	"google.golang.org/grpc"
 )
 
 type LogStreamClient struct {
-	nd *node.Node
+	nd *Node
 
 	grpcClient *grpc.ClientConn
 
@@ -22,7 +21,7 @@ type LogStreamClient struct {
 	closeCh   chan int
 }
 
-func NewLogStreamClient(nd *node.Node, grpcClient *grpc.ClientConn, logStream *logstream.LogStream) *LogStreamClient {
+func NewLogStreamClient(nd *Node, grpcClient *grpc.ClientConn, logStream *logstream.LogStream) *LogStreamClient {
 
 	return &LogStreamClient{
 		nd:         nd,

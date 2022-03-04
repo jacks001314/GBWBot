@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/sbot/backend"
 	"os"
 	"os/signal"
@@ -19,7 +20,7 @@ func main() {
 
 	if err != nil {
 
-		log.Errorf("setup backend failed:%v", err)
+		fmt.Printf("setup backend failed:%v", err)
 		return
 	}
 
