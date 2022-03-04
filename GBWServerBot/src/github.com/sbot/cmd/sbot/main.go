@@ -23,11 +23,7 @@ func main() {
 		return
 	}
 
-	if err := bend.Start(); err != nil {
-
-		log.Errorf("start backend failed:%v", err)
-		return
-	}
+	bend.Start()
 
 	waitExit()
 

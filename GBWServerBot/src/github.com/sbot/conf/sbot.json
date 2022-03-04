@@ -3,7 +3,7 @@
 
   "rport": 3333,
 
-  "rDownloadDir": "/opt/data/store/files",
+  "rDownloadDir": "/opt/data/store/",
 
   "certFlag": "",
 
@@ -21,9 +21,11 @@
 
   "dnslogReplyIP": "",
 
-  "fserverDir": "/opt/data/store/files",
+  "cbotFileStoreDir": "/opt/data/store/cbot/",
 
-  "fserverHost": "0.0.0.0",
+  "attackFileServerDir": "/opt/data/store/attack/tasks/",
 
-  "fserverPort": 6666
+  "attackFileServerHost": "0.0.0.0",
+
+  "attackFileServerPort": 6666
 }

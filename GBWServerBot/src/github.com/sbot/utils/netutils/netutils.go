@@ -12,6 +12,8 @@ import (
 type URLPathCrypt struct {
 	TaskId string
 
+	NodeId string
+
 	Fname string
 
 	AttackType string
@@ -85,7 +87,7 @@ func DeCryptToDNSDomain(content string) (*DNSDomainCrypt, error) {
 
 func URLPathCryptToString(u *URLPathCrypt) string {
 
-	s := fmt.Sprintf("%s,%s,%s,%d,%d,%d,%s", u.TaskId,
+	s := fmt.Sprintf("%s,%s,%s,%s,%d,%d,%d,%s", u.TaskId, u.NodeId,
 		u.Fname, u.AttackType, IPStrToInt(u.AttackIP), IPStrToInt(u.TargetIP), u.TargetPort, u.DownloadTool)
 
 	return base64.StdEncoding.EncodeToString([]byte(s))
@@ -109,13 +111,13 @@ func DeCryptToURLPath(content string) (*URLPathCrypt, error) {
 
 	args := strings.Split(s, ",")
 
-	if len(args) != 7 {
+	if len(args) != 8 {
 		return nil, fmt.Errorf("Invalid url path format:%s", s)
 	}
 
-	attackIPI, err := strconv.ParseUint(args[3], 10, 32)
-	targetIPI, err := strconv.ParseUint(args[4], 10, 32)
-	targetPortI, err := strconv.ParseUint(args[5], 10, 32)
+	attackIPI, err := strconv.ParseUint(args[4], 10, 32)
+	targetIPI, err := strconv.ParseUint(args[5], 10, 32)
+	targetPortI, err := strconv.ParseUint(args[6], 10, 32)
 
 	if err != nil {
 
@@ -124,11 +126,12 @@ func DeCryptToURLPath(content string) (*URLPathCrypt, error) {
 
 	return &URLPathCrypt{
 		TaskId:       args[0],
-		Fname:        args[1],
-		AttackType:   args[2],
+		NodeId:       args[1],
+		Fname:        args[2],
+		AttackType:   args[3],
 		AttackIP:     IPv4StrBig(uint32(attackIPI)),
 		TargetIP:     IPv4StrBig(uint32(targetIPI)),
 		TargetPort:   int(targetPortI),
-		DownloadTool: args[6],
+		DownloadTool: args[7],
 	}, nil
 }

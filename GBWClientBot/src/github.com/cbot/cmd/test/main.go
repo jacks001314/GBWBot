@@ -20,6 +20,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -520,6 +521,13 @@ func main() {
 
 	//testOSCmd()
 
+	path := "/attack/tasks/taskId/pnodeId/cbot_linux"
+
+	paths := strings.Split(path, "/")
+
+	fmt.Println(len(paths))
+	fmt.Println(paths[3])
+	fmt.Println(paths[len(paths)-1])
 	fmt.Println(runtime.GOARCH)
 	fmt.Println(runtime.GOOS)
 

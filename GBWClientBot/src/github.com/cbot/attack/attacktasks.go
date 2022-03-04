@@ -127,6 +127,7 @@ func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackTy
 
 	upc := &netutils.URLPathCrypt{
 		TaskId:       at.Cfg.TaskId,
+		NodeId:       at.Cfg.NodeId,
 		Fname:        fname,
 		AttackType:   attackType,
 		AttackIP:     at.nodeInfo.IP,

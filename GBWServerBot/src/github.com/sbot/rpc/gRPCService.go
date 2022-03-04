@@ -25,7 +25,7 @@ type GRPCService struct {
 
 type Config struct {
 	Host     string
-	Port     string
+	Port     int
 	CertFlag string
 	KeyFlag  string
 
@@ -43,7 +43,7 @@ func NewGRPCService(cfg *Config, attackTaskHandle *handler.AttackTaskHandler, no
 
 func (s *GRPCService) Start() {
 
-	address := fmt.Sprintf("%s:%s", s.cfg.Host, s.cfg.Port)
+	address := fmt.Sprintf("%s:%d", s.cfg.Host, s.cfg.Port)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 
