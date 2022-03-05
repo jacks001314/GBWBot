@@ -11,7 +11,15 @@ import (
 	"github.com/cbot/targets/source"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"log"
+	"os"
+	"path/filepath"
 )
+
+
+var CBotDir="cbot"
+var DownloadStoreDir="DFile"
+
 
 type Node struct {
 	nodeId string
@@ -26,6 +34,8 @@ type Node struct {
 
 	logStreamClient *LogStreamClient
 
+	fserverClient  *FServerClient
+
 	spool *source.SourcePool
 
 	attackTasks *attack.AttackTasks
@@ -37,7 +47,25 @@ type Node struct {
 	dictPools map[string]*bruteforce.DictPool
 
 	unixAttack *unix.UnixSSHLoginAttack
+
+
 }
+
+func initCbotDownloaFileStoreDir() string {
+
+	fpath := filepath.Join(os.TempDir(),CBotDir,DownloadStoreDir)
+
+	if err := os.MkdirAll(fpath,0755);err!=nil {
+
+		errS := fmt.Sprintf("Cannot mkdir:%s failed:%v",fpath,err)
+		log.Println(errS)
+
+		fpath = os.TempDir()
+	}
+
+	return fpath
+}
+
 
 func NewNode(cfg *Config) *Node {
 
@@ -120,6 +148,8 @@ func (n *Node) Start() error {
 
 		return fmt.Errorf("Cannot start logstream client to send log to sbot:%v", err)
 	}
+
+	n.fserverClient = NewFServerClient(n,n.grpcClient,initCbotDownloaFileStoreDir())
 
 	//setup attack tasks
 	n.attackTasks.Start()

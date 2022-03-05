@@ -9,8 +9,12 @@ mkdir -p build/bin
 cd src/github.com/sbot
 
 go build -o sbot cmd/sbot/main.go
+go build -o SbotClient cmd/client/main.go
+go build -o SbotFileClient cmd/fileclient/main.go
 
 mv sbot ../../../build/bin
+mv SbotClient ../../../build/bin
+mv SbotFileClient ../../../build/bin
 
 cp -rf conf ../../../build
 cp -rf scripts ../../../build

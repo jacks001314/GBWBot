@@ -179,8 +179,6 @@ func fileCmd (fclient service.FileSerivceClient,op string,args []string) {
 
 func main() {
 
-
-
 	addr := os.Args[1]
 	op := os.Args[2]
 
