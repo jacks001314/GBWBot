@@ -5,6 +5,7 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/targets/local"
+	"log"
 	"runtime"
 	"time"
 )
@@ -70,6 +71,9 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 	if port <= 0 {
 		port = 22
 	}
+
+
+	log.Printf("Try to  use ssh login remote host:%s:%d,with private key:%s",host,port,privkey)
 
 	sshClient, err := ssh.LoginWithPrivKey(host, port, user, privkey, 10000)
 

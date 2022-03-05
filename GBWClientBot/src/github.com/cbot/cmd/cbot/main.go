@@ -51,6 +51,8 @@ func main() {
 		}
 	}
 
+	log.Printf("Start cbot ok!")
+
 	waitExit()
 
 }

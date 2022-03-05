@@ -111,12 +111,15 @@ func (n *Node) Start() error {
 	var err error
 
 	//connect to sbot
-	n.grpcClient, err = grpc.Dial(fmt.Sprintf("%s:%d", n.cfg.SbotHost, n.cfg.SbotRPCPort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	addr := fmt.Sprintf("%s:%d", n.cfg.SbotHost, n.cfg.SbotRPCPort)
+	n.grpcClient, err = grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
 
-		return fmt.Errorf("Cannot connect to sbot:%v", err)
+		errS := fmt.Sprintf("Cannot connect to sbot:%s,failed:%v",addr,err)
+		log.Println(errS)
+
+		return fmt.Errorf(errS)
 	}
 
 	n.logStreamClient = NewLogStreamClient(n, n.grpcClient, n.logStream)
@@ -127,26 +130,35 @@ func (n *Node) Start() error {
 
 	if err != nil {
 
-		return fmt.Errorf("Create node failed:%v", err)
+		errS := fmt.Sprintf("Cannot create a node from sbot:%s,failed:%v", addr,err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
 	}
 
 	n.attackTasks.Cfg.NodeId = n.nodeId
 
 	n.cmdClient, err = NewCmdClient(n, n.grpcClient)
 	if err != nil {
-		return fmt.Errorf("Create command node client failed:%v", err)
+
+		errS := fmt.Sprintf("Cannot create command client for connecting to sbot:%s,failed:%v", addr,err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
 	}
 
 	//setup command client to receive cmd from sbot
 	if err = n.cmdClient.Start(); err != nil {
-
-		return fmt.Errorf("Cannot start command client to receive cmd from sbot:%v", err)
+		errS := fmt.Sprintf("Cannot start command client to receive cmd from sbot:%s,failed:%v", addr,err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
 	}
 
 	//setup logstream client to send log to sbot
 	if err = n.logStreamClient.Start(); err != nil {
 
-		return fmt.Errorf("Cannot start logstream client to send log to sbot:%v", err)
+		errS := fmt.Sprintf("Cannot start logstream client to send log to sbot:%s,failed:%v", addr,err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
+
 	}
 
 	n.fserverClient = NewFServerClient(n,n.grpcClient,initCbotDownloaFileStoreDir())

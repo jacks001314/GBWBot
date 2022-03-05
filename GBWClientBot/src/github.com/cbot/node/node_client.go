@@ -6,11 +6,14 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/client/model"
 	"github.com/cbot/client/service"
+	"github.com/cbot/utils/jsonutils"
 	"google.golang.org/grpc"
+	"log"
 	"time"
 )
 
 type NodeClient struct {
+
 	nd *Node
 
 	nodeId string
@@ -44,7 +47,7 @@ func (n *NodeClient) CreateNode() (string, error) {
 	nodeInfo := n.nd.GetNodeInfo()
 	now := time.Now().UnixNano() / (1000 * 1000)
 
-	ndreply, err := n.nodeClient.CreateNode(context.Background(), &model.CreateNodeRequest{
+	request := &model.CreateNodeRequest{
 		TaskId:   n.nd.TaskId(),
 		PnodeId:  n.nd.ParentNodeId(),
 		Version:  "cbot-1.0",
@@ -57,37 +60,55 @@ func (n *NodeClient) CreateNode() (string, error) {
 		HostName: nodeInfo.Hostname,
 		Time:     uint64(now),
 		LastTime: uint64(now),
-	})
+	}
+
+	log.Printf("Prepare to Send a create node request to sbot,details:%s",jsonutils.ToJsonString(request,true))
+
+	ndreply, err := n.nodeClient.CreateNode(context.Background(), request)
 
 	if err != nil {
 
-		return "", err
-	}
+		errS := fmt.Sprintf("Create node failed:%v",err)
 
-	if ndreply.Status != 0 {
+		log.Println(errS)
 
-		return "", fmt.Errorf("create node failed:%d", ndreply.Status)
+		return "", fmt.Errorf(errS)
 	}
 
 	n.nodeId = ndreply.Id
+
+	log.Printf("Create node ok,nodeId:%s,taskId:%s",n.nodeId,n.nd.TaskId())
 
 	return n.nodeId, nil
 }
 
 func (n *NodeClient) Ping() error {
 
-	_, err := n.nodeClient.Ping(context.Background(), &model.PingRequest{
+	request :=  &model.PingRequest{
 		TaskId: n.nd.TaskId(),
 		NodeId: n.nodeId,
 		Time:   uint64(time.Now().UnixNano() / (1000 * 1000)),
-	})
+	}
 
-	return err
+	log.Printf("Prepare to Send a Ping Message to sbot,details:%s",jsonutils.ToJsonString(request,true))
+
+	reply, err := n.nodeClient.Ping(context.Background(),request)
+
+	if err!=nil {
+
+		errS := fmt.Sprintf("Send Ping Message to Sbot failed:%v",err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
+	}
+
+	log.Printf("Send Ping Message to sbot ok,reply.status:%d,reply.message:%s",reply.Status,reply.Message)
+
+	return nil
 }
 
 func (n *NodeClient) SendAttackProcess(process *attack.AttackProcess) error {
 
-	_, err := n.nodeClient.SendAttackProcessRequest(context.Background(), &model.AttackProcessRequest{
+	request := &model.AttackProcessRequest{
 		TaskId:     n.nd.TaskId(),
 		NodeId:     n.nodeId,
 		Time:       uint64(time.Now().UnixNano() / (1000 * 1000)),
@@ -103,7 +124,20 @@ func (n *NodeClient) SendAttackProcess(process *attack.AttackProcess) error {
 		Payload:    process.Payload,
 		Result:     process.Result,
 		Details:    process.Details,
-	})
+	}
+
+	log.Printf("Prepare to Send an attack process result to sbot,details:%s",jsonutils.ToJsonString(request,true))
+
+	reply, err := n.nodeClient.SendAttackProcessRequest(context.Background(),request)
+
+	if err!=nil {
+
+		errS := fmt.Sprintf("Send Attack Process to sbot failed:%v",err)
+		log.Println(errS)
+		return fmt.Errorf(errS)
+	}
+
+	log.Printf("Send Attack Process to sbot is ok,reply.status:%d,reply.message:%s",reply.Status,reply.Message)
 
 	return err
 }

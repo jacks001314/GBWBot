@@ -27,3 +27,23 @@ func UNMarshalFromFile(v interface{},fpath string) (err error) {
 		return json.Unmarshal(data,v)
 	}
 }
+
+func ToJsonString(v interface{},pretty bool) string {
+
+	var data []byte
+	var err error
+
+	if pretty {
+
+		data,err= json.MarshalIndent(v,"","\t")
+	}else {
+		data,err= json.Marshal(v)
+	}
+
+	if err!=nil {
+		return ""
+	}
+
+	return string(data)
+}
+
