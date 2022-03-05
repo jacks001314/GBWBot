@@ -6,7 +6,6 @@ import (
 	"github.com/sbot/backend"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 )
 
@@ -36,16 +35,5 @@ func waitExit() {
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
-	go func() {
-		for {
-			select {
-			case <-sigs:
-
-				wg.Done()
-			}
-		}
-	}()
+	<-sigs
 }

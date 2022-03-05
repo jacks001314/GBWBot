@@ -20,6 +20,11 @@ import (
 
 func createAttackTask(conn *grpc.ClientConn, args []string) {
 
+	if len(args)<7 {
+
+		log.Fatalf("Invalid args for create attack task ,usage:createAttackTask args--->name:userId:host:port:user:passwd:privateKey")
+	}
+
 	client := service.NewAttackTaskServiceClient(conn)
 
 	defer conn.Close()
@@ -31,13 +36,6 @@ func createAttackTask(conn *grpc.ClientConn, args []string) {
 		log.Fatalf("Cannot parse port:%s for create attack task args,failed:%v",args[3],err)
 
 	}
-
-	if len(args)<8 {
-
-		log.Fatalf("Invalid args for create attack task ,usage:createAttackTask args--->name:userId:host:port:user:passwd:privateKey")
-	}
-
-
 	request := &model.CreateAttackTaskRequest{
 		Name:       args[0],
 		UserId:     args[1],
@@ -336,6 +334,7 @@ func main(){
 
 	args := flag.String("args","","set the operator's args")
 
+	flag.Parse()
 
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%d",*rhost,*rport),grpc.WithTransportCredentials(insecure.NewCredentials()))
 

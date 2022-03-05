@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 )
@@ -63,16 +62,5 @@ func waitExit() {
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
-	go func() {
-		for {
-			select {
-			case <-sigs:
-
-				wg.Done()
-			}
-		}
-	}()
+	<-sigs
 }
