@@ -2,6 +2,7 @@ package genip
 
 import (
 	"fmt"
+	"github.com/cbot/targets/local"
 	"github.com/cbot/utils/netutils"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/v2"
@@ -297,6 +298,15 @@ func newTengoIPGenFromArray(args ... objects.Object) (objects.Object,error) {
 }
 
 
+func newTengoIPGenFromSubnet(args ...objects.Object) (ret objects.Object, err error) {
+
+	workIP := local.GetWorkingIP().String()
+	workIPRange := local.GetWorkingIPRange(true)
+
+
+	return NewIPGen("","",[]string{workIPRange},[]string{workIP},true)
+}
+
 var moduleMap objects.Object = &objects.ImmutableMap{
 
 	Value: map[string]objects.Object{
@@ -310,9 +320,14 @@ var moduleMap objects.Object = &objects.ImmutableMap{
 			Name:  "new_ipgen_from_array",
 			Value: newTengoIPGenFromArray,
 		},
-
+		"newIPGenFromSubnet": &objects.UserFunction{
+			Name:  "new_ipgen_from_local_subnet",
+			Value: newTengoIPGenFromSubnet,
+		},
 	},
 }
+
+
 
 func (IPGen) Import(moduleName string) (interface{}, error) {
 

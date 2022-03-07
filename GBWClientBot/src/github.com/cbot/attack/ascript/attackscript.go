@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cbot/attack"
 	"github.com/cbot/proto/http"
+	"github.com/cbot/proto/transport"
 	"github.com/cbot/targets/source"
 	"github.com/d5/tengo/objects"
 	"github.com/d5/tengo/script"
@@ -48,6 +49,7 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 	mm.AddMap(builtinMaps)
 	mm.Add("attack", AttackScript{})
 	mm.Add("http", http.HttpTengo{})
+	mm.Add("transport",transport.TransportTengo{})
 
 	script.SetImports(mm)
 
@@ -131,7 +133,7 @@ func (as *AttackScript) Accept(target source.Target) bool {
 
 func (as *AttackScript) Run(target source.Target) error {
 
-	defer as.attackTasks.PubSyn()
+	defer as.attackTasks.PubUnSyn()
 
 	attackTarget := newAttackTarget(as, target)
 

@@ -178,6 +178,8 @@ func (rba *RedisBruteforceAttack) tryBruteforce(ip string, port int, entry *Dict
 
 func (rba *RedisBruteforceAttack) Run(target source.Target) error {
 
+	defer rba.attackTasks.PubUnSyn()
+
 	dictEntries := rba.dictPool.Dicts()
 
 	ip := target.IP()

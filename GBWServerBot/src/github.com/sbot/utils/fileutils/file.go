@@ -3,11 +3,13 @@ package fileutils
 import (
 	"archive/zip"
 	"bufio"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 func GetFilePaths(fpath string) []string {
@@ -282,6 +284,29 @@ func GetFilesStartsWith(prefix string) (files []string) {
 	return
 }
 
+/*generate file from template file */
+func GenerateFileFromTemplateFile(fpath string,tpath string,tempData interface{}) error{
+
+	file, err := os.OpenFile(fpath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
+
+	if err != nil {
+
+		errS := fmt.Sprintf("Cannot open file:%s to store content from template file:%s,err:%v", fpath, tpath, err)
+		return fmt.Errorf("%s", errS)
+	}
+
+	defer file.Close()
+
+	t, err := template.ParseFiles(tpath)
+
+	if err != nil {
+
+		errS := fmt.Sprintf("Cannot parse template file:%s,err:%v", tpath, err)
+		return fmt.Errorf("%s", errS)
+	}
+
+	return  t.Execute(file,tempData)
+}
 
 
 

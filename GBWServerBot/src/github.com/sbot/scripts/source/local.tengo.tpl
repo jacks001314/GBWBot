@@ -1,34 +1,28 @@
 /*
-*This Tengo Script Generate ips from ip range
+*This Tengo Script Generate ips from local subnet ip range template
 **/
 
 fmt  := import("fmt")
 source := import("source")
 ipgen := import("ipgen")
 
-fmt.Println("ffffffffffffffffffffffffffffffffff")
-wlists := ["192.168.1.0/24"]
-blists := ["192.168.1.1","192.168.1.255"]
-
-ipg := ipgen.newIPGenFromArray(wlists,blists)
+ipg := ipgen.newIPGenFromSubnet()
 
 setEntry := func (ip) {
 
      entry := source.newEntry()
      entry.setIP(ip)
      entry.setHost(ip)
-     entry.setPort(22)
-     entry.setProto("ssh")
-     entry.setApp("ssh")
+     entry.setPort({{.Port}})
+     entry.setProto("{{.Proto}}")
+     entry.setApp("{{.App}}")
 
      scriptSource.put(entry)
-
 }
 
 main := func () {
 
     for ip:= ipg.curIP();ip!="";ip= ipg.nextIP() {
-
 
         setEntry(ip)
     }

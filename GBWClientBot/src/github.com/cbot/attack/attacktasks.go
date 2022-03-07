@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
-	"github.com/cbot/utils/jsonutils"
 	"github.com/cbot/utils/netutils"
-	"log"
 	"sync"
 )
 
 type AttackTasks struct {
+
 	lock sync.Mutex
 
 	Cfg *Config
@@ -83,8 +82,11 @@ func (at *AttackTasks) run(target source.Target) {
 
 		if attack.Accept(target) {
 
-			log.Printf("Try to Attack for target,attack.name",attack.Name())
+			//log.Printf("Try to Attack for target,attack.name:%s",attack.Name())
 
+			//try to run,if too many threads is live than wait some threads exit
+			at.PubSyn()
+			//ok
 			go attack.Run(target)
 		}
 	}
@@ -94,6 +96,11 @@ func (at *AttackTasks) PubSyn() {
 
 	at.syncChan <- 1
 
+}
+
+func (at *AttackTasks) PubUnSyn() {
+
+	<-at.syncChan
 }
 
 func (at *AttackTasks) Start() {
@@ -117,11 +124,7 @@ func (at *AttackTasks) Start() {
 
 			case target := <-targetChan:
 
-				//try to run,if too many threads is live than wait some threads exit
-				<-at.syncChan
-				//ok
-
-				log.Printf("Receive a attack target:%s",jsonutils.ToJsonString(target,true))
+				//log.Printf("Receive a attack target:%s",jsonutils.ToJsonString(target,true))
 				at.run(target)
 
 			}

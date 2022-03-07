@@ -1,5 +1,5 @@
 {
-  "rhost": "",
+  "rhost": "192.168.1.151",
 
   "rport": 3333,
 
@@ -15,11 +15,11 @@
 
   "dbUser": "redis",
 
-  "dbPass": "",
+  "dbPass": "AntellSec#2017",
 
-  "subDomain": "",
+  "subDomain": "dnslog.gbw3bao.com",
 
-  "dnslogReplyIP": "",
+  "dnslogReplyIP": "47.93.48.162",
 
   "cbotFileStoreDir": "/opt/data/store/cbot/",
 
@@ -27,5 +27,6 @@
 
   "attackFileServerHost": "0.0.0.0",
 
-  "attackFileServerPort": 6666
+  "attackFileServerPort": 6666,
+  "javaVersion": "1.8.0_261"
 }

@@ -21,6 +21,8 @@ type GRPCService struct {
 	attackTaskHandle *handler.AttackTaskHandler
 
 	nodeHandle *handler.NodeHandler
+
+	attackJarPayloadHandler *handler.AttackJarPayloadHandle
 }
 
 type Config struct {
@@ -32,12 +34,16 @@ type Config struct {
 	FDir string
 }
 
-func NewGRPCService(cfg *Config, attackTaskHandle *handler.AttackTaskHandler, nodeHandler *handler.NodeHandler) *GRPCService {
+func NewGRPCService(cfg *Config,
+	attackTaskHandle *handler.AttackTaskHandler,
+	nodeHandler *handler.NodeHandler,
+	attackJarPayloadHandler *handler.AttackJarPayloadHandle) *GRPCService {
 
 	return &GRPCService{
 		cfg:              cfg,
 		attackTaskHandle: attackTaskHandle,
 		nodeHandle:       nodeHandler,
+		attackJarPayloadHandler: attackJarPayloadHandler,
 	}
 }
 
@@ -74,6 +80,8 @@ func (s *GRPCService) Start() {
 	service.RegisterCmdServiceServer(s.grpcServer, rservice.NewCmdService())
 	service.RegisterLogStreamServiceServer(s.grpcServer, rservice.NewLogStreamService())
 	service.RegisterAttackTaskServiceServer(s.grpcServer, rservice.NewAttackTaskService(s.attackTaskHandle))
+	service.RegisterAttackPayloadServiceServer(s.grpcServer,rservice.NewAttackPayloadService(s.attackJarPayloadHandler))
+
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)

@@ -152,7 +152,7 @@ func (afs *AttackFileServer) Start() {
 	server := &http.Server{Addr: fmt.Sprintf("%s:%d", afs.host, afs.port),
 		Handler: afs}
 
-	log.Infof("FileServer starting on directory: %s\nListening on http://%s:%s\n", afs.attackFileDir, afs.host, afs.port)
+	log.Infof("FileServer starting on directory: %s\nListening on http://%s:%d\n", afs.attackFileDir, afs.host, afs.port)
 
 	if err := server.ListenAndServe(); err != nil {
 

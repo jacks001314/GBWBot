@@ -46,4 +46,7 @@ type Config struct {
 
 	//the attack file server port
 	AttackFileServerPort int `json:"attackFileServerPort"`
+
+	//the java version used to generator jar attack payload
+	JavaVersion string  `json:"javaVersion"`
 }

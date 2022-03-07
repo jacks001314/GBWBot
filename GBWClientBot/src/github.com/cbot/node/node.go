@@ -36,6 +36,8 @@ type Node struct {
 
 	fserverClient  *FServerClient
 
+	attackPayloadClient *AttackPayloadClient
+
 	spool *source.SourcePool
 
 	attackTasks *attack.AttackTasks
@@ -162,6 +164,8 @@ func (n *Node) Start() error {
 	}
 
 	n.fserverClient = NewFServerClient(n,n.grpcClient,initCbotDownloaFileStoreDir())
+
+	n.attackPayloadClient = NewAttackPayloadClient(n,n.grpcClient)
 
 	//setup attack tasks
 	n.attackTasks.Start()

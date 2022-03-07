@@ -129,6 +129,7 @@ func (sba *SSHBruteforceAttack) tryBruteforce(ip string, port int, entry *DictEn
 
 func (sba *SSHBruteforceAttack) Run(target source.Target) error {
 
+	defer sba.attackTasks.PubUnSyn()
 	dictEntries := sba.dictPool.Dicts()
 
 	ip := target.IP()

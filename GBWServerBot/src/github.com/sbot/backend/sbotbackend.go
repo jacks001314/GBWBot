@@ -145,7 +145,7 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 
 	return &SbotBackend{
 		cfg:              &cfg,
-		rpcService:       rpc.NewGRPCService(rpcCfg, attackTaskHandle, nodeHandle),
+		rpcService:       rpc.NewGRPCService(rpcCfg, attackTaskHandle, nodeHandle,handler.NewAttackJarPayloadHandle(cfg.CBotFileStoreDir,cfg.JavaVersion)),
 		attackFileServer: server.NewAttackFileServer(attackFileDownloadHandle, cfg.AttackFileServerDir, "0.0.0.0", cfg.AttackFileServerPort),
 	}, nil
 }
