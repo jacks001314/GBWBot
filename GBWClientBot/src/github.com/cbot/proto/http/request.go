@@ -112,7 +112,7 @@ func (r *HttpRequest) UPload(name string,fpath string,boundary string) *HttpRequ
 	defer f.Close()
 
 	// Add file
-	fw, err := r.writer.CreateFormFile(name, fpath)
+	fw, err := r.writer.CreateFormFile(name, name)
 	if err != nil {
 		panic(err)
 	}

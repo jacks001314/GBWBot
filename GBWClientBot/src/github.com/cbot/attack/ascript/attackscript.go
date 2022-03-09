@@ -36,7 +36,8 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 
 	script := script.New(sdata)
 
-	script.Add("scriptSource", nil)
+	script.Add("attackScript", nil)
+	script.Add("attackTarget",nil)
 
 	mm := objects.NewModuleMap()
 
@@ -176,6 +177,27 @@ func newAttackProcess(args ...objects.Object) (ret objects.Object, err error) {
 
 }
 
+func (as *AttackScript) MakeJarAttackPayload(args ...objects.Object) (ret objects.Object, err error) {
+
+	if len(args) != 1 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	cmd, ok := objects.ToString(args[0])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "targetIP",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	fpath,_:= as.attackTasks.MakeJarAttackPayload(cmd)
+
+	return objects.FromInterface(fpath)
+}
+
 func (as *AttackScript) InitCmdForLinux(args ...objects.Object) (ret objects.Object, err error) {
 
 	if len(args) != 1 {
@@ -267,6 +289,13 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 			TengoObj: attack.TengoObj{Name: "initCmdForLinux"},
 			as:       as,
 		}, nil
+
+	case "makeJarAttackPayload":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "makeJarAttackPayload"},
+			as:       as,
+		}, nil
 	}
 
 	return nil, fmt.Errorf("Unknown Attack script method:%s", key)
@@ -293,6 +322,11 @@ func (m *AttackScriptMethod) Call(args ...objects.Object) (objects.Object, error
 
 	case "initCmdForLinux":
 		return m.as.InitCmdForLinux(args...)
+
+	case "makeJarAttackPayload":
+
+		return m.as.MakeJarAttackPayload(args...)
+
 	}
 
 	return m.as, nil
