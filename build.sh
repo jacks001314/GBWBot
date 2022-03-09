@@ -27,9 +27,11 @@ cd GBWClientBot/src/github.com/cbot
 
 go build -o cbot_linux cmd/cbot/main.go
 go build -o AttackDump cmd/attack/main.go
+go build -o AttackHadoopIPC cmd/hadoop/attack.go
 
 mv cbot_linux ../../../../build/bin
 mv AttackDump ../../../../build/bin
+mv AttackHadoopIPC ../../../../build/bin
 
 cd ../../../../
 
