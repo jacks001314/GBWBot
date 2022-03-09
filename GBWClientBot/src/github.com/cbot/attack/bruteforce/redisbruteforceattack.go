@@ -162,6 +162,8 @@ func (rba *RedisBruteforceAttack) tryBruteforce(ip string, port int, entry *Dict
 
 	redisClient := redis.NewRedisClient(ip, port, entry.pass, uint64(RedisTimeout), 0)
 
+	defer redisClient.Close()
+
 	info, err := redisClient.Info()
 
 	if err != nil || !strings.Contains(info, "redis_version:") {

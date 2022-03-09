@@ -307,6 +307,7 @@ func testConnection() {
 		transport.DialTLSSkipVerify(true),
 		transport.DialUseTLS(true))
 
+
 	if err != nil {
 		fmt.Println(err)
 		return

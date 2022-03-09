@@ -39,6 +39,7 @@ type ApplicationClientProtocolService interface {
 	GetDelegationToken(in *hadoop_common.GetDelegationTokenRequestProto, out *hadoop_common.GetDelegationTokenResponseProto) error
 	RenewDelegationToken(in *hadoop_common.RenewDelegationTokenRequestProto, out *hadoop_common.RenewDelegationTokenResponseProto) error
 	CancelDelegationToken(in *hadoop_common.CancelDelegationTokenRequestProto, out *hadoop_common.CancelDelegationTokenResponseProto) error
+	Close()
 }
 
 type ApplicationClientProtocolServiceClient struct {
@@ -85,14 +86,17 @@ func (c *ApplicationClientProtocolServiceClient) CancelDelegationToken(in *hadoo
 	return c.Call(gohadoop.GetCalleeRPCRequestHeaderProto(&APPLICATION_CLIENT_PROTOCOL), in, out)
 }
 
+
 // DialApplicationClientProtocolService connects to an ApplicationClientProtocolService at the specified network address.
 func DialApplicationClientProtocolService(conf yarn_conf.YarnConfiguration) (ApplicationClientProtocolService, error) {
 	clientId, _ := uuid.NewV4()
 	ugi, _ := gohadoop.CreateSimpleUGIProto()
 	serverAddress, _ := conf.GetRMAddress()
-	c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress}
+	c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress,Conn:nil}
+
 	return &ApplicationClientProtocolServiceClient{c}, nil
 }
+
 
 /*
 // DialApplicationClientProtocolServiceTimeout connects to an ApplicationClientProtocolService at the specified network address.
@@ -103,5 +107,5 @@ func DialApplicationClientProtocolServiceTimeout(network, addr string,
 		return nil, nil, err
 	}
 	return &ApplicationClientProtocolServiceClient{c}, c, nil
-}
-*/
+}*/
+

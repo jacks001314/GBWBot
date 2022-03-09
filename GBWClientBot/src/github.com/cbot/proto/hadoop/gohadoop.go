@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/cbot/proto/hadoop/hadoop_common"
-	"log"
 	"os/user"
 	"runtime"
 	"strings"
@@ -88,7 +87,6 @@ func CreateSimpleUGIProto() (*hadoop_common.UserInformationProto, error) {
 	// Figure the current user-name
 	var username string
 	if user, err := user.Current(); err != nil {
-		log.Fatal("user.Current", err)
 		return nil, err
 	} else {
 		username = user.Username

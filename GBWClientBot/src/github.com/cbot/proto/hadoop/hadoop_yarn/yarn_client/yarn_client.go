@@ -14,6 +14,11 @@ func CreateYarnClient(conf yarn_conf.YarnConfiguration) (*YarnClient, error) {
 	return &YarnClient{client: c}, err
 }
 
+func (c *YarnClient) Close() {
+
+	c.client.Close()
+}
+
 func (c *YarnClient) CreateNewApplication() (*hadoop_yarn.GetNewApplicationResponseProto, *hadoop_yarn.ApplicationSubmissionContextProto, error) {
 	request := hadoop_yarn.GetNewApplicationRequestProto{}
 	response := hadoop_yarn.GetNewApplicationResponseProto{}

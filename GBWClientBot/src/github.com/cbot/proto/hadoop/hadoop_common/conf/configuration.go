@@ -3,7 +3,6 @@ package conf
 import (
 	"encoding/xml"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 )
@@ -90,12 +89,12 @@ func NewConfigurationResources(resources []Resource) (Configuration, error) {
 			if !resource.Required {
 				continue
 			}
-			log.Fatal("Couldn't open resource: ", err)
+
 			return nil, err
 		}
 		confData, err := ioutil.ReadAll(conf)
 		if err != nil {
-			log.Fatal("Couldn't read resource: ", err)
+
 			return nil, err
 		}
 		defer conf.Close()
@@ -104,7 +103,7 @@ func NewConfigurationResources(resources []Resource) (Configuration, error) {
 		var hConf hadoopConfiguration
 		err = xml.Unmarshal(confData, &hConf)
 		if err != nil {
-			log.Fatal("Couldn't parse core-site.xml: ", err)
+
 			return nil, err
 		}
 

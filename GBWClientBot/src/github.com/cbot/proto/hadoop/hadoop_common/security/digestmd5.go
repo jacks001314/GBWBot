@@ -21,7 +21,7 @@ func getChallengeParams(challenge string) (map[string]string, error) {
 		keyVal := strings.SplitN(split, "=", 2)
 
 		if len(keyVal) != 2 {
-			log.Fatal("found invalid param: ", split)
+
 			return nil, errors.New("found invalid param: " + split)
 		}
 
@@ -144,7 +144,7 @@ func generateChallengeReponse(username string, password string, protocol string,
 
 func GetDigestMD5ChallengeResponse(protocol string, serverId string, challenge []byte, userToken *hadoop_common.TokenProto) (string, error) {
 	if len(challenge) <= 0 {
-		log.Fatal("challenge cannot be empty!")
+
 
 		return "", errors.New("challenge cannot be empty!")
 	}
@@ -153,13 +153,13 @@ func GetDigestMD5ChallengeResponse(protocol string, serverId string, challenge [
 
 	challengeParams, err := getChallengeParams(string(challenge))
 	if err != nil {
-		log.Fatal("challenge params extraction failure! ", err)
+
 		return "", err
 	}
 
 	err = validateChallengeParameters(challengeParams)
 	if err != nil {
-		log.Fatal("challenge params validation failure! ", err)
+
 		return "", err
 	}
 
@@ -168,7 +168,7 @@ func GetDigestMD5ChallengeResponse(protocol string, serverId string, challenge [
 	response, err := generateChallengeReponse(username, password, protocol, serverId, challengeParams)
 
 	if err != nil {
-		log.Fatal("Failed to generate challenge response! ", err)
+
 		return "", err
 	}
 

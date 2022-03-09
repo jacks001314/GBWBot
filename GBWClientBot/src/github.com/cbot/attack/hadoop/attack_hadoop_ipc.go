@@ -80,9 +80,13 @@ func (ha *HadoopIPCAttack) doAttack(ip string ,port int) error {
 
 	// Create YarnClient
 	yarnClient, err := yarn_client.CreateYarnClient(conf)
+
+
 	if err!=nil {
 		return fmt.Errorf("Create hadoop yarn client failed:%v",err)
 	}
+
+	defer yarnClient.Close()
 
 	// Create new application to get ApplicationSubmissionContext
 	_, asc, err := yarnClient.CreateNewApplication()
@@ -159,7 +163,6 @@ func (ha *HadoopIPCAttack) Run(target source.Target) error {
 
 	if err := ha.doAttack(ip,port);err!=nil {
 
-		log.Println(err)
 		return err
 	}
 
