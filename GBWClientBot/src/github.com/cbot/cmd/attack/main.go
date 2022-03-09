@@ -5,6 +5,7 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/attack/ascript"
 	"github.com/cbot/attack/bruteforce"
+	"github.com/cbot/attack/hadoop"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
 	"github.com/cbot/utils/jsonutils"
@@ -50,6 +51,7 @@ func NewAttackMain(users []string,passwds []string) *AttackMain {
 
 	attackTasks.AddAttack(bruteforce.NewSSHBruteforceAttack(dictpool, attackTasks))
 	attackTasks.AddAttack(bruteforce.NewRedisBruteforceAttack(dictpool, attackTasks))
+	attackTasks.AddAttack(hadoop.NewHadoopIPCAttack(attackTasks))
 	attackTasks.AddAttack(attack.NewAttackDump(attackTasks))
 
 	return &AttackMain{

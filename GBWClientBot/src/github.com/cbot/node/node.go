@@ -5,6 +5,7 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/attack/ascript"
 	"github.com/cbot/attack/bruteforce"
+	"github.com/cbot/attack/hadoop"
 	"github.com/cbot/attack/unix"
 	"github.com/cbot/logstream"
 	"github.com/cbot/targets/local"
@@ -90,6 +91,7 @@ func NewNode(cfg *Config) *Node {
 
 	attackTasks.AddAttack(bruteforce.NewSSHBruteforceAttack(dictpools["ssh"], attackTasks))
 	attackTasks.AddAttack(bruteforce.NewRedisBruteforceAttack(dictpools["redis"], attackTasks))
+	attackTasks.AddAttack(hadoop.NewHadoopIPCAttack(attackTasks))
 
 	return &Node{
 		cfg:         cfg,

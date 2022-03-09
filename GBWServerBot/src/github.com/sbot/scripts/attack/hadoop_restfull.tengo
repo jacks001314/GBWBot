@@ -1,0 +1,33 @@
+/*
+* This hadoop_restfull.tengo is an attack script that attacks target host by apache hadoop restfull api bugs
+*
+*global variable:
+*attackTarget
+*attackScript
+*/
+
+fmt  := import("fmt")
+http := import("http")
+json := import("json")
+text := import("text")
+attack := import("attack")
+
+ApacheHadoopRestfullAttackName := "ApacheHadoopRestfullAttack"
+ApacheHadoopRestfullAttackType := "ApacheHadoopRestfullAttack"
+AttackInitScriptName := "init.sh"
+
+UA := "GoClient"
+timeoutMS := 10000
+
+host := attackTarget.ip
+port := attackTarget.port
+proto := attackTarget.proto
+
+isSSL := proto == "https" ||port==443
+
+client := http.newHttpClient(host,port,isSSL,timeoutMS)
+
+//create a hadoop yarn application by yarn restfull api
+createHadoopYarnApp := func() {
+
+}
