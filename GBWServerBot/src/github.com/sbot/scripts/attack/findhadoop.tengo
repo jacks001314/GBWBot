@@ -1,0 +1,36 @@
+/*
+* This findhadoop.tengo is an script used to find hadoop ipc
+*
+*global variable:
+*attackTarget
+*attackScript
+*/
+
+fmt  := import("fmt")
+http := import("http")
+json := import("json")
+text := import("text")
+attack := import("attack")
+
+UA := "FindHadoopApplication"
+timeoutMS := 10000
+
+host := attackTarget.ip
+port := attackTarget.port
+proto := attackTarget.proto
+key := "Hadoop IPC port"
+isSSL := proto == "https" ||port==443
+
+client := http.newHttpClient(host,port,isSSL,timeoutMS)
+
+request := http.newHttpRequest("get","/").addHeader("User-Agent",UA)
+
+response := client.send(request)
+
+content := response.getBodyAsString()
+
+if text.contains(content,key) {
+
+    fmt.printf("%s:%d\n",host,port)
+
+}

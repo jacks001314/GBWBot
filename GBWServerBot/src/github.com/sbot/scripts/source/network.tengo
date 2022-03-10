@@ -6,9 +6,10 @@ fmt  := import("fmt")
 source := import("source")
 ipgen := import("ipgen")
 
-fmt.Println("ffffffffffffffffffffffffffffffffff")
-wlists := ["192.168.1.0/24"]
-blists := ["192.168.1.1","192.168.1.255"]
+wlists := []
+blists := ["0.0.0.0/8","10.0.0.0/8","100.64.0.0/10","127.0.0.0/8","169.254.0.0/16","172.16.0.0/12",
+"192.0.0.0/24","192.0.2.0/24","192.88.99.0/24","192.168.0.0/16","198.18.0.0/15",
+"198.51.100.0/24","203.0.113.0/24","240.0.0.0/4","255.255.255.255/32","224.0.0.0/4"]
 
 ipg := ipgen.newIPGenFromArray(wlists,blists)
 
@@ -17,9 +18,9 @@ setEntry := func (ip) {
      entry := source.newEntry()
      entry.setIP(ip)
      entry.setHost(ip)
-     entry.setPort(22)
-     entry.setProto("ssh")
-     entry.setApp("ssh")
+     entry.setPort(0)
+     entry.setProto("find")
+     entry.setApp("find")
 
      scriptSource.put(entry)
 
@@ -28,7 +29,6 @@ setEntry := func (ip) {
 main := func () {
 
     for ip:= ipg.curIP();ip!="";ip= ipg.nextIP() {
-
 
         setEntry(ip)
     }
