@@ -12,11 +12,13 @@ go build -o sbot cmd/sbot/main.go
 go build -o SbotClient cmd/client/main.go
 go build -o SbotFileClient cmd/fileclient/main.go
 go build -o SbotAttackPayloadClient cmd/attackpayloadclient/main.go
+go build -o SbotAttackQueryClient   cmd/query/main.go
 
 mv sbot ../../../../build/bin
 mv SbotClient ../../../../build/bin
 mv SbotFileClient ../../../../build/bin
 mv SbotAttackPayloadClient ../../../../build/bin
+mv SbotAttackQueryClient ../../../../build/bin
 
 cp -rf conf ../../../../build
 cp -rf scripts ../../../../build

@@ -23,6 +23,12 @@ func (sqh *SbotQueryHandler) queryStringOfAttackedNode(query *model.AttackedNode
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["pnodeId"]=="%s"`,query.ParentNodeId))
 	}
 
+	if query.Mac != "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["mac"]=="%s"`,query.Mac))
+	}
+
+
 	if len(queryStringS) == 0 {
 
 		return "1==1"
