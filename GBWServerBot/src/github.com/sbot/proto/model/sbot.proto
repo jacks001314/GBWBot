@@ -1,0 +1,230 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "Sbot";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+
+//page query
+
+message PageQuery {
+
+  uint64 page = 1;
+  uint64 size = 2;
+}
+
+message TimeRange {
+
+  uint64 start = 1;
+  uint64 end = 2;
+}
+
+message PageMessage {
+
+  uint64 page =1;
+  uint64 size =2;
+  uint64 totalNum = 3;
+  uint64 totalPage = 4;
+  
+}
+
+//attack task query and reply
+message AttackTaskQuery {
+
+  string taskId = 1;
+  string name = 2;
+  TimeRange time = 3;
+  PageQuery page = 4;
+}
+
+message AttackTaskMessage {
+
+  string taskId = 1;
+
+  string name = 2;
+
+  string userId = 3;
+
+  string host = 4;
+
+  int32  port = 5;
+
+  string user = 6;
+
+  string passwd = 7;
+
+  string privateKey = 8;
+
+  string os = 9;
+
+  string cbot = 10;
+
+  string cbotPath = 11;
+
+}
+
+message AttackTaskReply {
+
+  repeated AttackTaskMessage messages =1;
+
+  PageMessage page = 2;
+}
+
+//attacked nodes query and reply
+message AttackedNodeQuery {
+
+  string taskId = 1;
+  string parentNodeId = 2;
+  string nodeId = 3;
+  string mac = 4;
+
+  PageQuery page = 5;
+  TimeRange time = 6;
+}
+
+message AttackedNodeMessage {
+
+  string taskId = 1;
+
+  string parentNodeID = 2;
+
+  string nodeId = 3;
+
+  //the cbot version
+  string version = 4;
+
+  //the local ip address that been attacked node
+  string localIP = 5;
+
+  // the out ip address that been attacked node
+  string outIP = 6;
+
+  // the mac address that been attacked node
+  string mac = 7;
+
+  //the os that been attacked node
+  string os = 8;
+
+  //the system arch
+  string arch = 9;
+
+  //the current user
+  string user = 10;
+
+  //the host name that been attacked node
+  string hostName = 11;
+
+  //the create node time
+  uint64 time = 12;
+
+  //the last ping node time
+  uint64 lastTime = 13;
+
+}
+
+message AttackedNodeReply {
+
+  PageMessage page = 1;
+
+  repeated AttackedNodeMessage nodes = 2;
+
+}
+
+//attack process query and reply
+message AttackProcessQuery {
+
+  string taskId = 1;
+  string nodeId = 2;
+  string attackType = 3;
+
+  PageQuery page = 4;
+  TimeRange time = 5;
+}
+
+message AttackProcessMessage {
+
+  string taskId = 1;
+
+  string nodeId = 2;
+
+  uint64 time = 3;
+
+  string targetIP = 4;
+
+  string targetHost = 5;
+
+  int32  targetPort = 6;
+
+  string proto = 7;
+
+  string app = 8;
+
+  string os = 9;
+
+  string attackName = 10;
+
+  string attackType = 11;
+
+  int32 status = 12;
+
+  string payload = 13;
+
+  string result = 14;
+
+  string details = 15;
+
+}
+
+message AttackProcessMessageReply {
+
+  PageMessage page = 1;
+
+  repeated AttackProcessMessage aps = 2;
+
+}
+
+//download files query and reply
+message AttackedNodeDownloadFileQuery {
+
+  string taskId = 1;
+  string nodeId = 2;
+  string attackType = 3;
+
+  PageQuery page = 4;
+
+  TimeRange time = 5;
+}
+
+
+message AttackedNodeDownloadFileMessage {
+
+  string taskId = 1;
+  string nodeId = 2;
+  string url = 3;
+  string fname = 4;
+
+  string attackType = 5;
+  string attackIP = 6;
+  string targetIP = 7;
+  int32  targetPort = 8;
+  string targetOutIP = 9;
+  string downloadTool = 10;
+  string userAgent = 11;
+
+}
+
+message AttackedNodeDownloadFileReply {
+
+  PageMessage page = 1;
+  repeated AttackedNodeDownloadFileMessage downloadFiles = 2;
+
+}
+
+
+
+

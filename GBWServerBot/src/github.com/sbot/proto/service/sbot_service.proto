@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/sbot.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "SbotService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+service SbotService {
+
+  rpc QueryAttackTasks(model.AttackTaskQuery) returns (model.AttackTaskReply);
+
+  rpc QueryAttackedNodes(model.AttackedNodeQuery) returns (model.AttackedNodeReply);
+
+  rpc QueryAttackProcess(model.AttackProcessQuery) returns (model.AttackProcessMessageReply);
+
+  rpc QueryAttackedDownloadFiles(model.AttackedNodeDownloadFileQuery) returns (model.AttackedNodeDownloadFileReply);
+
+}

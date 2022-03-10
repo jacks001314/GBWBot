@@ -104,35 +104,71 @@ func makeAttackFileDownloadHandle(cfg *Config) (*handler.AttackFileServerHandle,
 	return handler.NewAttackFileServerHandle(db), nil
 }
 
+func makeSbotQueryHandle(cfg *Config) (*handler.SbotQueryHandler,error) {
+
+	dbnode, err := openRedisDB(cfg, AttackedNodeDB, AttackedNodeDBTable)
+	if err != nil {
+
+		return nil, err
+	}
+
+	attackProcessDB, err := openRedisDB(cfg, AttackedNodeDB, NodeAttackProcessTable)
+	if err != nil {
+
+		return nil, err
+	}
+
+	attackTaskDB, err := openRedisDB(cfg, AttackTaskDB, AttackTaskTable)
+	if err != nil {
+
+		return nil, err
+	}
+
+	downloadDB, err := openRedisDB(cfg, AttackFileDownloadDB, AttackFileDownloadTable)
+	if err != nil {
+
+		return nil, err
+	}
+
+	return handler.NewSbotQueryHandler(attackTaskDB,dbnode,attackProcessDB,downloadDB),nil
+}
+
 func NewSbotBacked(cfile string) (*SbotBackend, error) {
 
 	var cfg Config
 
 	if err := jsonutils.UNMarshalFromFile(&cfg, cfile); err != nil {
 
-		log.Errorf("load config from file:%s is failed", cfile)
+		log.Errorf("load config from file:%s is failed\n", cfile)
 		return nil, err
 	}
 
 	nodeHandle, err := makeNodeHandle(&cfg)
 	if err != nil {
 
-		log.Error("Create attacked node handler failed:%v", err)
+		log.Errorf("Create attacked node handler failed:%v\n", err)
 		return nil, err
 	}
 
 	attackTaskHandle, err := makeAttackTaskHandle(&cfg)
 	if err != nil {
 
-		log.Error("Create attack task handler failed:%v", err)
+		log.Errorf("Create attack task handler failed:%v\n", err)
 		return nil, err
 	}
 
 	attackFileDownloadHandle, err := makeAttackFileDownloadHandle(&cfg)
 	if err != nil {
 
-		log.Error("Create attack file download handler failed:%v", err)
+		log.Errorf("Create attack file download handler failed:%v\n", err)
 		return nil, err
+	}
+
+	sbotQueryHandle ,err := makeSbotQueryHandle(&cfg)
+	if err!=nil {
+
+		log.Errorf("Create sbot query handler failed:%v\n",err)
+		return nil,err
 	}
 
 	rpcCfg := &rpc.Config{
@@ -145,10 +181,20 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 
 	return &SbotBackend{
 		cfg:              &cfg,
-		rpcService:       rpc.NewGRPCService(rpcCfg, attackTaskHandle, nodeHandle,handler.NewAttackJarPayloadHandle(cfg.CBotFileStoreDir,cfg.JavaVersion)),
-		attackFileServer: server.NewAttackFileServer(attackFileDownloadHandle, cfg.AttackFileServerDir, "0.0.0.0", cfg.AttackFileServerPort),
+		rpcService:       rpc.NewGRPCService(rpcCfg,
+			attackTaskHandle,
+			nodeHandle,
+			handler.NewAttackJarPayloadHandle(cfg.CBotFileStoreDir,cfg.JavaVersion),
+			sbotQueryHandle),
+		attackFileServer: server.NewAttackFileServer(attackFileDownloadHandle,
+			cfg.AttackFileServerDir,
+			"0.0.0.0",
+			cfg.AttackFileServerPort),
 	}, nil
+
 }
+
+
 
 func (sb *SbotBackend) Start() {
 
