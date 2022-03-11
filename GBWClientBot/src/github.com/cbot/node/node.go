@@ -202,6 +202,11 @@ func (n *Node) ParentNodeId() string {
 	return n.cfg.PNodeId
 }
 
+func (n *Node) AttackType()string {
+
+	return n.cfg.AttackType
+}
+
 func (n *Node) AddAttackSource(name string, types []string, content []byte) error {
 
 	s, err := source.NewScriptSourceFromContent(n.spool, name, types, content)

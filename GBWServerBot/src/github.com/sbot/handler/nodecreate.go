@@ -20,12 +20,12 @@ func (nh *NodeHandler) HandleCreateNode(request *model.CreateNodeRequest) (strin
 
 		errS := fmt.Sprintf("Cannot write node:%s into database,err:%v", nodeId, err)
 
-		log.Error(errS)
+		log.Errorln(errS)
 
 		return "", fmt.Errorf(errS)
 	}
 
-	log.Infof("Create nodeId:%s,parentNodeId:%s for request:%v", nodeId, request.PnodeId, request)
+	log.Infof("Create nodeId:%s,parentNodeId:%s for request:%v\n", nodeId, request.PnodeId, request)
 
 	return nodeId, nil
 }

@@ -5,6 +5,8 @@ type Config struct {
 
 	PNodeId string `json:"pnodeId"`
 
+	AttackType string `json:"attackType"`
+
 	SbotHost string `json:"sbotHost"`
 
 	SbotRPCPort int `json:"sbotRPCPort"`

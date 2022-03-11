@@ -82,9 +82,10 @@ message AttackedNodeQuery {
   string parentNodeId = 2;
   string nodeId = 3;
   string mac = 4;
-
-  PageQuery page = 5;
-  TimeRange time = 6;
+  string attackType = 5;
+  PageQuery page = 6;
+  TimeRange time = 7;
+  
 }
 
 message AttackedNodeMessage {
@@ -125,6 +126,8 @@ message AttackedNodeMessage {
   //the last ping node time
   uint64 lastTime = 13;
 
+  string attackType = 14;
+  
 }
 
 message AttackedNodeReply {

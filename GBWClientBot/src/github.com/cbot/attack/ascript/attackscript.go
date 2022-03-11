@@ -200,7 +200,7 @@ func (as *AttackScript) MakeJarAttackPayload(args ...objects.Object) (ret object
 
 func (as *AttackScript) InitCmdForLinux(args ...objects.Object) (ret objects.Object, err error) {
 
-	if len(args) != 1 {
+	if len(args) != 2 {
 
 		return nil, tengo.ErrWrongNumArguments
 	}
@@ -208,13 +208,22 @@ func (as *AttackScript) InitCmdForLinux(args ...objects.Object) (ret objects.Obj
 	initUrl, ok := objects.ToString(args[0])
 	if !ok {
 		return nil, tengo.ErrInvalidArgumentType{
-			Name:     "targetIP",
+			Name:     "initUrl",
 			Expected: "string(compatible)",
 			Found:    args[0].TypeName(),
 		}
 	}
 
-	return objects.FromInterface(as.attackTasks.InitCmdForLinux(initUrl))
+	attackType, ok := objects.ToString(args[1])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "attackType",
+			Expected: "string(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+	return objects.FromInterface(as.attackTasks.InitCmdForLinux(initUrl,attackType))
 }
 
 func (as *AttackScript) DownloadInitURL(args ...objects.Object) (ret objects.Object, err error) {

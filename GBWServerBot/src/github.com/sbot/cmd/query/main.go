@@ -56,7 +56,7 @@ func main(){
 		queryAttackTask(client,*startTime,*endTime,*page,*pageSize,*taskId,*taskName)
 
 	case "node":
-		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac)
+		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType)
 
 	case "process":
 		queryAttackProcess(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType)
@@ -66,7 +66,7 @@ func main(){
 
 	default:
 		log.Fatalf("Unknown query object:%s\n",*name)
-		
+
 	}
 }
 
@@ -133,13 +133,14 @@ func queryAttackProcess(client service.SbotServiceClient, startTime,endTime,page
 	}
 }
 
-func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId,pnodeId,mac string) {
+func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId,pnodeId,mac,attackType string,) {
 
 	query := &model.AttackedNodeQuery{
 		TaskId:       taskId,
 		ParentNodeId: pnodeId,
 		NodeId:       nodeId,
 		Mac:          mac,
+		AttackType: attackType,
 		Time:   &model.TimeRange{
 			Start: startTime,
 			End:   endTime,

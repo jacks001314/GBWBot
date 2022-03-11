@@ -50,6 +50,7 @@ func (n *NodeClient) CreateNode() (string, error) {
 	request := &model.CreateNodeRequest{
 		TaskId:   n.nd.TaskId(),
 		PnodeId:  n.nd.ParentNodeId(),
+		AttackType: n.nd.AttackType(),
 		Version:  "cbot-1.0",
 		LocalIP:  nodeInfo.IP,
 		OutIP:    nodeInfo.OutIP,

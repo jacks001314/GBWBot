@@ -28,6 +28,10 @@ func (sqh *SbotQueryHandler) queryStringOfAttackedNode(query *model.AttackedNode
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["mac"]=="%s"`,query.Mac))
 	}
 
+	if query.AttackType != "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["attackType"]=="%s"`,query.AttackType))
+	}
 
 	if len(queryStringS) == 0 {
 
@@ -54,6 +58,7 @@ func (sqh *SbotQueryHandler) makeAttackedNodeMessage(entry *store.ResultEntry) (
 	return &model.AttackedNodeMessage{
 		TaskId:       node.TaskId,
 		ParentNodeID: node.PnodeId,
+		AttackType:    node.AttackType,
 		NodeId:       entry.Key,
 		Version:      node.Version,
 		LocalIP:      node.LocalIP,
@@ -92,6 +97,7 @@ func (sqh *SbotQueryHandler) AttackedNodeQueryHandle(query *model.AttackedNodeQu
 				{
 					TaskId:       node.TaskId,
 					ParentNodeID: node.PnodeId,
+					AttackType:   node.AttackType,
 					NodeId:       query.NodeId,
 					Version:      node.Version,
 					LocalIP:      node.LocalIP,

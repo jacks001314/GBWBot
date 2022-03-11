@@ -17,35 +17,38 @@ message CreateNodeRequest {
   //the parent cbot nodeId
   string pnodeId = 2;
 
+  //the parent cbot attack type
+  string attackType = 3;
+
   //the cbot version
-  string version = 3;
+  string version = 4;
 
   //the local ip address that been attacked node
-  string localIP = 4;
+  string localIP = 5;
 
   // the out ip address that been attacked node
-  string outIP = 5;
+  string outIP = 6;
 
   // the mac address that been attacked node
-  string mac = 6;
+  string mac = 7;
 
   //the os that been attacked node
-  string os = 7;
+  string os = 8;
 
   //the system arch
-  string arch = 8;
+  string arch = 9;
 
   //the current user
-  string user = 9;
+  string user = 10;
 
   //the host name that been attacked node
-  string hostName = 10;
+  string hostName = 11;
 
   //the create node time
-  uint64 time = 11;
+  uint64 time = 12;
 
   //the last ping node time
-  uint64 lastTime = 12;
+  uint64 lastTime = 13;
 
 }
 

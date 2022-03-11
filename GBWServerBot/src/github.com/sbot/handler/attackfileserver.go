@@ -15,11 +15,11 @@ type AttackFileServerHandle struct {
 type AttackFileDownloadRequest struct {
 	TaskId string `json:"taskId"`
 	NodeId string `json:"nodeId"`
+	AttackType string `json:"attackType"`
 
 	Url   string `json:"url"`
 	Fname string `json:"fname"`
 
-	AttackType string `json:"attackType"`
 	AttackIP   string `json:"attackIP"`
 	TargetIP   string `json:"targetIP"`
 	TargetPort int    `json:"targetPort"`

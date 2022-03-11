@@ -51,7 +51,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.
 
 	paths := strings.Split(path, "/")
 
-	if len(paths) < 5 {
+	if len(paths) < 6 {
 
 		errS := fmt.Sprintf("Invalid url path:%s", path)
 		log.WithField("urlPath", path).Error(errS)
@@ -62,6 +62,8 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.
 
 	taskId := paths[3]
 	nodeId := paths[4]
+	attackType := paths[5]
+
 	fname := paths[len(paths)-1]
 
 	return &handler.AttackFileDownloadRequest{
@@ -69,7 +71,7 @@ func (afs *AttackFileServer) makeAttackFileDownloadRequest(path string, r *http.
 		NodeId:       nodeId,
 		Url:          path,
 		Fname:        fname,
-		AttackType:   "attack",
+		AttackType:   attackType,
 		AttackIP:     "0.0.0.0",
 		TargetIP:     r.RemoteAddr,
 		TargetPort:   0,

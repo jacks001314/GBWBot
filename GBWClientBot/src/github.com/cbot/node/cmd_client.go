@@ -110,6 +110,7 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 
 			return []byte(fmt.Sprintf("Add Attack Source is failed:%v", err)), err
 		}
+		return []byte(fmt.Sprintf("add attack source ok,cmd.name:%s",cmd.Name)),nil
 
 	case model.CmdCode_RunAddAttack:
 
@@ -119,6 +120,7 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 
 			return []byte(fmt.Sprintf("Add Attack  is failed:%v", err)), err
 		}
+		return []byte(fmt.Sprintf("add attack script ok,cmd.name:%s",cmd.Name)),nil
 
 	case model.CmdCode_RunOSCmd:
 		return cc.runOsCmd(cmd.Name, cmd.Args)
@@ -130,6 +132,7 @@ func (cc *CmdClient) handle(cmd *model.Cmd) ([]byte, error) {
 		if err != nil {
 			return []byte(fmt.Sprintf("Add Bruteforce dictory failed:%v", err)), err
 		}
+		return []byte(fmt.Sprintf("add bruteforce dict ok,cmd.name:%s",cmd.Name)),nil
 	}
 
 	return []byte(fmt.Sprintf("Unkown cmd:%s", cmd.Name)), fmt.Errorf("Unkown cmd:%s", cmd.Name)

