@@ -442,7 +442,8 @@ func readDelimited(rawData []byte, msg proto.Message) (int, error) {
 func (c *Client) checkRpcHeader(rpcResponseHeaderProto *hadoop_common.RpcResponseHeaderProto) error {
 	var callClientId [16]byte = [16]byte(*c.ClientId)
 	var headerClientId []byte = []byte(rpcResponseHeaderProto.ClientId)
-	if rpcResponseHeaderProto.ClientId != nil {
+
+	if rpcResponseHeaderProto.ClientId != nil &&len(headerClientId)>=16{
 		if !bytes.Equal(callClientId[0:16], headerClientId[0:16]) {
 
 			return errors.New("Incorrect clientId")

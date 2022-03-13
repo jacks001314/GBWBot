@@ -30,7 +30,7 @@ type AttackMain struct {
 
 }
 
-func NewAttackMain(users []string,passwds []string) *AttackMain {
+func NewAttackMain(users []string,passwds []string,dumpOutFile string) *AttackMain {
 
 
 	nodeInfo := local.GetNodeInfo()
@@ -52,7 +52,7 @@ func NewAttackMain(users []string,passwds []string) *AttackMain {
 	attackTasks.AddAttack(bruteforce.NewSSHBruteforceAttack(dictpool, attackTasks))
 	attackTasks.AddAttack(bruteforce.NewRedisBruteforceAttack(dictpool, attackTasks))
 	attackTasks.AddAttack(hadoop.NewHadoopIPCAttack(attackTasks))
-	attackTasks.AddAttack(attack.NewAttackDump(attackTasks))
+	attackTasks.AddAttack(attack.NewAttackDump(attackTasks,dumpOutFile))
 
 	return &AttackMain{
 		spool:       spool,
@@ -127,6 +127,7 @@ func main(){
 	attack := flag.String("addAttack","","add a attack script")
 	source := flag.String("addSource","","add a attack source")
 	dict :=flag.String("addDict","","add bruteforce dictory ")
+	output := flag.String("output","","set attack dump write to fpath")
 
 	flag.Parse()
 
@@ -137,7 +138,7 @@ func main(){
 
 	if *dict == "" {
 
-		attackMain = NewAttackMain([]string{"root","test","admin"},[]string{"root","test","admin","passwd","password","123456"})
+		attackMain = NewAttackMain([]string{"root","test","admin"},[]string{"root","test","admin","passwd","password","123456"},*output)
 
 	}else {
 
@@ -146,7 +147,7 @@ func main(){
 			log.Fatalf("Invalid dictory format,should as example:[root,admin,test:123456,passwd]")
 		}
 
-		attackMain = NewAttackMain(strings.Split(args[0],","),strings.Split(args[1],","))
+		attackMain = NewAttackMain(strings.Split(args[0],","),strings.Split(args[1],","),*output)
 	}
 
 	if *attack!="" {

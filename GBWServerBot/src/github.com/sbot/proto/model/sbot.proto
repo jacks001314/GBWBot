@@ -37,9 +37,10 @@ message PageMessage {
 message AttackTaskQuery {
 
   string taskId = 1;
-  string name = 2;
-  TimeRange time = 3;
-  PageQuery page = 4;
+  string userId = 2;
+  string name = 3;
+  TimeRange time = 4;
+  PageQuery page = 5;
 }
 
 message AttackTaskMessage {
@@ -227,6 +228,8 @@ message AttackedNodeDownloadFileReply {
   repeated AttackedNodeDownloadFileMessage downloadFiles = 2;
 
 }
+
+
 
 
 

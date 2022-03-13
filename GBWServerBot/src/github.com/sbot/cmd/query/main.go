@@ -26,6 +26,7 @@ func main(){
 	taskName := flag.String("taskName","","set the task name")
 	taskId := flag.String("taskId","","set the taskId")
 	nodeId := flag.String("nodeId","","set the nodeId")
+	userId := flag.String("userId","","set the userId")
 	pnodeId := flag.String("pnodeId","","set the parent node id")
 	mac := flag.String("mac","","set the node mac ")
 	attackType := flag.String("attackType","","set the attack type")
@@ -53,7 +54,7 @@ func main(){
 	switch *name {
 
 	case "task":
-		queryAttackTask(client,*startTime,*endTime,*page,*pageSize,*taskId,*taskName)
+		queryAttackTask(client,*startTime,*endTime,*page,*pageSize,*taskId,*taskName,*userId)
 
 	case "node":
 		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType)
@@ -167,10 +168,11 @@ func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,
 }
 
 
-func queryAttackTask(client service.SbotServiceClient,startTime,endTime,page,size uint64,taskId,taskName string) {
+func queryAttackTask(client service.SbotServiceClient,startTime,endTime,page,size uint64,taskId,taskName,userId string) {
 
 	query := &model.AttackTaskQuery{
 		TaskId: taskId,
+		UserId: userId,
 		Name:   taskName,
 		Time:   &model.TimeRange{
 			Start: startTime,

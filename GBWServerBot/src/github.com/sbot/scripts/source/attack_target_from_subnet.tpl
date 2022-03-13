@@ -1,7 +1,3 @@
-/*
-*This Tengo Script Generate ips from local subnet ip range template
-**/
-
 fmt  := import("fmt")
 source := import("source")
 ipgen := import("ipgen")
@@ -13,7 +9,7 @@ setEntry := func (ip) {
      entry := source.newEntry()
      entry.setIP(ip)
      entry.setHost(ip)
-     entry.setPort({{.Port}})
+     entry.setPort(0)
      entry.setProto("{{.Proto}}")
      entry.setApp("{{.App}}")
 

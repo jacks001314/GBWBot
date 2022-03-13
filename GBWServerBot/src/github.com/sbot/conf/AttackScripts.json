@@ -1,0 +1,84 @@
+
+{
+  "storePath": "/opt/data/store/attack/script/",
+  "storeRPath": "attack/script/",
+  "attackScripts":[
+      {
+        "id":"Attack_Hadoop_IPC_001",
+        "name": "HadoopIPCAttack",
+        "defaultProto": "hrpc",
+        "defaultPort": 8032,
+        "attackType":"HadoopIPCAttack",
+        "fname":"",
+        "inline": true,
+        "language":"go",
+        "desc": "Hadoop IPC 远程攻击武器"
+      },
+      {
+        "id":"Attack_Hadoop_Restfull_002",
+        "name": "ApacheHadoopRestfullAttack",
+        "defaultProto": "http",
+        "defaultPort": 8088,
+        "attackType":"ApacheHadoopRestfullAttack",
+        "fname":"hadoop_restfull.tengo",
+        "inline": false,
+        "language":"tengo",
+        "desc": "Hadoop Restfull API 远程攻击武器"
+     },
+    {
+      "id":"Attack_Flink_Jar_003",
+      "name": "ApacheFlinkAnyJarUploadAttack",
+      "defaultProto": "http",
+      "defaultPort": 8081,
+      "attackType":"ApacheFlinkAnyJarUploadAttack",
+      "fname":"flink.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Flink任意Jar文件上传执行攻击武器"
+    },
+    {
+      "id":"Attack_Solr_Velocity_004",
+      "name": "ApacheSolrInjectAttack",
+      "defaultProto": "http",
+      "defaultPort": 8983,
+      "attackType":"ApacheSolrInjectAttack",
+      "fname":"solr.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Solr Velocity模板远程注入攻击武器"
+    },
+    {
+      "id":"Attack_Bruteforce_SSH_005",
+      "name": "SSHBruteForceAttack",
+      "defaultProto": "ssh",
+      "defaultPort": 22,
+      "attackType":"SSHBruteForceAttack",
+      "fname":"",
+      "inline": true,
+      "language":"go",
+      "desc": "SSH弱口令暴力破解攻击武器"
+    },
+    {
+      "id":"Attack_Bruteforce_Redis_006",
+      "name": "RedisBruteForceAttack",
+      "defaultProto": "redis",
+      "defaultPort": 6379,
+      "attackType":"RedisBruteForceAttack",
+      "fname":"",
+      "inline": true,
+      "language":"go",
+      "desc": "Redis弱口令暴力破解攻击武器"
+    },
+    {
+      "id":"Attack_NOPasswdLogin_SSH_007",
+      "name": "SSHNoPasswdLoginAttack",
+      "defaultProto": "ssh",
+      "defaultPort": 22,
+      "attackType":"SSHNoPasswdLoginAttack",
+      "fname":"",
+      "inline": true,
+      "language":"go",
+      "desc": "SSH无密码登录攻击武器"
+    }
+]
+}

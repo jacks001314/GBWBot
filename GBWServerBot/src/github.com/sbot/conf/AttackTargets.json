@@ -1,0 +1,12 @@
+{
+  "storePath": "/opt/data/store/source/script",
+  "attackTargets": [
+    {
+      "id": "",
+      "name": "",
+      "fname":"",
+      "isTemplate":false,
+      "desc": "",
+    }
+  ]
+}

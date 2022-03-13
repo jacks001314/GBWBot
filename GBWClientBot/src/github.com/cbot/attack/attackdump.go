@@ -1,19 +1,35 @@
 package attack
 
 import (
+	"fmt"
 	"github.com/cbot/targets/source"
-	"log"
+	"io"
+	"os"
 	"strings"
 )
 
 type AttackDump struct {
 	attackTasks *AttackTasks
+	out io.Writer
 }
 
-func NewAttackDump(attackTasks *AttackTasks) *AttackDump {
+func NewAttackDump(attackTasks *AttackTasks,fpath string) *AttackDump {
+
+	out := os.Stdout
+
+	if fpath != "" {
+
+		file, err := os.OpenFile(fpath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0755)
+
+		if err == nil {
+
+			out = file
+		}
+	}
 
 	return &AttackDump{
 		attackTasks: attackTasks,
+		out:out,
 	}
 }
 
@@ -50,8 +66,9 @@ func (ad *AttackDump) Accept(target source.Target) bool {
 
 func (ad *AttackDump) Run(target source.Target) error {
 
-	log.Printf("Attack Dump tryto attack targets:{ip:%s,host:%s,port:%d,app:%s,proto:%s}",
-		target.IP(),target.Host(),target.Port(),target.App(),target.Proto())
+	defer ad.attackTasks.PubUnSyn()
+
+	fmt.Fprintf(ad.out,"%s:%d\n", target.IP(),target.Port())
 
 	return nil
 }

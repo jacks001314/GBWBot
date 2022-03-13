@@ -5,22 +5,36 @@ import (
 	"fmt"
 	"github.com/sbot/proto/model"
 	"github.com/sbot/store"
+	"strings"
 )
 
 
 func (sqh *SbotQueryHandler) queryStringOfAttackTask(query *model.AttackTaskQuery) string {
 
-	if query.Name != "" {
+	queryStringS := make([]string,0)
 
-		return fmt.Sprintf(`JsonValue["name"]=="%s"`,query.Name)
+	if query.Name!= "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["name"]=="%s"`,query.Name))
 	}
 
-	return "1==1"
+	if query.UserId != "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["userId"]=="%s"`,query.UserId))
+	}
+
+	if len(queryStringS) == 0 {
+
+		return "1==1"
+	}
+
+	return strings.Join(queryStringS," and ")
+
 }
 
 func (sqh *SbotQueryHandler) getCbotPath(taskId string,osType model.OsType) string {
 
-	return fmt.Sprintf("%s/cbot_%s.zip",taskId,model.OsType_name[int32(osType)])
+	return strings.ToLower(fmt.Sprintf("%s/cbot_%s.zip",taskId,model.OsType_name[int32(osType)]))
 }
 
 func (sqh *SbotQueryHandler) makeAttackTaskMessage(entry *store.ResultEntry) (*model.AttackTaskMessage,error) {
