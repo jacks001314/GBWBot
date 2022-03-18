@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package sbot.proto.service;
+
+import "proto/model/attack_scripts.proto";
+
+option csharp_namespace = "SBot.Proto.Service";
+option go_package = "github.com/sbot/proto/service";
+option java_multiple_files = true;
+option java_outer_classname = "AttackScriptsService";
+option java_package = "com.gbw3bao.sbot.proto.service";
+option php_namespace = "SBot\\Proto\\Service";
+
+
+service AttackScriptsService {
+
+  rpc AddAttackScripts(model.AddAttackScriptsRequest) returns (model.AddAttackScriptsReply){};
+
+  rpc FetchAttackScripts(model.FetchAttackScriptsRequest) returns (stream model.AttackScripts);
+
+}

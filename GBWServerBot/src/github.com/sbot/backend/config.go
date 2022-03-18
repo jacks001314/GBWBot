@@ -49,4 +49,23 @@ type Config struct {
 
 	//the java version used to generator jar attack payload
 	JavaVersion string  `json:"javaVersion"`
+
+	//the attack targets config file path
+	AttackTargetsCFile string `json:"attackTargetsConfigPath"`
+
+	//the attack targets wait queue capacity
+	AttackTargetsQueueCapacity uint32 `json:"attackTargetsQueueCapacity"`
+
+	//the attack targets wait time out
+	AttackTargetsWaitTimeout uint64 `json:"attackTargetsWaitTimeout"`
+
+
+	//the attack scripts config file path
+	AttackScriptsCFile string `json:"attackScriptsConfigPath"`
+
+	//the attack scripts wait queue capacity
+	AttackScriptsQueueCapacity uint32 `json:"attackScriptsQueueCapacity"`
+
+	//the attack scripts wait time out
+	AttackScriptsWaitTimeout uint64 `json:"attackScriptsWaitTimeout"`
 }

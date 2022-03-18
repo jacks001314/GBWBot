@@ -264,6 +264,16 @@ func (as *AttackScript) DownloadInitURL(args ...objects.Object) (ret objects.Obj
 
 }
 
+func (as *AttackScript) GetTaskId(args ...objects.Object) (ret objects.Object, err error) {
+
+	return objects.FromInterface(as.attackTasks.GetTaskId())
+}
+
+func (as *AttackScript) GetNodeId(args ...objects.Object) (ret objects.Object, err error) {
+
+	return objects.FromInterface(as.attackTasks.GetNodeId())
+}
+
 func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, err error) {
 
 	key, ok := objects.ToString(index)
@@ -305,6 +315,20 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 			TengoObj: attack.TengoObj{Name: "makeJarAttackPayload"},
 			as:       as,
 		}, nil
+
+	case "getTaskId":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "getTaskId"},
+			as:       as,
+		}, nil
+
+	case "getNodeId":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "getNodeId"},
+			as:       as,
+		}, nil
 	}
 
 	return nil, fmt.Errorf("Unknown Attack script method:%s", key)
@@ -335,6 +359,13 @@ func (m *AttackScriptMethod) Call(args ...objects.Object) (objects.Object, error
 	case "makeJarAttackPayload":
 
 		return m.as.MakeJarAttackPayload(args...)
+
+	case "getTaskId":
+		return m.as.GetTaskId(args ...)
+
+	case "getNodeId":
+		return m.as.GetNodeId(args ...)
+
 
 	}
 

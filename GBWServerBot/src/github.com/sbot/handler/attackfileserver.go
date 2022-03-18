@@ -28,6 +28,7 @@ type AttackFileDownloadRequest struct {
 	DownloadTool string `json:"downloadTool"`
 
 	UserAgent string `json:"userAgent"`
+	Time uint64 `json:"time"`
 }
 
 func NewAttackFileServerHandle(db store.Store) *AttackFileServerHandle {
@@ -40,6 +41,8 @@ func (afsh *AttackFileServerHandle) Handle(request *AttackFileDownloadRequest) e
 	key := fmt.Sprintf("AttackFile_%s", uuid.UUID())
 
 	now := uint64(time.Now().UnixNano() / (1000 * 1000))
+
+	request.Time = uint64(now)
 
 	jdata, _ := json.Marshal(request)
 

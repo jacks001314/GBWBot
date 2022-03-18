@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package sbot.proto.model;
+
+option csharp_namespace = "SBot.Proto.Model";
+option go_package = "github.com/sbot/proto/model";
+option java_multiple_files = true;
+option java_outer_classname = "AttackScripts";
+option java_package = "com.gbw3bao.sbot.proto.model";
+option php_namespace = "SBot\\Proto\\Model";
+
+message AddAttackScriptsRequest {
+
+  repeated string cfgIds = 1;
+
+  repeated string nodeIds = 2;
+
+}
+
+message AddAttackScriptsReply {
+
+  int32 status = 1;
+  string message = 2;
+
+  repeated string fetchedNodes = 3;
+
+}
+
+message FetchAttackScriptsRequest {
+
+  string nodeId = 1;
+
+}
+
+message AttackScripts {
+
+  string name = 1;
+
+  string attackType = 2;
+
+  int32 defaultPort = 3;
+
+  string defaultProto = 4;
+
+  uint64 size = 5;
+
+  bytes content = 6;
+
+  bool hasNext = 7;
+
+}

@@ -60,6 +60,7 @@ func (sqh *SbotQueryHandler) makeAttackTaskMessage(entry *store.ResultEntry) (*m
 		Os:         model.OsType_name[int32(attackTask.OsType)],
 		Cbot:       attackTask.Cbot,
 		CbotPath:   sqh.getCbotPath(entry.Key,attackTask.OsType),
+		Time: attackTask.Time,
 	},nil
 }
 
@@ -79,17 +80,19 @@ func (sqh *SbotQueryHandler) AttackTaskQueryHandle(query *model.AttackTaskQuery)
 		return &model.AttackTaskReply{
 			Messages: [] *model.AttackTaskMessage{
 				{
-				TaskId:     query.TaskId,
-				Name:       attackTask.Name,
-				UserId:     attackTask.UserId,
-				Host:       attackTask.Host,
-				Port:       attackTask.Port,
-				User:       attackTask.User,
-				Passwd:     attackTask.Passwd,
-				PrivateKey: attackTask.PrivateKey,
-				Os:         model.OsType_name[int32(attackTask.OsType)],
-				Cbot:       attackTask.Cbot,
-				CbotPath:   sqh.getCbotPath(query.TaskId,attackTask.OsType)},
+					TaskId:     query.TaskId,
+					Name:       attackTask.Name,
+					UserId:     attackTask.UserId,
+					Host:       attackTask.Host,
+					Port:       attackTask.Port,
+					User:       attackTask.User,
+					Passwd:     attackTask.Passwd,
+					PrivateKey: attackTask.PrivateKey,
+					Os:         model.OsType_name[int32(attackTask.OsType)],
+					Cbot:       attackTask.Cbot,
+					CbotPath:   sqh.getCbotPath(query.TaskId,attackTask.OsType),
+					Time:attackTask.Time,
+				},
 			},
 			Page: &model.PageMessage{
 				Page:  1,

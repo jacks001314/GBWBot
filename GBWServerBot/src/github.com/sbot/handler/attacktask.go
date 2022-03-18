@@ -204,6 +204,7 @@ func (ath *AttackTaskHandler) makeCbot(taskId string, request *model.CreateAttac
 func (ath *AttackTaskHandler) writeDB(taskId string, request *model.CreateAttackTaskRequest) error {
 
 	now := time.Now().UnixNano() / (1000 * 1000)
+	request.Time = uint64(now)
 	return ath.db.Put(taskId, uint64(now), request)
 
 }

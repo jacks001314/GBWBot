@@ -37,6 +37,7 @@ message CreateAttackTaskRequest {
 
   string cbot = 9;
 
+  uint64 time = 10;
 }
 
 message CreateAttackTaskReply {

@@ -179,7 +179,7 @@ func (s *CmdService) FetchCmd(stream service.CmdService_FetchCmdServer) error {
 			//send this cmd to client---cbot
 			if err = stream.Send(cmd.Cmd); err != nil {
 
-				s.removeCbotContext(nodeId)
+				//s.removeCbotContext(nodeId)
 				cmdCtx.replyCh <- &model.CmdReply{
 					NodeId:   nodeId,
 					Status:   0,
@@ -187,13 +187,14 @@ func (s *CmdService) FetchCmd(stream service.CmdService_FetchCmdServer) error {
 					Contents: []byte(fmt.Sprintf("%v",err)),
 				}
 
+				log.Errorf("Could not send over stream: %v\n", err)
 				return status.Errorf(codes.Unavailable, "Could not send over stream: %v", err)
 			}
 
 			//wait to reply from cbot
 			reply, err := stream.Recv()
 			if err != nil {
-				s.removeCbotContext(nodeId)
+				//s.removeCbotContext(nodeId)
 				cmdCtx.replyCh <- &model.CmdReply{
 					NodeId:   nodeId,
 					Status:   0,
@@ -201,6 +202,7 @@ func (s *CmdService) FetchCmd(stream service.CmdService_FetchCmdServer) error {
 					Contents: []byte(fmt.Sprintf("%v",err)),
 				}
 
+				log.Errorf("Receive a reply  over stream faield: %v\n", err)
 				return err
 			}
 

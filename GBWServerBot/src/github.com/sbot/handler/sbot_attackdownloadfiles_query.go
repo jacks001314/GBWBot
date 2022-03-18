@@ -62,6 +62,7 @@ func (sqh *SbotQueryHandler) makeAttackedNodeDownloadFileMessage(entry *store.Re
 		TargetOutIP:  request.TargetOutIP,
 		DownloadTool: request.DownloadTool,
 		UserAgent:    request.UserAgent,
+		Time: request.Time,
 	},nil
 }
 

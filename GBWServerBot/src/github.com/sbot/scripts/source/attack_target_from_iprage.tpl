@@ -2,8 +2,8 @@ fmt  := import("fmt")
 source := import("source")
 ipgen := import("ipgen")
 
-wlists := {{.WhiteList}}
-blist  := {{.BlackList}}
+wlists := {{tostring .WhiteList}}
+blist  := {{tostring .BlackList}}
 
 ipg := ipgen.newIPGenFromArray(wlists,blists)
 

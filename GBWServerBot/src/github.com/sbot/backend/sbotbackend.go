@@ -171,6 +171,21 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 		return nil,err
 	}
 
+	attackTargetsHandle,err := handler.NewAttackTargetsHandler(cfg.AttackTargetsCFile,cfg.AttackTargetsQueueCapacity,cfg.AttackTargetsWaitTimeout)
+
+	if err!= nil {
+		log.Errorf("Create attack targets handler failed:%v\n",err)
+		return nil,err
+	}
+
+	attackScriptsHandle,err := handler.NewAttackScriptsHandler(cfg.AttackScriptsCFile,cfg.AttackScriptsQueueCapacity,cfg.AttackScriptsWaitTimeout)
+
+	if err!=nil {
+		log.Errorf("Create attack scripts handler failed:%v\n",err)
+		return nil,err
+
+	}
+
 	rpcCfg := &rpc.Config{
 		Host:     "0.0.0.0",
 		Port:     cfg.RPort,
@@ -185,7 +200,7 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 			attackTaskHandle,
 			nodeHandle,
 			handler.NewAttackJarPayloadHandle(cfg.CBotFileStoreDir,cfg.JavaVersion),
-			sbotQueryHandle),
+			sbotQueryHandle,attackTargetsHandle,attackScriptsHandle),
 		attackFileServer: server.NewAttackFileServer(attackFileDownloadHandle,
 			cfg.AttackFileServerDir,
 			"0.0.0.0",

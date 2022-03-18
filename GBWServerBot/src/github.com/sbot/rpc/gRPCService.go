@@ -12,6 +12,7 @@ import (
 )
 
 type GRPCService struct {
+
 	cfg *Config
 
 	listener net.Listener
@@ -25,6 +26,10 @@ type GRPCService struct {
 	attackJarPayloadHandler *handler.AttackJarPayloadHandle
 
 	sbotQueryHandle *handler.SbotQueryHandler
+
+	attackTargetsHandle *handler.AttackTargetsHandler
+
+	attackScriptsHandle *handler.AttackScriptsHandler
 
 }
 
@@ -41,7 +46,9 @@ func NewGRPCService(cfg *Config,
 	attackTaskHandle *handler.AttackTaskHandler,
 	nodeHandler *handler.NodeHandler,
 	attackJarPayloadHandler *handler.AttackJarPayloadHandle,
-	sbotQueryHandle *handler.SbotQueryHandler) *GRPCService {
+	sbotQueryHandle *handler.SbotQueryHandler,
+	attackTargetsHandle *handler.AttackTargetsHandler,
+	attackScriptsHandle *handler.AttackScriptsHandler) *GRPCService {
 
 	return &GRPCService{
 		cfg:              cfg,
@@ -49,6 +56,8 @@ func NewGRPCService(cfg *Config,
 		nodeHandle:       nodeHandler,
 		attackJarPayloadHandler: attackJarPayloadHandler,
 		sbotQueryHandle: sbotQueryHandle,
+		attackTargetsHandle:attackTargetsHandle,
+		attackScriptsHandle:attackScriptsHandle,
 	}
 }
 
@@ -87,6 +96,8 @@ func (s *GRPCService) Start() {
 	service.RegisterAttackTaskServiceServer(s.grpcServer, rservice.NewAttackTaskService(s.attackTaskHandle))
 	service.RegisterAttackPayloadServiceServer(s.grpcServer,rservice.NewAttackPayloadService(s.attackJarPayloadHandler))
 	service.RegisterSbotServiceServer(s.grpcServer,rservice.NewSbotQueryservice(s.sbotQueryHandle))
+	service.RegisterAttackTargetsServiceServer(s.grpcServer,rservice.NewAttackTargetsService(s.attackTargetsHandle))
+	service.RegisterAttackScriptsServiceServer(s.grpcServer,rservice.NewAttackScriptsService(s.attackScriptsHandle))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s.grpcServer)

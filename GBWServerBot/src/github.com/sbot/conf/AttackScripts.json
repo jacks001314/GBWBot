@@ -1,6 +1,6 @@
 
 {
-  "storePath": "/opt/data/store/attack/script/",
+  "storePath": "/opt/data/store/",
   "storeRPath": "attack/script/",
   "attackScripts":[
       {

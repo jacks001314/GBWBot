@@ -13,12 +13,17 @@ go build -o SbotClient cmd/client/main.go
 go build -o SbotFileClient cmd/fileclient/main.go
 go build -o SbotAttackPayloadClient cmd/attackpayloadclient/main.go
 go build -o SbotAttackQueryClient   cmd/query/main.go
+go build -o SbotAttackTargetsClient cmd/attacktargets/main.go
+go build -o SbotAttackScriptsClient cmd/attackscripts/main.go
+
 
 mv sbot ../../../../build/bin
 mv SbotClient ../../../../build/bin
 mv SbotFileClient ../../../../build/bin
 mv SbotAttackPayloadClient ../../../../build/bin
 mv SbotAttackQueryClient ../../../../build/bin
+mv SbotAttackTargetsClient ../../../../build/bin
+mv SbotAttackScriptsClient ../../../../build/bin
 
 cp -rf conf ../../../../build
 cp -rf scripts ../../../../build
@@ -27,7 +32,7 @@ cd ../../../../
 
 cd GBWClientBot/src/github.com/cbot
 
-go build -o cbot_linux cmd/cbot/main.go
+go build -o cbot_linux cmd/cbotlinux/main.go
 go build -o AttackDump cmd/attack/main.go
 go build -o AttackHadoopIPC cmd/hadoop/attack.go
 

@@ -1,12 +1,34 @@
 {
-  "storePath": "/opt/data/store/source/script",
+  "storePath": "/opt/data/store/",
+  "storeRPath": "source/script/",
   "attackTargets": [
     {
-      "id": "",
-      "name": "",
-      "fname":"",
-      "isTemplate":false,
-      "desc": "",
+      "id": "Attack_Target_Subnet_001",
+      "name": "AttackTargetSubnet",
+      "fname":"attack_target_from_subnet.tpl",
+      "isTemplate":true,
+      "desc": "从攻击节点所在的局域网生成攻击目标"
+    },
+    {
+      "id": "Attack_Target_IPRange_002",
+      "name": "AttackTargetIPRange",
+      "fname":"attack_target_from_iprage.tpl",
+      "isTemplate":true,
+      "desc": "通过指定黑白IP范围名单生成攻击目标"
+    },
+    {
+      "id": "Attack_Target_Shodan_003",
+      "name": "AttackTargetShodan",
+      "fname":"attack_target_from_shodan.tpl",
+      "isTemplate":true,
+      "desc": "从Shodan网络空间测绘平台生成攻击目标"
+    },
+    {
+      "id": "Attack_Target_ZoomEye_004",
+      "name": "AttackTargetZoomEye",
+      "fname":"attack_target_from_zoomeye.tpl",
+      "isTemplate":true,
+      "desc": "从ZoomEye网络空间测绘平台生成攻击目标"
     }
   ]
 }

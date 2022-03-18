@@ -28,5 +28,18 @@
   "attackFileServerHost": "0.0.0.0",
 
   "attackFileServerPort": 6666,
-  "javaVersion": "1.8.0_261"
+
+  "javaVersion": "1.8.0_261",
+
+  "attackTargetsConfigPath": "/opt/bot/sbot/conf/AttackTargets.json",
+
+  "attackTargetsQueueCapacity":1000,
+
+  "attackTargetsWaitTimeout": 60000,
+
+  "attackScriptsConfigPath": "/opt/bot/sbot/conf/AttackScripts.json",
+
+  "attackScriptsQueueCapacity": 1000,
+
+  "attackScriptsWaitTimeout": 60000
 }

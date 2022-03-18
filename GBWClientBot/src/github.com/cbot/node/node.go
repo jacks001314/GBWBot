@@ -23,6 +23,7 @@ var DownloadStoreDir="DFile"
 
 
 type Node struct {
+
 	nodeId string
 
 	cfg *Config
@@ -38,6 +39,10 @@ type Node struct {
 	fserverClient  *FServerClient
 
 	attackPayloadClient *AttackPayloadClient
+
+	attackTargetsClient *AttackTargetsClient
+
+	attackScriptsClient *AttackScriptsClient
 
 	spool *source.SourcePool
 
@@ -169,6 +174,10 @@ func (n *Node) Start() error {
 
 	n.attackPayloadClient = NewAttackPayloadClient(n,n.grpcClient)
 
+	n.attackTargetsClient = NewAttackTargetsClient(n,n.grpcClient)
+
+	n.attackScriptsClient = NewAttackScriptsClient(n,n.grpcClient)
+
 	//setup attack tasks
 	n.attackTasks.Start()
 
@@ -178,6 +187,11 @@ func (n *Node) Start() error {
 	n.waitAttackProcess()
 
 	n.Ping()
+
+	n.attackTargetsClient.Start()
+
+	n.attackScriptsClient.Start()
+
 
 	return nil
 }
@@ -223,10 +237,12 @@ func (n *Node) AddAttackSource(name string, types []string, content []byte) erro
 
 func (n *Node) AddAttack(name string, attackType string, defaultProto string, defaultPort int, content []byte) error {
 
+	fmt.Printf("add an attack script:%s,type:%s,dport:%d,dproto:%s\ncontent:%s\n",name,attackType,defaultPort,defaultProto,string(content))
 	att, err := ascript.NewAttackScriptFromContent(n.attackTasks, name, attackType, defaultPort, defaultProto, content)
 
 	if err != nil {
 
+		log.Printf("add attack script err:%v\n",err)
 		return err
 	}
 

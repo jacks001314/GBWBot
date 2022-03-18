@@ -67,6 +67,7 @@ message AttackTaskMessage {
 
   string cbotPath = 11;
 
+  uint64 time = 12;
 }
 
 message AttackTaskReply {
@@ -219,6 +220,8 @@ message AttackedNodeDownloadFileMessage {
   string targetOutIP = 9;
   string downloadTool = 10;
   string userAgent = 11;
+
+  uint64 time = 12;
 
 }
 
