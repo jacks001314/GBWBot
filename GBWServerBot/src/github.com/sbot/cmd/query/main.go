@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"strconv"
+	"strings"
 )
 
 func main(){
@@ -17,7 +19,7 @@ func main(){
 	sbotHost := flag.String("sbotHost","127.0.0.1","set the sbot rpc host")
 	sbotPort := flag.Int("sbotPort",3333,"set the sbot rpc port")
 
-	name := flag.String("name","","set the query name,valid name is :[task,node,process,download]")
+	name := flag.String("name","","set the query name,valid name is :[task,node,process,download,facet,count]")
 
 	startTime := flag.Uint64("startTime",0,"set the start time to query")
 	endTime := flag.Uint64("endTime",0,"set the end time to query")
@@ -29,7 +31,9 @@ func main(){
 	userId := flag.String("userId","","set the userId")
 	pnodeId := flag.String("pnodeId","","set the parent node id")
 	mac := flag.String("mac","","set the node mac ")
+	nodeIP := flag.String("nodeIP","","set the node ip ")
 	attackType := flag.String("attackType","","set the attack type")
+	args := flag.String("args","","specify facet/count args")
 
 	flag.Parse()
 
@@ -57,7 +61,7 @@ func main(){
 		queryAttackTask(client,*startTime,*endTime,*page,*pageSize,*taskId,*taskName,*userId)
 
 	case "node":
-		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType)
+		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType,*nodeIP)
 
 	case "process":
 		queryAttackProcess(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType)
@@ -65,10 +69,95 @@ func main(){
 	case "download":
 		queryAttackedNodeDownloadFiles(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType)
 
+	case "facet":
+		facet(client,*args)
+
+	case "count":
+		count(client,*args)
+
 	default:
 		log.Fatalf("Unknown query object:%s\n",*name)
 
 	}
+}
+
+func facet(client service.SbotServiceClient,args string) {
+
+	var reply *model.FacetReply
+	var err error
+
+	arr := strings.Split(args,":")
+	if len(arr) != 4 {
+
+		log.Fatalf("Please specify valid facet args:[name:term:topN:isDec]\n")
+	}
+
+	topN,_ := strconv.ParseInt(arr[2],10,32)
+	isDec,_:= strconv.ParseBool(arr[3])
+
+	request := &model.FacetRequest{
+		Term:  arr[1],
+		TopN:  int32(topN),
+		IsDec: isDec,
+	}
+
+	switch arr[0] {
+
+	case "task":
+		reply,err = client.FacetAttackTasks(context.Background(),request)
+
+	case "node":
+		reply,err = client.FacetAttackedNodes(context.Background(),request)
+
+	case "process":
+		reply,err = client.FacetAttackProcess(context.Background(),request)
+
+	case "download":
+		reply,err = client.FacetAttackedDownloadFiles(context.Background(),request)
+
+	default:
+		log.Fatalf("unknown facet dbname:%s",arr[0])
+	}
+
+	if err!=nil {
+		log.Fatalf("facet dbname:%s failed:%v",arr[0],err)
+	}
+
+	fmt.Printf("facets:%s",jsonutils.ToJsonString(reply,true))
+
+
+}
+
+func count(client service.SbotServiceClient,name string)  {
+
+	var count *model.Count
+	var err error
+
+
+	switch name {
+
+	case "task":
+		count,err = client.CountAttackTasks(context.Background(),&model.Empty{})
+
+	case "node":
+		count,err = client.CountAttackedNodes(context.Background(),&model.Empty{})
+
+	case "process":
+		count,err = client.CountAttackProcess(context.Background(),&model.Empty{})
+
+	case "download":
+		count,err = client.CountAttackedDownloadFiles(context.Background(),&model.Empty{})
+
+	default:
+		log.Fatalf("unknown count dbname:%s",name)
+	}
+
+	if err!=nil {
+		log.Fatalf("count dbname:%s failed:%v",name,err)
+	}
+
+	fmt.Printf("%s.count:%d\n",name,count.C)
+
 }
 
 func queryAttackedNodeDownloadFiles(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId, attackType string) {
@@ -93,11 +182,11 @@ func queryAttackedNodeDownloadFiles(client service.SbotServiceClient, startTime,
 		log.Fatalf("Query AttackedNodeDownloaFiles Failed:%v\n",err)
 	}
 
-	log.Printf("Query AttackedNodeDownloaFiles Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
+	fmt.Printf("Query AttackedNodeDownloaFiles Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
 
 	for _,entry:= range reply.DownloadFiles {
 
-		log.Printf("%s\n",jsonutils.ToJsonString(entry,true))
+		fmt.Printf("%s\n",jsonutils.ToJsonString(entry,true))
 
 	}
 
@@ -125,21 +214,22 @@ func queryAttackProcess(client service.SbotServiceClient, startTime,endTime,page
 		log.Fatalf("Query AttackedProcess Failed:%v\n",err)
 	}
 
-	log.Printf("Query AttackProcess Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
+	fmt.Printf("Query AttackProcess Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
 
 	for _,entry:= range reply.Aps {
 
-		log.Printf("%s\n",jsonutils.ToJsonString(entry,true))
+		fmt.Printf("%s\n",jsonutils.ToJsonString(entry,true))
 
 	}
 }
 
-func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId,pnodeId,mac,attackType string,) {
+func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId,pnodeId,mac,attackType,nodeIP string) {
 
 	query := &model.AttackedNodeQuery{
 		TaskId:       taskId,
 		ParentNodeId: pnodeId,
 		NodeId:       nodeId,
+		NodeIP: 	  nodeIP,
 		Mac:          mac,
 		AttackType: attackType,
 		Time:   &model.TimeRange{
@@ -158,11 +248,11 @@ func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,
 		log.Fatalf("Query AttackedNode Failed:%v\n",err)
 	}
 
-	log.Printf("Query Attacked Nodes Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
+	fmt.Printf("Query Attacked Nodes Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
 
 	for _,entry:= range reply.Nodes {
 
-		log.Printf("%s\n",jsonutils.ToJsonString(entry,true))
+		fmt.Printf("%s\n",jsonutils.ToJsonString(entry,true))
 
 	}
 }
@@ -190,11 +280,11 @@ func queryAttackTask(client service.SbotServiceClient,startTime,endTime,page,siz
 		log.Fatalf("Query AttackTasks Failed:%v\n",err)
 	}
 
-	log.Printf("Query Attack Tasks Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
+	fmt.Printf("Query Attack Tasks Results:%s\n",jsonutils.ToJsonString(reply.Page,true))
 
 	for _,entry:= range reply.Messages {
 
-		log.Printf("%s\n",jsonutils.ToJsonString(entry,true))
+		fmt.Printf("%s\n",jsonutils.ToJsonString(entry,true))
 
 	}
 }

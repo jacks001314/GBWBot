@@ -14,11 +14,19 @@ option php_namespace = "SBot\\Proto\\Service";
 service SbotService {
 
   rpc QueryAttackTasks(model.AttackTaskQuery) returns (model.AttackTaskReply);
+  rpc FacetAttackTasks(model.FacetRequest) returns (model.FacetReply);
+  rpc CountAttackTasks(model.Empty) returns (model.Count);
 
   rpc QueryAttackedNodes(model.AttackedNodeQuery) returns (model.AttackedNodeReply);
+  rpc FacetAttackedNodes(model.FacetRequest) returns (model.FacetReply);
+  rpc CountAttackedNodes(model.Empty) returns (model.Count);
 
   rpc QueryAttackProcess(model.AttackProcessQuery) returns (model.AttackProcessMessageReply);
+  rpc FacetAttackProcess(model.FacetRequest) returns (model.FacetReply);
+  rpc CountAttackProcess(model.Empty) returns (model.Count);
 
   rpc QueryAttackedDownloadFiles(model.AttackedNodeDownloadFileQuery) returns (model.AttackedNodeDownloadFileReply);
+  rpc FacetAttackedDownloadFiles(model.FacetRequest) returns (model.FacetReply);
+  rpc CountAttackedDownloadFiles(model.Empty) returns (model.Count);
 
 }

@@ -83,10 +83,12 @@ message AttackedNodeQuery {
   string taskId = 1;
   string parentNodeId = 2;
   string nodeId = 3;
-  string mac = 4;
-  string attackType = 5;
-  PageQuery page = 6;
-  TimeRange time = 7;
+  string nodeIP = 4;
+  string mac = 5;
+  string attackType = 6;
+
+  PageQuery page = 7;
+  TimeRange time = 8;
   
 }
 
@@ -129,7 +131,9 @@ message AttackedNodeMessage {
   uint64 lastTime = 13;
 
   string attackType = 14;
-  
+
+  string sbot = 15;
+
 }
 
 message AttackedNodeReply {
@@ -232,7 +236,37 @@ message AttackedNodeDownloadFileReply {
 
 }
 
+message FacetRequest {
 
+  string term = 1;
+
+  int32  topN = 2;
+
+  bool  isDec = 3;
+
+}
+
+message FacetItem {
+
+  string key = 1;
+  uint64  count = 2;
+}
+
+message FacetReply {
+
+  repeated FacetItem items =1 ;
+
+}
+
+message Count {
+
+  uint64  c = 1;
+
+}
+
+message Empty {
+
+}
 
 
 

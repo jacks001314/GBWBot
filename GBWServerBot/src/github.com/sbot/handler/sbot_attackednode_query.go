@@ -32,6 +32,10 @@ func (sqh *SbotQueryHandler) queryStringOfAttackedNode(query *model.AttackedNode
 
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["attackType"]=="%s"`,query.AttackType))
 	}
+	if query.NodeIP != "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["localIP"]=="%s"`,query.NodeIP))
+	}
 
 	if len(queryStringS) == 0 {
 
@@ -70,6 +74,7 @@ func (sqh *SbotQueryHandler) makeAttackedNodeMessage(entry *store.ResultEntry) (
 		HostName:     node.HostName,
 		Time:         node.Time,
 		LastTime:     node.LastTime,
+		Sbot:		  sqh.sbot,
 	},nil
 }
 
@@ -109,6 +114,7 @@ func (sqh *SbotQueryHandler) AttackedNodeQueryHandle(query *model.AttackedNodeQu
 					HostName:     node.HostName,
 					Time:         node.Time,
 					LastTime:     node.LastTime,
+					Sbot: 		  sqh.sbot,
 				},
 			},
 		},nil
@@ -152,4 +158,7 @@ func (sqh *SbotQueryHandler) AttackedNodeQueryHandle(query *model.AttackedNodeQu
 		return attackedNodeReply,nil
 	}
 }
+
+
+
 

@@ -130,7 +130,7 @@ func makeSbotQueryHandle(cfg *Config) (*handler.SbotQueryHandler,error) {
 		return nil, err
 	}
 
-	return handler.NewSbotQueryHandler(attackTaskDB,dbnode,attackProcessDB,downloadDB),nil
+	return handler.NewSbotQueryHandler(cfg.RHost,attackTaskDB,dbnode,attackProcessDB,downloadDB),nil
 }
 
 func NewSbotBacked(cfile string) (*SbotBackend, error) {
