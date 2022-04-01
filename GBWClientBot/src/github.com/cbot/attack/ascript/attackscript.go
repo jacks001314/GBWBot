@@ -3,6 +3,7 @@ package ascript
 import (
 	"fmt"
 	"github.com/cbot/attack"
+	"github.com/cbot/attack/weblogic"
 	"github.com/cbot/proto/http"
 	"github.com/cbot/proto/transport"
 	"github.com/cbot/targets/source"
@@ -177,6 +178,36 @@ func newAttackProcess(args ...objects.Object) (ret objects.Object, err error) {
 
 }
 
+func (as *AttackScript) MakeWeblogicT3Payload(args ...objects.Object) (ret objects.Object, err error) {
+
+	if len(args) != 2 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	cmd, ok := objects.ToString(args[0])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "cmd",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	version, ok := objects.ToString(args[1])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "version",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	pload,_ := weblogic.MakeWeblogicPayload(cmd,version)
+
+	return objects.FromInterface(pload)
+}
+
 func (as *AttackScript) MakeJarAttackPayload(args ...objects.Object) (ret objects.Object, err error) {
 
 	if len(args) != 1 {
@@ -329,6 +360,13 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 			TengoObj: attack.TengoObj{Name: "getNodeId"},
 			as:       as,
 		}, nil
+
+	case "makeWeblogicT3Payload":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "makeWeblogicT3Payload"},
+			as:       as,
+		}, nil
 	}
 
 	return nil, fmt.Errorf("Unknown Attack script method:%s", key)
@@ -366,6 +404,8 @@ func (m *AttackScriptMethod) Call(args ...objects.Object) (objects.Object, error
 	case "getNodeId":
 		return m.as.GetNodeId(args ...)
 
+	case "makeWeblogicT3Payload":
+		return m.as.MakeWeblogicT3Payload(args...)
 
 	}
 

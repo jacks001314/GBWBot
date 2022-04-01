@@ -79,6 +79,17 @@
       "inline": true,
       "language":"go",
       "desc": "SSH无密码登录攻击武器"
+    },
+    {
+      "id":"Attack_WeblogicT3_008",
+      "name": "WeblogicT3Attack",
+      "defaultProto": "t3",
+      "defaultPort": 7001,
+      "attackType":"WeblogicT3Attack",
+      "fname":"weblogic_t3.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Weblogic T3序列化攻击武器"
     }
-]
+  ]
 }

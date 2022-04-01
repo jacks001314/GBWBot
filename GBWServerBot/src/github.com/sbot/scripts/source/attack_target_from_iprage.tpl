@@ -3,7 +3,7 @@ source := import("source")
 ipgen := import("ipgen")
 
 wlists := {{tostring .WhiteLists}}
-blist  := {{tostring .BlackLists}}
+blists  := {{tostring .BlackLists}}
 
 ipg := ipgen.newIPGenFromArray(wlists,blists)
 

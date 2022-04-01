@@ -223,6 +223,7 @@ func (n *Node) AttackType()string {
 
 func (n *Node) AddAttackSource(name string, types []string, content []byte) error {
 
+	//fmt.Printf("%s\n",string(content))
 	s, err := source.NewScriptSourceFromContent(n.spool, name, types, content)
 
 	if err != nil {
@@ -237,7 +238,7 @@ func (n *Node) AddAttackSource(name string, types []string, content []byte) erro
 
 func (n *Node) AddAttack(name string, attackType string, defaultProto string, defaultPort int, content []byte) error {
 
-	fmt.Printf("add an attack script:%s,type:%s,dport:%d,dproto:%s\ncontent:%s\n",name,attackType,defaultPort,defaultProto,string(content))
+	//fmt.Printf("add an attack script:%s,type:%s,dport:%d,dproto:%s\ncontent:%s\n",name,attackType,defaultPort,defaultProto,string(content))
 	att, err := ascript.NewAttackScriptFromContent(n.attackTasks, name, attackType, defaultPort, defaultProto, content)
 
 	if err != nil {
