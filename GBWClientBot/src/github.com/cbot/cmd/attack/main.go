@@ -6,6 +6,7 @@ import (
 	"github.com/cbot/attack/ascript"
 	"github.com/cbot/attack/bruteforce"
 	"github.com/cbot/attack/hadoop"
+	"github.com/cbot/attack/php"
 	"github.com/cbot/targets/local"
 	"github.com/cbot/targets/source"
 	"github.com/cbot/utils/jsonutils"
@@ -43,6 +44,7 @@ func NewAttackMain(users []string,passwds []string,dumpOutFile string) *AttackMa
 		AttackProcessCapacity: 10,
 		SBotHost:              "127.0.0.1",
 		SBotPort:              3333,
+		SBotLdapPort:           3890,
 	}, nodeInfo, spool)
 
 	dictpool := bruteforce.NewDictPool()
@@ -53,6 +55,7 @@ func NewAttackMain(users []string,passwds []string,dumpOutFile string) *AttackMa
 	attackTasks.AddAttack(bruteforce.NewRedisBruteforceAttack(dictpool, attackTasks))
 	attackTasks.AddAttack(hadoop.NewHadoopIPCAttack(attackTasks))
 	attackTasks.AddAttack(attack.NewAttackDump(attackTasks,dumpOutFile))
+	attackTasks.AddAttack(php.NewPHPAttackCVE2019_11043(attackTasks))
 
 	return &AttackMain{
 		spool:       spool,

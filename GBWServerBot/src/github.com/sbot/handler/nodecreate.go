@@ -15,6 +15,7 @@ func (nh *NodeHandler) HandleCreateNode(request *model.CreateNodeRequest) (strin
 
 	request.Time = now
 	request.LastTime = now
+	request.UserId = GetUserId(nh.taskDB,request.TaskId)
 
 	if err := nh.dbnode.Put(nodeId, now, request); err != nil {
 

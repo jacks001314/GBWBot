@@ -37,18 +37,29 @@
       "desc": "Flink任意Jar文件上传执行攻击武器"
     },
     {
-      "id":"Attack_Solr_Velocity_004",
-      "name": "ApacheSolrInjectAttack",
+      "id":"Attack_ApacheSolr_CVE_2019_17558_004",
+      "name": "ApacheSolrAttackCVE_2019_17558",
       "defaultProto": "http",
       "defaultPort": 8983,
-      "attackType":"ApacheSolrInjectAttack",
-      "fname":"solr.tengo",
+      "attackType":"ApacheSolrAttackCVE_2019_17558",
+      "fname":"solr_rce_cve_2019_17558.tengo",
       "inline": false,
       "language":"tengo",
-      "desc": "Solr Velocity模板远程注入攻击武器"
+      "desc": "Apache Solr Velocity模板远程注入攻击武器"
     },
     {
-      "id":"Attack_Bruteforce_SSH_005",
+      "id":"Attack_ApacheSolr_CVE_2019_0193_005",
+      "name": "ApacheSolrAttackCVE_2019_0193",
+      "defaultProto": "http",
+      "defaultPort": 8983,
+      "attackType":"ApacheSolrAttackCVE_2019_0193",
+      "fname":"solr_rce_cve_2019_0193.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Apache Solr Dataimport远程配置导入注入攻击武器"
+    },
+    {
+      "id":"Attack_Bruteforce_SSH_006",
       "name": "SSHBruteForceAttack",
       "defaultProto": "ssh",
       "defaultPort": 22,
@@ -59,7 +70,7 @@
       "desc": "SSH弱口令暴力破解攻击武器"
     },
     {
-      "id":"Attack_Bruteforce_Redis_006",
+      "id":"Attack_Bruteforce_Redis_007",
       "name": "RedisBruteForceAttack",
       "defaultProto": "redis",
       "defaultPort": 6379,
@@ -70,7 +81,7 @@
       "desc": "Redis弱口令暴力破解攻击武器"
     },
     {
-      "id":"Attack_NOPasswdLogin_SSH_007",
+      "id":"Attack_NOPasswdLogin_SSH_008",
       "name": "SSHNoPasswdLoginAttack",
       "defaultProto": "ssh",
       "defaultPort": 22,
@@ -81,15 +92,81 @@
       "desc": "SSH无密码登录攻击武器"
     },
     {
-      "id":"Attack_WeblogicT3_008",
-      "name": "WeblogicT3Attack",
+      "id":"Attack_WeblogicT3_CVE_2020_2555_009",
+      "name": "WeblogicT3AttackCVE2020_2555",
       "defaultProto": "t3",
       "defaultPort": 7001,
-      "attackType":"WeblogicT3Attack",
-      "fname":"weblogic_t3.tengo",
+      "attackType":"WeblogicT3AttackCVE2020_2555",
+      "fname":"weblogic_t3_rce_cve_2020_2555.tengo",
       "inline": false,
       "language":"tengo",
-      "desc": "Weblogic T3序列化攻击武器"
+      "desc": "Weblogic T3序列化攻击武器--CVE-2020-2555"
+    },
+    {
+      "id":"Attack_WeblogicT3_CVE_2020_2883_010",
+      "name": "WeblogicT3AttackCVE2020_2883",
+      "defaultProto": "t3",
+      "defaultPort": 7001,
+      "attackType":"WeblogicT3AttackCVE2020_2883",
+      "fname":"weblogic_t3_rce_cve_2020_2883.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Weblogic T3序列化攻击武器--CVE-2020-2883"
+    },
+    {
+      "id":"Attack_PHP_RCE_CVE_2019_11043_Attack_011",
+      "name": "PHP_RCE_CVE_2019_11043_Attack",
+      "defaultProto": "http",
+      "defaultPort": 8080,
+      "attackType":"PHP_RCE_CVE_2019_11043_Attack",
+      "fname":"",
+      "inline": true,
+      "language":"go",
+      "desc": "PHP_RCE_CVE_2019_11043 远程代码执行攻击武器"
+    },
+    {
+      "id":"Attack_JenkinsAttackCVE_2019_1003000_012",
+      "name": "JenkinsAttackCVE_2019_1003000",
+      "defaultProto": "http",
+      "defaultPort": 8080,
+      "attackType":"JenkinsAttackCVE_2019_1003000",
+      "fname":"jenkins_rce_cve_2019_1003000.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Jenkins 登录验证远程代码执行攻击武器"
+    },
+    {
+      "id":"Attack_SpringBoot_RCE_Hikaricp_013",
+      "name": "SpringBoot_RCE_Hikaricp",
+      "defaultProto": "http",
+      "defaultPort": 8080,
+      "attackType":"SpringBoot_RCE_Hikaricp",
+      "fname":"spring_boot_rce_hikaricp.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Spring boot hikaricp 参数注入远程代码执行攻击武器"
+    },
+    {
+      "id":"Attack_SpringCloud_RCE_CVE_2022_22963_014",
+      "name": "SpringCloudAttackCVE2022_22963",
+      "defaultProto": "http",
+      "defaultPort": 8080,
+      "attackType":"SpringCloudAttackCVE2022_22963",
+      "fname":"spring_cloud_rce_cve_2022_22963.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "Spring Cloud Function SPEL表达式注入远程代码执行攻击武器"
+    },
+    {
+      "id":"Attack_SpringCloud_Gateway_RCE_CVE_2022_22947_015",
+      "name": "SpringCloudGatewayAttackCVE2022_22947",
+      "defaultProto": "http",
+      "defaultPort": 8080,
+      "attackType":"SpringCloudGatewayAttackCVE2022_22947",
+      "fname":"spring_cloud_gateway_rce_cve_2022_22947.tengo",
+      "inline": false,
+      "language":"tengo",
+      "desc": "spring Cloud Gateway 参数注入漏洞远程代码执行攻击武器"
     }
   ]
 }

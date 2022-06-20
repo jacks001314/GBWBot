@@ -469,3 +469,52 @@ func (s *RedisStore) Facet(query string ,term string,num uint64,isDec bool) ([]*
 
 	return results,err
 }
+
+func getCountScript(query string) string  {
+
+	fscritp := `
+
+local valueKey = KEYS[1]
+local cur = 0
+local values = {}
+local count = 0
+
+repeat
+
+    values = redis.call("hscan",valueKey,cur)
+    cur = tonumber(values[1])
+    local kvals = values[2]
+
+    for i=1,#kvals,2 do
+
+        local JsonValue = cjson.decode(kvals[i+1])
+        if %s then
+            count = count+1
+        end
+    end
+
+until cur == 0
+return count
+`
+	return fmt.Sprintf(fscritp,query)
+
+}
+
+func (s *RedisStore) CountWithQuery(query string) uint64 {
+
+	src := getCountScript(query)
+
+	script := redis.NewScript(src)
+
+	keys := []string{s.storeValueKey}
+
+	r,err := script.Run(s.ctx,s.redisClient,keys).Result()
+
+	if err!=nil {
+
+		return 0
+	}
+
+	return uint64(r.(int64))
+
+}

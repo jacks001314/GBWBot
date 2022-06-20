@@ -9,10 +9,13 @@ import (
 )
 
 type AttackFileServerHandle struct {
+	taskDb store.Store
 	db store.Store
 }
 
 type AttackFileDownloadRequest struct {
+	
+	UserId string `json:"userId"`
 	TaskId string `json:"taskId"`
 	NodeId string `json:"nodeId"`
 	AttackType string `json:"attackType"`
@@ -31,9 +34,9 @@ type AttackFileDownloadRequest struct {
 	Time uint64 `json:"time"`
 }
 
-func NewAttackFileServerHandle(db store.Store) *AttackFileServerHandle {
+func NewAttackFileServerHandle(db store.Store,taskDB store.Store) *AttackFileServerHandle {
 
-	return &AttackFileServerHandle{db: db}
+	return &AttackFileServerHandle{db: db,taskDb:taskDB}
 }
 
 func (afsh *AttackFileServerHandle) Handle(request *AttackFileDownloadRequest) error {
@@ -43,6 +46,7 @@ func (afsh *AttackFileServerHandle) Handle(request *AttackFileDownloadRequest) e
 	now := uint64(time.Now().UnixNano() / (1000 * 1000))
 
 	request.Time = uint64(now)
+	request.UserId = GetUserId(afsh.taskDb,request.TaskId)
 
 	jdata, _ := json.Marshal(request)
 

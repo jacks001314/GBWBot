@@ -5,6 +5,7 @@ attackFileStoreDir=/opt/data/store/attack/tasks
 cbotAttackSourceScriptStoreDir=/opt/data/store/source/script
 cbotAttackScriptStoreDir=/opt/data/store/attack/script
 confStoreDir=/opt/data/store/conf/
+payloadsStoreDir=/opt/data/store/payloads
 
 mkdir -p $installDir
 mkdir -p $cbotStoreDir
@@ -12,6 +13,7 @@ mkdir -p $attackFileStoreDir
 mkdir -p $cbotAttackScriptStoreDir
 mkdir -p $cbotAttackSourceScriptStoreDir
 mkdir -p $confStoreDir
+mkdir -p $payloadsStoreDir
 
 cp -fr bin $installDir
 cp -fr conf $installDir

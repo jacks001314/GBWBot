@@ -61,19 +61,19 @@ func main(){
 		queryAttackTask(client,*startTime,*endTime,*page,*pageSize,*taskId,*taskName,*userId)
 
 	case "node":
-		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType,*nodeIP)
+		queryAttackedNode(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*pnodeId,*mac,*attackType,*nodeIP,*userId)
 
 	case "process":
-		queryAttackProcess(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType)
+		queryAttackProcess(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType,*userId)
 
 	case "download":
-		queryAttackedNodeDownloadFiles(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType)
+		queryAttackedNodeDownloadFiles(client,*startTime,*endTime,*page,*pageSize,*taskId,*nodeId,*attackType,*userId)
 
 	case "facet":
-		facet(client,*args)
+		facet(client,*args,*userId)
 
 	case "count":
-		count(client,*args)
+		count(client,*args,*userId)
 
 	default:
 		log.Fatalf("Unknown query object:%s\n",*name)
@@ -81,7 +81,7 @@ func main(){
 	}
 }
 
-func facet(client service.SbotServiceClient,args string) {
+func facet(client service.SbotServiceClient,args string,userId string) {
 
 	var reply *model.FacetReply
 	var err error
@@ -96,6 +96,7 @@ func facet(client service.SbotServiceClient,args string) {
 	isDec,_:= strconv.ParseBool(arr[3])
 
 	request := &model.FacetRequest{
+		UserId: userId,
 		Term:  arr[1],
 		TopN:  int32(topN),
 		IsDec: isDec,
@@ -128,25 +129,25 @@ func facet(client service.SbotServiceClient,args string) {
 
 }
 
-func count(client service.SbotServiceClient,name string)  {
+func count(client service.SbotServiceClient,name string,userId string)  {
 
 	var count *model.Count
 	var err error
-
+	request := &model.CountRequest{UserId:userId}
 
 	switch name {
 
 	case "task":
-		count,err = client.CountAttackTasks(context.Background(),&model.Empty{})
+		count,err = client.CountAttackTasks(context.Background(),request)
 
 	case "node":
-		count,err = client.CountAttackedNodes(context.Background(),&model.Empty{})
+		count,err = client.CountAttackedNodes(context.Background(),request)
 
 	case "process":
-		count,err = client.CountAttackProcess(context.Background(),&model.Empty{})
+		count,err = client.CountAttackProcess(context.Background(),request)
 
 	case "download":
-		count,err = client.CountAttackedDownloadFiles(context.Background(),&model.Empty{})
+		count,err = client.CountAttackedDownloadFiles(context.Background(),request)
 
 	default:
 		log.Fatalf("unknown count dbname:%s",name)
@@ -160,9 +161,10 @@ func count(client service.SbotServiceClient,name string)  {
 
 }
 
-func queryAttackedNodeDownloadFiles(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId, attackType string) {
+func queryAttackedNodeDownloadFiles(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId, attackType string,userId string ) {
 
 	query := &model.AttackedNodeDownloadFileQuery{
+		UserId: userId,
 		TaskId:     taskId,
 		NodeId:     nodeId,
 		AttackType: attackType,
@@ -192,9 +194,10 @@ func queryAttackedNodeDownloadFiles(client service.SbotServiceClient, startTime,
 
 }
 
-func queryAttackProcess(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId, attackType string) {
+func queryAttackProcess(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId, attackType string,userId string ) {
 
 	query := &model.AttackProcessQuery{
+		UserId: userId,
 		TaskId:     taskId,
 		NodeId:     nodeId,
 		AttackType: attackType,
@@ -223,9 +226,10 @@ func queryAttackProcess(client service.SbotServiceClient, startTime,endTime,page
 	}
 }
 
-func queryAttackedNode(client service.SbotServiceClient, startTime,endTime,page,size uint64, taskId,nodeId,pnodeId,mac,attackType,nodeIP string) {
+func queryAttackedNode(client service.SbotServiceClient, startTime, endTime, page, size uint64, taskId, nodeId, pnodeId, mac, attackType, nodeIP,userId string) {
 
 	query := &model.AttackedNodeQuery{
+		UserId: userId,
 		TaskId:       taskId,
 		ParentNodeId: pnodeId,
 		NodeId:       nodeId,

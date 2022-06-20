@@ -8,6 +8,7 @@ import (
 )
 
 type NetInterface struct {
+
 	name string
 	ip   net.IP
 	mask net.IPMask

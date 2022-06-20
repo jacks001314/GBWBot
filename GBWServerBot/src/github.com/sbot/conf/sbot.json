@@ -41,5 +41,15 @@
 
   "attackScriptsQueueCapacity": 1000,
 
-  "attackScriptsWaitTimeout": 60000
+  "attackScriptsWaitTimeout": 60000,
+
+  "jndiLdapAddress": "0.0.0.0:3890",
+
+  "jndiLdapPayloadDir": "/opt/data/store/payloads",
+
+  "jndiLdapCodebase": "http://192.168.1.151:3891/",
+
+  "httpFileServerAddr": "0.0.0.0:3891",
+
+  "httpFileServerDir": "/opt/data/store/payloads"
 }

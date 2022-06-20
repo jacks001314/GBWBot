@@ -58,6 +58,78 @@ func urlDecode(args ... objects.Object) (objects.Object,error) {
 	return objects.FromInterface(durl)
 }
 
+func detectApplication(args ... objects.Object) (objects.Object,error) {
+
+	if len(args)!=6 {
+
+		return nil,tengo.ErrWrongNumArguments
+	}
+
+	host, ok := objects.ToString(args[0])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "host",
+			Expected: "string(compatible)",
+			Found:    args[0].TypeName(),
+		}
+	}
+
+	port,ok := objects.ToInt(args[1])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "port",
+			Expected: "int(compatible)",
+			Found:    args[1].TypeName(),
+		}
+	}
+
+
+	url, ok := objects.ToString(args[2])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "url",
+			Expected: "string(compatible)",
+			Found:    args[2].TypeName(),
+		}
+	}
+
+	key, ok := objects.ToString(args[3])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "key",
+			Expected: "string(compatible)",
+			Found:    args[3].TypeName(),
+		}
+	}
+
+	status,ok := objects.ToInt(args[4])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "status",
+			Expected: "int(compatible)",
+			Found:    args[4].TypeName(),
+		}
+	}
+
+	timeout,ok := objects.ToInt64(args[5])
+	if !ok {
+
+		return nil,tengo.ErrInvalidArgumentType{
+			Name:     "timeout",
+			Expected: "int64(compatible)",
+			Found:    args[5].TypeName(),
+		}
+	}
+
+
+	return DetectHttpApp(host,port,url,key,status,timeout),nil
+}
+
 var moduleMap objects.Object = &objects.ImmutableMap{
 	Value: map[string]objects.Object{
 		"newHttpClient": &objects.UserFunction{
@@ -78,7 +150,10 @@ var moduleMap objects.Object = &objects.ImmutableMap{
 			Name:  "urlDecode",
 			Value: urlDecode,
 		},
-
+		"detectApp": &objects.UserFunction{
+			Name:  "detectApp",
+			Value: detectApplication,
+		},
 	},
 }
 

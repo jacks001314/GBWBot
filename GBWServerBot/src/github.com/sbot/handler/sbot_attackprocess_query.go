@@ -12,6 +12,11 @@ func (sqh *SbotQueryHandler) queryStringOfAttackProcess(query *model.AttackProce
 
 	queryStringS := make([]string,0)
 
+	if query.UserId!= "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["userId"]=="%s"`,query.UserId))
+	}
+
 	if query.TaskId!= "" {
 
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["taskId"]=="%s"`,query.TaskId))
@@ -51,6 +56,7 @@ func (sqh *SbotQueryHandler) makeAttackProcessMessage(entry *store.ResultEntry) 
 	}
 
 	return &model.AttackProcessMessage{
+		UserId:     attackProcess.UserId,
 		TaskId:     attackProcess.TaskId,
 		NodeId:     attackProcess.NodeId,
 		Time:       attackProcess.Time,

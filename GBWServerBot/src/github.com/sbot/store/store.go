@@ -22,6 +22,8 @@ type Store interface {
 
 	Count() uint64
 
+	CountWithQuery(query string) uint64
+
 	Facet(query string ,term string,num uint64,isDec bool) ([]*TermFacet,error)
 }
 

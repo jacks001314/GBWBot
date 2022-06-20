@@ -68,4 +68,20 @@ type Config struct {
 
 	//the attack scripts wait time out
 	AttackScriptsWaitTimeout uint64 `json:"attackScriptsWaitTimeout"`
+
+	//the jndi ldap address
+	JNDILdapAddress string `json:"jndiLdapAddress"`
+
+	//the jndi ldap java class store dir
+	JNDILdapPayloadDir string `json:"jndiLdapPayloadDir"`
+
+	//the jndi ldap codebase
+	JNDILdapCodeBase string `json:"jndiLdapCodebase"`
+
+	//the http file server address
+	HttpFileServerAddr string `json:"httpFileServerAddr"`
+
+	//the http file server dir
+	HttpFileServerDir  string `json:"httpFileServerDir"`
+
 }

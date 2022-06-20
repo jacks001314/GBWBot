@@ -14,4 +14,7 @@ type Config struct {
 	SBotHost string `json:"sbotHost"`
 
 	SBotPort int `json:"sbotPort"`
+
+	SBotLdapPort int `json:"sbotLdapPort"`
+
 }

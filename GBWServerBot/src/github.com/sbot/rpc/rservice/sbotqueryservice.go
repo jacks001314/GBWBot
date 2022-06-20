@@ -34,8 +34,8 @@ func (sqs *SbotQueryService) FacetAttackTasks(_ context.Context, request *model.
 	return sqs.handle.FacetHandle(sqs.handle.GetAttackTasksDB(),request)
 }
 
-func (sqs *SbotQueryService) CountAttackTasks(context.Context, *model.Empty) (*model.Count, error) {
-	return sqs.handle.CountHandle(sqs.handle.GetAttackTasksDB(),nil)
+func (sqs *SbotQueryService) CountAttackTasks(_ context.Context, request *model.CountRequest) (*model.Count, error) {
+	return sqs.handle.CountHandle(sqs.handle.GetAttackTasksDB(),request)
 }
 
 func (sqs *SbotQueryService) QueryAttackedNodes(_ context.Context, query *model.AttackedNodeQuery) (*model.AttackedNodeReply, error) {
@@ -48,8 +48,8 @@ func (sqs *SbotQueryService) FacetAttackedNodes(_ context.Context, request *mode
 	return sqs.handle.FacetHandle(sqs.handle.GetAttackedNodesDB(),request)
 }
 
-func (sqs *SbotQueryService) CountAttackedNodes(context.Context, *model.Empty) (*model.Count, error) {
-	return sqs.handle.CountHandle(sqs.handle.GetAttackedNodesDB(),nil)
+func (sqs *SbotQueryService) CountAttackedNodes(_ context.Context, request *model.CountRequest) (*model.Count, error) {
+	return sqs.handle.CountHandle(sqs.handle.GetAttackedNodesDB(),request)
 }
 
 func (sqs *SbotQueryService) QueryAttackProcess(_ context.Context, query *model.AttackProcessQuery) (*model.AttackProcessMessageReply, error) {
@@ -61,8 +61,8 @@ func (sqs *SbotQueryService) FacetAttackProcess(_ context.Context, request *mode
 	return sqs.handle.FacetHandle(sqs.handle.GetAttackProcessDB(),request)
 }
 
-func (sqs *SbotQueryService) CountAttackProcess(context.Context, *model.Empty) (*model.Count, error) {
-	return sqs.handle.CountHandle(sqs.handle.GetAttackProcessDB(), nil)
+func (sqs *SbotQueryService) CountAttackProcess(_ context.Context, request *model.CountRequest) (*model.Count, error) {
+	return sqs.handle.CountHandle(sqs.handle.GetAttackProcessDB(), request)
 }
 
 func (sqs *SbotQueryService) QueryAttackedDownloadFiles(_ context.Context, query *model.AttackedNodeDownloadFileQuery) (*model.AttackedNodeDownloadFileReply, error) {
@@ -75,7 +75,7 @@ func (sqs *SbotQueryService) FacetAttackedDownloadFiles(_ context.Context, reque
 	return sqs.handle.FacetHandle(sqs.handle.GetAttackedDownloadFileDB(),request)
 }
 
-func (sqs *SbotQueryService) CountAttackedDownloadFiles(context.Context, *model.Empty) (*model.Count, error) {
-	return sqs.handle.CountHandle(sqs.handle.GetAttackedDownloadFileDB(),nil)
+func (sqs *SbotQueryService) CountAttackedDownloadFiles(_ context.Context, request *model.CountRequest) (*model.Count, error) {
+	return sqs.handle.CountHandle(sqs.handle.GetAttackedDownloadFileDB(),request)
 
 }

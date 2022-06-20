@@ -191,8 +191,8 @@ func (r *HttpRequest) Build(proto string,host string,port int) (req *http.Reques
 	}
 
 	for k,v := range r.headers {
-
-		req.Header.Set(k,v)
+		req.Header[k] = []string{v}
+		//req.Header.Set(k,v)
 	}
 
 	return

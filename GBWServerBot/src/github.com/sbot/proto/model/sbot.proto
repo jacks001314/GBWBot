@@ -80,59 +80,62 @@ message AttackTaskReply {
 //attacked nodes query and reply
 message AttackedNodeQuery {
 
-  string taskId = 1;
-  string parentNodeId = 2;
-  string nodeId = 3;
-  string nodeIP = 4;
-  string mac = 5;
-  string attackType = 6;
+  string userId = 1;
+  string taskId = 2;
+  string parentNodeId = 3;
+  string nodeId = 4;
+  string nodeIP = 5;
+  string mac = 6;
+  string attackType = 7;
 
-  PageQuery page = 7;
-  TimeRange time = 8;
+  PageQuery page = 8;
+  TimeRange time = 9;
   
 }
 
 message AttackedNodeMessage {
 
-  string taskId = 1;
+  string userId = 1;
 
-  string parentNodeID = 2;
+  string taskId = 2;
 
-  string nodeId = 3;
+  string parentNodeID = 3;
+
+  string nodeId = 4;
 
   //the cbot version
-  string version = 4;
+  string version = 5;
 
   //the local ip address that been attacked node
-  string localIP = 5;
+  string localIP = 6;
 
   // the out ip address that been attacked node
-  string outIP = 6;
+  string outIP = 7;
 
   // the mac address that been attacked node
-  string mac = 7;
+  string mac = 8;
 
   //the os that been attacked node
-  string os = 8;
+  string os = 9;
 
   //the system arch
-  string arch = 9;
+  string arch = 10;
 
   //the current user
-  string user = 10;
+  string user = 11;
 
   //the host name that been attacked node
-  string hostName = 11;
+  string hostName = 12;
 
   //the create node time
-  uint64 time = 12;
+  uint64 time = 13;
 
   //the last ping node time
-  uint64 lastTime = 13;
+  uint64 lastTime = 14;
 
-  string attackType = 14;
+  string attackType = 15;
 
-  string sbot = 15;
+  string sbot = 16;
 
 }
 
@@ -147,45 +150,48 @@ message AttackedNodeReply {
 //attack process query and reply
 message AttackProcessQuery {
 
-  string taskId = 1;
-  string nodeId = 2;
-  string attackType = 3;
+  string userId = 1;
+  string taskId = 2;
+  string nodeId = 3;
+  string attackType = 4;
 
-  PageQuery page = 4;
-  TimeRange time = 5;
+  PageQuery page = 5;
+  TimeRange time = 6;
 }
 
 message AttackProcessMessage {
 
-  string taskId = 1;
+  string userId = 1;
 
-  string nodeId = 2;
+  string taskId = 2;
 
-  uint64 time = 3;
+  string nodeId = 3;
 
-  string targetIP = 4;
+  uint64 time = 4;
 
-  string targetHost = 5;
+  string targetIP = 5;
 
-  int32  targetPort = 6;
+  string targetHost = 6;
 
-  string proto = 7;
+  int32  targetPort = 7;
 
-  string app = 8;
+  string proto = 8;
 
-  string os = 9;
+  string app = 9;
 
-  string attackName = 10;
+  string os = 10;
 
-  string attackType = 11;
+  string attackName = 11;
 
-  int32 status = 12;
+  string attackType = 12;
 
-  string payload = 13;
+  int32 status = 13;
 
-  string result = 14;
+  string payload = 14;
 
-  string details = 15;
+  string result = 15;
+
+  string details = 16;
 
 }
 
@@ -200,32 +206,34 @@ message AttackProcessMessageReply {
 //download files query and reply
 message AttackedNodeDownloadFileQuery {
 
-  string taskId = 1;
-  string nodeId = 2;
-  string attackType = 3;
+  string userId = 1;
+  string taskId = 2;
+  string nodeId = 3;
+  string attackType = 4;
 
-  PageQuery page = 4;
+  PageQuery page = 5;
 
-  TimeRange time = 5;
+  TimeRange time = 6;
 }
 
 
 message AttackedNodeDownloadFileMessage {
 
-  string taskId = 1;
-  string nodeId = 2;
-  string url = 3;
-  string fname = 4;
+  string userId = 1;
+  string taskId = 2;
+  string nodeId = 3;
+  string url = 4;
+  string fname = 5;
 
-  string attackType = 5;
-  string attackIP = 6;
-  string targetIP = 7;
-  int32  targetPort = 8;
-  string targetOutIP = 9;
-  string downloadTool = 10;
-  string userAgent = 11;
+  string attackType = 6;
+  string attackIP = 7;
+  string targetIP = 8;
+  int32  targetPort = 9;
+  string targetOutIP = 10;
+  string downloadTool = 11;
+  string userAgent = 12;
 
-  uint64 time = 12;
+  uint64 time = 13;
 
 }
 
@@ -238,11 +246,13 @@ message AttackedNodeDownloadFileReply {
 
 message FacetRequest {
 
-  string term = 1;
+  string userId = 1;
 
-  int32  topN = 2;
+  string term = 2;
 
-  bool  isDec = 3;
+  int32  topN = 3;
+
+  bool  isDec = 4;
 
 }
 
@@ -261,6 +271,12 @@ message FacetReply {
 message Count {
 
   uint64  c = 1;
+
+}
+
+message CountRequest {
+
+  string userId = 1;
 
 }
 

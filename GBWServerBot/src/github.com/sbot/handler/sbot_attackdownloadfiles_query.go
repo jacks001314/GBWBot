@@ -12,6 +12,11 @@ func (sqh *SbotQueryHandler) queryStringOfAttackDownloadFiles(query *model.Attac
 
 	queryStringS := make([]string,0)
 
+	if query.UserId!= "" {
+
+		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["userId"]=="%s"`,query.UserId))
+	}
+
 	if query.TaskId!= "" {
 
 		queryStringS = append(queryStringS,fmt.Sprintf(`JsonValue["taskId"]=="%s"`,query.TaskId))
@@ -51,6 +56,7 @@ func (sqh *SbotQueryHandler) makeAttackedNodeDownloadFileMessage(entry *store.Re
 	}
 
 	return &model.AttackedNodeDownloadFileMessage{
+		UserId: 	  request.UserId,
 		TaskId:       request.TaskId,
 		NodeId:       request.NodeId,
 		Url:          request.Url,

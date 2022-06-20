@@ -66,9 +66,17 @@ func (sbh *SbotQueryHandler)getTimeRange(s,e uint64) (start, end uint64){
 	return s,e
 }
 
+
 func (sqh *SbotQueryHandler) FacetHandle(db store.Store ,request *model.FacetRequest) (*model.FacetReply,error) {
 
-	q := "1==1"
+	var q string
+
+	if request.UserId != "" {
+
+		q = fmt.Sprintf(`JsonValue["userId"]=="%s"`,request.UserId)
+	}else {
+		q = "1==1"
+	}
 
 	results := &model.FacetReply{Items:make([]*model.FacetItem,0)}
 
@@ -91,9 +99,18 @@ func (sqh *SbotQueryHandler) FacetHandle(db store.Store ,request *model.FacetReq
 	return results,nil
 }
 
-func (sqh *SbotQueryHandler) CountHandle(db store.Store,request *model.Empty) (*model.Count,error) {
+func (sqh *SbotQueryHandler) CountHandle(db store.Store,request *model.CountRequest) (*model.Count,error) {
 
-	return &model.Count{C:db.Count()},nil
+	if request.UserId != "" {
+
+		q := fmt.Sprintf(`JsonValue["userId"]=="%s"`,request.UserId)
+
+		return &model.Count{C:db.CountWithQuery(q)},nil
+	}else {
+
+		return &model.Count{C:db.Count()},nil
+	}
+
 }
 
 

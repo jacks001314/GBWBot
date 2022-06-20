@@ -16,6 +16,8 @@ func (nh *NodeHandler) HandleAttackProcess(request *model.AttackProcessRequest) 
 
 	jdata, _ := json.Marshal(request)
 
+	request.UserId = GetUserId(nh.taskDB,request.TaskId)
+
 	if err := nh.attackProcessDB.Put(key, now, request); err != nil {
 
 		errS := fmt.Sprintf("Cannot write attack process into database,failed:%v", err)
